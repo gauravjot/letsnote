@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* h1 h2 etc */
+
+  a {
+    @apply text-sky-700 hover:text-sky-900;
+  }
+}
+
+@layer components {
+}
+
+@layer utilities {
+  .user-select-none {
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
+  }
+}
+
+body {
+  font-family: "Roboto", Helvetica, Arial, "Segoe UI", sans-serif;
+}
+
+.container {
+  margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+  .container {
+    max-width: 100%;
+  }
+}
+
+.ab-btn {
+  @apply bg-sky-600 text-white shadow rounded py-1.5 px-4 hover:bg-sky-500 hover:text-white hover:shadow-md;
+}
+
+.ab-btn-sm {
+  @apply px-2.5 py-1.5 text-sm;
+}
+
+.ab-btn-big {
+  @apply py-3 font-bold text-base rounded-md;
+}
+
+.ab-btn:disabled {
+  @apply opacity-50;
+}
+
+.ab-btn:disabled:hover {
+  @apply bg-sky-600;
+}
+
+.ab-btn-outline {
+  @apply border-2 border-slate-200 text-slate-600 font-medium border-solid px-4 py-1.5 rounded-full hover:bg-slate-100 hover:border-slate-300;
+}
+
+.ab-form-input {
+  @apply appearance-none border-2 border-gray-200 rounded-md px-3 py-2 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-sky-600 focus:shadow-lg focus:border-gray-100;
+}
+
+.ab-checkbox {
+  @apply accent-sky-500 text-white;
+}
+
+/*
+   * Icons
+  */
+
+.ic {
+  height: 1rem;
+  width: 1rem;
+  filter: invert(1);
+  display: inline-block;
+  vertical-align: text-bottom;
+}
+
+.ic-md {
+  height: 1.25rem;
+  width: 1.25rem;
+}
+
+.ic-logout {
+  background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTkgNDIuM3EtMS40IDAtMi40MjUtMS4wMjVUNS41NSAzOC45VjkuMXEwLTEuNCAxLjAyNS0yLjRUOSA1LjdoMTQuNnYzLjRIOXYyOS44aDE0LjZ2My40Wm0yNC4zLTkuMS0yLjQ1LTIuNDUgNS4wNS01LjA1SDE4LjZ2LTMuNGgxNy4ybC01LjA1LTUuMDUgMi40NS0yLjQ1IDkuMjUgOS4yNVoiLz48L3N2Zz4=);
+  background-size: contain;
+}
+
+.ic-login {
+  background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTI0LjQgNDIuM3YtMy40SDM5VjkuMUgyNC40VjUuN0gzOXExLjQgMCAyLjQyNSAxdDEuMDI1IDIuNHYyOS44cTAgMS4zNS0xLjAyNSAyLjM3NVQzOSA0Mi4zWm0tNC4xLTkuMS0yLjQ1LTIuNDUgNS4wNS01LjA1SDUuNTV2LTMuNEgyMi44bC01LjA1LTUuMDUgMi40NS0yLjQ1IDkuMiA5LjI1WiIvPjwvc3ZnPg==);
+  background-size: contain;
+}

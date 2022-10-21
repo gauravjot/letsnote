@@ -1,4 +1,12 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+.env
+.venv/
+
+# django
+__pycache__/
+migrations/
+/apis/media
+/storage/*
 
 # dependencies
 /node_modules
