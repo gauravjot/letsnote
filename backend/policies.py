@@ -1,0 +1,1 @@
+MAX_SIGNIN_PERIOD=90*24*60 # in minutes, 90 days
