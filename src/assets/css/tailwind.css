@@ -8,6 +8,36 @@
   a {
     @apply text-sky-700 hover:text-sky-900;
   }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: revert;
+    font-weight: revert;
+  }
+
+  h1 {
+    @apply mt-5 mb-3;
+  }
+
+  h2 {
+    @apply mt-5 mb-2;
+  }
+
+  h3 {
+    @apply mt-5 mb-2;
+  }
+
+  h4 {
+    @apply mt-5 mb-2;
+  }
+
+  p {
+    @apply my-2.5;
+  }
 }
 
 @layer components {
@@ -24,6 +54,7 @@
 
 body {
   font-family: "Roboto", Helvetica, Arial, "Segoe UI", sans-serif;
+  @apply bg-slate-200;
 }
 
 .container {
@@ -66,6 +97,35 @@ body {
 
 .ab-checkbox {
   @apply accent-sky-500 text-white;
+}
+
+.codex-editor__redactor {
+  @apply p-0 h-full min-h-screen;
+}
+
+.ce-block__content,
+.ce-toolbar__content {
+  @apply bg-white max-w-4xl;
+}
+
+.ce-block__content {
+  @apply px-12;
+}
+/* 
+.ce-block:last-child .ce-block__content {
+  @apply pb-12;
+}
+
+.ce-block:first-child .ce-block__content {
+  @apply pt-10;
+} */
+
+.ce-toolbar__actions {
+  opacity: 1 !important;
+}
+
+#editorjs {
+  @apply mt-5;
 }
 
 /*
