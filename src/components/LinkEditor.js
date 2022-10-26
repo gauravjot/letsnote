@@ -19,13 +19,26 @@ export default function LinkEditor({ editorOffsets, selectionForLink }) {
   }, [node]);
 
   const onLinkURLChange = useCallback(
-    (event) => setLinkURL(event.target.value),
+    (event) => {
+      setLinkURL(event.target.value);
+    },
     [setLinkURL]
   );
 
   const onApply = useCallback(
     (event) => {
-      Transforms.setNodes(editor, { url: linkURL }, { at: path });
+      let url = String(linkURL);
+      if (!(url.includes("//") || url.includes("\\\\"))) {
+        url = "http://" + url;
+      }
+      setLinkURL(url);
+      Transforms.setNodes(
+        editor,
+        {
+          url: url,
+        },
+        { at: path }
+      );
     },
     [editor, linkURL, path]
   );
@@ -53,23 +66,44 @@ export default function LinkEditor({ editorOffsets, selectionForLink }) {
   }
 
   return (
-    <div ref={linkEditorRef} className={"link-editor"}>
-      <div>
+    <div
+      ref={linkEditorRef}
+      className="absolute max-sm:left-4 z-20 bg-gray-100 shadow-lg border-2 border-solid border-gray-300 rounded px-2 mt-2"
+    >
+      <div className="text-sm">
+        <a
+          href={linkURL}
+          target="_blank"
+          rel="noreferrer"
+          className={
+            isUrl(linkURL)
+              ? "hover:bg-gray-300 rounded cursor-pointer p-1 my-2 inline-block"
+              : "pointer-events-none ic-opacity-50 p-1 my-2 inline-block"
+          }
+          alt="Open link in new tab"
+        >
+          <span className="ic ic-black ic-open-in-new"></span>
+        </a>
         <input
-          size="sm"
+          className="ml-2 my-2 mr-2 px-2 py-1 rounded bg-opacity-50 focus:outline-none active:outline-none focus-visible:outline-none bg-gray-300 focus-visible:bg-opacity-80 text-sm font-medium"
           type="text"
           value={linkURL}
+          placeholder="insert a link here"
           onChange={onLinkURLChange}
         />
         <button
-          className={"link-editor-btn"}
-          size="sm"
-          variant="primary"
-          disabled={!isUrl(linkURL)}
+          className="hover:bg-green-200 my-2 disabled:bg-opacity-0 disabled:cursor-not-allowed rounded cursor-pointer p-1 text-xs"
+          disabled={String(linkURL).length < 3}
           onClick={onApply}
         >
-          Apply
+          <span className="ic ic-black ic-done"></span>
         </button>
+        {/* <button
+          className="hover:bg-red-200 bg-red-100 my-2 rounded cursor-pointer p-1 ml-2 text-xs"
+          onClick={() => {}}
+        >
+          <span className="ic ic-black ic-delete"></span>
+        </button> */}
       </div>
     </div>
   );

@@ -76,10 +76,6 @@ const KeyBindings = {
       toggleStyle(editor, "italic");
       return;
     }
-    if (isHotkey("mod+c", event)) {
-      toggleStyle(editor, "code");
-      return;
-    }
     if (isHotkey("mod+u", event)) {
       toggleStyle(editor, "underline");
       return;
