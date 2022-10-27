@@ -44,13 +44,18 @@ export function toggleStyle(editor, style) {
   }
 }
 
+export function insertContent(editor, content) {
+  Editor.insertText(editor, content);
+}
+
 export function toggleBlockType(editor, blockType) {
   const currentBlockType = getTextBlockStyle(editor);
   const changeTo = currentBlockType === blockType ? "paragraph" : blockType;
   Transforms.setNodes(
     editor,
     { type: changeTo },
-    { at: editor.selection, match: (n) => Editor.isBlock(editor, n) }
+    { at: editor.selection, match: (n) => Editor.isBlock(editor, n) },
+    { at: Editor.start(editor, [0]) }
   );
 }
 

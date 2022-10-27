@@ -47,14 +47,7 @@ export default function Editor({ document, onChange }) {
   return (
     <Slate editor={editor} value={document} onChange={onChangeLocal}>
       <div className={"editor-container"}>
-        <div>
-          <div>
-            <Toolbar
-              selection={selection}
-              previousSelection={previousSelection}
-            />
-          </div>
-        </div>
+        <Toolbar selection={selection} previousSelection={previousSelection} />
         <div>
           <div>
             <div className="editor" ref={editorRef}>

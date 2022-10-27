@@ -11,7 +11,7 @@ import React, { useCallback } from "react";
 import { useSlateStatic } from "slate-react";
 import useImageUploadHandler from "../hooks/useImageUploadHandler";
 
-const PARAGRAPH_STYLES = ["h1", "h2", "h3", "h4", "paragraph", "multiple"];
+const PARAGRAPH_STYLES = ["paragraph", "h1", "h2", "h3", "h4"];
 const CHARACTER_STYLES = ["bold", "italic", "underline", "code"];
 
 export default function Toolbar({ selection, previousSelection }) {
@@ -32,79 +32,77 @@ export default function Toolbar({ selection, previousSelection }) {
   const blockType = getTextBlockStyle(editor);
 
   return (
-    <div className="toolbar">
-      {/* Dropdown for paragraph styles */}
-      <DropDown
-        title={getLabelForBlockStyle(blockType ?? "paragraph")}
-        elements={PARAGRAPH_STYLES}
-        onSelect={onBlockTypeChange}
-      />
-      {/* Buttons for character styles */}
-      {CHARACTER_STYLES.map((style) => (
-        <ToolBarButton
-          key={style}
-          characterStyle={style}
-          label={<span>{style}</span>}
-          isActive={getActiveStyles(editor).has(style)}
-          onMouseDown={(event) => {
-            event.preventDefault();
-            toggleStyle(editor, style);
-          }}
+    <div className="top-0 z-30 sticky" id="toolbar">
+      <div className="bg-slate-300 px-1 shadow-md mt-6 rounded ab-toolbar">
+        {/* Dropdown for paragraph styles */}
+        <ElementSelect
+          title={getLabelForBlockStyle(blockType ?? "paragraph")}
+          elements={PARAGRAPH_STYLES}
+          onSelect={onBlockTypeChange}
         />
-      ))}
-      {/* Link Button */}
-      <ToolBarButton
-        isActive={hasActiveLinkAtSelection(editor)}
-        label={<span>link</span>}
-        onMouseDown={() => toggleLinkAtSelection(editor)}
-      />
-      {/* Image Upload Button */}
-      <ToolBarButton
-        isActive={false}
-        as={"label"}
-        htmlFor="image-upload"
-        label={
-          <>
-            <span>image</span>
-            <input
-              type="file"
-              id="image-upload"
-              className="image-upload-input"
-              accept="image/png, image/jpeg"
-              onChange={onImageSelected}
-            />
-          </>
-        }
-      />
+        {/* Buttons for character styles */}
+        <div className="inline-block my-2.5">
+          <div className="border-r-2 border-gray-400 inline-block pr-3">
+            {CHARACTER_STYLES.map((style) => (
+              <ToolBarButton
+                key={style}
+                characterStyle={style}
+                label={style}
+                isActive={getActiveStyles(editor).has(style)}
+                onMouseDown={(event) => {
+                  event.preventDefault();
+                  toggleStyle(editor, style);
+                }}
+              />
+            ))}
+          </div>
+          {/* Link Button */}
+          <ToolBarButton
+            isActive={hasActiveLinkAtSelection(editor)}
+            label={"link"}
+            onMouseDown={() => toggleLinkAtSelection(editor)}
+          />
+          {/* Image Upload Button */}
+          <label
+            className="ml-3 p-1 text-xs rounded aspect-square cursor-pointer"
+            htmlFor="image-upload"
+          >
+            <span
+              className={
+                "ic ic-md ic-black align-middle " + getIconForButton("image")
+              }
+            ></span>
+          </label>
+          <input
+            type="file"
+            id="image-upload"
+            className="hidden"
+            accept="image/png, image/jpeg"
+            onChange={onImageSelected}
+          />
+        </div>
+      </div>
     </div>
   );
 }
 
-function ToolBarStyleButton({ as, style, icon }) {
-  const editor = useSlateStatic();
-  return (
-    <ToolBarButton
-      as={as}
-      onMouseDown={(event) => {
-        event.preventDefault();
-        toggleStyle(editor, style);
-      }}
-      isActive={getActiveStyles(editor).has(style)}
-      label={icon}
-    />
-  );
-}
+// Text Formatting
 
 function ToolBarButton(props) {
   const { label, isActive, ...otherProps } = props;
   return (
     <button
-      variant="outline-primary"
-      className={isActive ? "font-bold mx-2 bg-gray-400" : "mx-2"}
+      variant=""
+      className={
+        (isActive ? "font-bold bg-slate-400 border-gray-400 " : "") +
+        " ml-3 p-1 text-xs rounded aspect-square"
+      }
       active={isActive}
       {...otherProps}
     >
-      {label}
+      <span
+        className={"ic ic-md ic-black align-middle " + getIconForButton(label)}
+      ></span>
     </button>
   );
 }
@@ -112,21 +110,24 @@ function ToolBarButton(props) {
 function getIconForButton(style) {
   switch (style) {
     case "bold":
-      return "bi-type-bold";
+      return "ic-b";
     case "italic":
-      return "bi-type-italic";
+      return "ic-i";
     case "code":
-      return "bi-code-slash";
+      return "ic-inline-code";
     case "underline":
-      return "bi-type-underline";
+      return "ic-u";
     case "image":
-      return "bi-file-image";
+      return "ic-add-photo";
     case "link":
-      return "bi-link-45deg";
+      return "ic-link";
     default:
-      throw new Error(`Unhandled style in getIconForButton: ${style}`);
+      console.log(style.props.children);
+      return "ic";
   }
 }
+
+// Element Select
 
 function getLabelForBlockStyle(style) {
   switch (style) {
@@ -146,69 +147,35 @@ function getLabelForBlockStyle(style) {
       throw new Error(`Unhandled style in getLabelForBlockStyle: ${style}`);
   }
 }
-function DropDown(props) {
-  const { elements, title, onSelect, ...otherProps } = props;
-  const [open, setOpen] = React.useState(false);
+
+function Element({ element, title, onSelect }) {
+  return (
+    <button
+      variant=""
+      className={
+        (title === getLabelForBlockStyle(element)
+          ? "font-bold bg-slate-400 border-gray-400 "
+          : "") + " ml-3 p-1 text-xs rounded aspect-square"
+      }
+      onClick={() => {
+        onSelect(element);
+      }}
+    >
+      <span className={"ic ic-md ic-black align-middle ic-" + element}></span>
+    </button>
+  );
+}
+
+function ElementSelect(props) {
+  const { elements, title, onSelect } = props;
 
   return (
-    <div className="relative inline-block text-left">
-      <div>
-        <button
-          type="button"
-          className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-100"
-          id="menu-button"
-          aria-expanded="true"
-          aria-haspopup="true"
-          onClick={() => {
-            setOpen(!open);
-          }}
-        >
-          {title}
-          <svg
-            className="-mr-1 ml-2 h-5 w-5"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-              clip-rule="evenodd"
-            />
-          </svg>
-        </button>
-      </div>
-      <div
-        className={open ? "block z-10 top-0 w-full h-full" : "hidden"}
-        onClick={() => {
-          setOpen(!open);
-        }}
-      ></div>
-      <div className={open ? "block" : "hidden"}>
-        <div
-          className="absolute left-0 z-10 mt-2 w-36 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-          aria-orientation="vertical"
-          aria-labelledby="menu-button"
-        >
-          <div className="py-1">
-            {elements.map((blockType, index) => (
-              <a
-                href="#a"
-                className="text-gray-700 block px-4 py-2 text-sm hover:bg-slate-200"
-                role="menuitem"
-                key={index}
-                onClick={() => {
-                  setOpen(false);
-                  onSelect(blockType);
-                }}
-              >
-                {getLabelForBlockStyle(blockType)}
-              </a>
-            ))}
-          </div>
-        </div>
-      </div>
+    <div className="border-r-2 border-gray-400 pr-3 inline-block my-2.5">
+      {elements.map((element, index) => (
+        <>
+          <Element element={element} title={title} onSelect={onSelect} />
+        </>
+      ))}
     </div>
   );
 }

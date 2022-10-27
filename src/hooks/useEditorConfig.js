@@ -5,7 +5,7 @@ import LinkEditor from "../components/LinkEditor";
 import React from "react";
 import StyledText from "../components/StyledText";
 import isHotkey from "is-hotkey";
-import { toggleStyle } from "../utils/EditorUtils";
+import { toggleStyle, insertContent } from "../utils/EditorUtils";
 
 export default function useEditorConfig(editor) {
   const { isVoid } = editor;
@@ -78,6 +78,32 @@ const KeyBindings = {
     }
     if (isHotkey("mod+u", event)) {
       toggleStyle(editor, "underline");
+      return;
+    }
+    if (isHotkey("tab", event)) {
+      event.preventDefault();
+      event.stopPropagation();
+      insertContent(editor, "	");
+      return;
+    }
+    if (isHotkey("mod+opt+`", event)) {
+      console.log("paragraph");
+      return;
+    }
+    if (isHotkey("mod+opt+1", event)) {
+      console.log("h1");
+      return;
+    }
+    if (isHotkey("mod+opt+2", event)) {
+      console.log("h2");
+      return;
+    }
+    if (isHotkey("mod+opt+3", event)) {
+      console.log("h3");
+      return;
+    }
+    if (isHotkey("mod+opt+4", event)) {
+      console.log("h4");
       return;
     }
   },

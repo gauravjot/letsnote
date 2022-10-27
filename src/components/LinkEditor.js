@@ -68,7 +68,7 @@ export default function LinkEditor({ editorOffsets, selectionForLink }) {
   return (
     <div
       ref={linkEditorRef}
-      className="absolute max-sm:left-4 z-20 bg-gray-100 shadow-lg border-2 border-solid border-gray-300 rounded px-2 mt-2"
+      className="absolute max-sm:left-4 z-20 bg-gray-100 shadow-lg border border-solid border-gray-300 rounded-xl px-2 mt-2"
     >
       <div className="text-sm">
         <a
@@ -92,11 +92,11 @@ export default function LinkEditor({ editorOffsets, selectionForLink }) {
           onChange={onLinkURLChange}
         />
         <button
-          className="hover:bg-green-200 my-2 disabled:bg-opacity-0 disabled:cursor-not-allowed rounded cursor-pointer p-1 text-xs"
+          className="hover:bg-blue-300 disabled:bg-opacity-0 disabled:cursor-not-allowed rounded cursor-pointer px-1 py-1 text-xs mb-1"
           disabled={String(linkURL).length < 3}
           onClick={onApply}
         >
-          <span className="ic ic-black ic-done"></span>
+          <span className="ic ic-md ic-black ic-done"></span>
         </button>
         {/* <button
           className="hover:bg-red-200 bg-red-100 my-2 rounded cursor-pointer p-1 ml-2 text-xs"
