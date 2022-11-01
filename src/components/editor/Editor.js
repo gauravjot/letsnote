@@ -2,15 +2,15 @@ import { Editable, Slate, withReact } from "slate-react";
 import {
   identifyLinksInTextIfAny,
   isLinkNodeAtSelection,
-} from "../utils/EditorUtils";
+} from "../../utils/EditorUtils";
 import { useCallback, useMemo, useRef } from "react";
 
 import LinkEditor from "./LinkEditor";
 import React from "react";
 import Toolbar from "./Toolbar";
 import { createEditor } from "slate";
-import useEditorConfig from "../hooks/useEditorConfig";
-import useSelection from "../hooks/useSelection";
+import useEditorConfig from "../../hooks/useEditorConfig";
+import useSelection from "../../hooks/useSelection";
 
 export default function Editor({ document, onChange }) {
   const editorRef = useRef(null);

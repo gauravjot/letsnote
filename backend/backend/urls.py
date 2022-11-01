@@ -27,4 +27,5 @@ urlpatterns = [
 # users
 urlpatterns += [
     path('', include('users.urls')),
+    path('', include('notes.urls')),
 ]

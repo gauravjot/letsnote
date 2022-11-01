@@ -20,7 +20,6 @@ export default function Login() {
   };
 
   const login = () => {
-    console.log("login");
     formRef.current.className = "opacity-30 pointer-events-none";
     formRef.current.setAttribute("disabled", "disabled");
 

@@ -5,11 +5,11 @@ import {
   toggleBlockType,
   toggleLinkAtSelection,
   toggleStyle,
-} from "../utils/EditorUtils";
+} from "../../utils/EditorUtils";
 
 import React, { useCallback } from "react";
 import { useSlateStatic } from "slate-react";
-import useImageUploadHandler from "../hooks/useImageUploadHandler";
+import useImageUploadHandler from "../../hooks/useImageUploadHandler";
 
 const PARAGRAPH_STYLES = ["paragraph", "h1", "h2", "h3", "h4"];
 const CHARACTER_STYLES = ["bold", "italic", "underline", "code"];

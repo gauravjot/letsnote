@@ -1,9 +1,9 @@
 import { DefaultElement } from "slate-react";
-import Image from "../components/Image";
-import Link from "../components/Link";
-import LinkEditor from "../components/LinkEditor";
+import Image from "../components/editor/Image";
+import Link from "../components/editor/Link";
+import LinkEditor from "../components/editor/LinkEditor";
 import React from "react";
-import StyledText from "../components/StyledText";
+import StyledText from "../components/editor/StyledText";
 import isHotkey from "is-hotkey";
 import { toggleStyle, insertContent } from "../utils/EditorUtils";
 
