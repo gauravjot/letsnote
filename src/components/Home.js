@@ -31,7 +31,7 @@ function Home() {
         .post(
           BACKEND_SERVER_DOMAIN +
             "/api/note/" +
-            (note.id ? "update/" + note.id + "/" : "create/"),
+            (note ? "update/" + note.id + "/" : "create/"),
           JSON.stringify({ title: title, content: content }),
           config
         )
@@ -47,7 +47,7 @@ function Home() {
   return (
     <>
       <div className="App min-h-screen">
-        <div className="sm:container mx-auto lg:grid lg:grid-cols-12 w-100">
+        <div className="xl:container mx-auto lg:grid lg:grid-cols-12 w-100">
           <div className="lg:col-span-3">
             <Sidebar />
           </div>

@@ -46,7 +46,7 @@ export default function Toolbar({ selection, previousSelection }) {
             {CHARACTER_STYLES.map((style) => (
               <ToolBarButton
                 key={style}
-                characterStyle={style}
+                characterstyle={style}
                 label={style}
                 isActive={getActiveStyles(editor).has(style)}
                 onMouseDown={(event) => {
@@ -94,10 +94,12 @@ function ToolBarButton(props) {
     <button
       variant=""
       className={
-        (isActive ? "font-bold bg-slate-400 border-gray-400 " : "") +
+        (isActive
+          ? "font-bold bg-slate-400 border-gray-400 "
+          : "hover:bg-slate-400 hover:bg-opacity-30") +
         " ml-3 p-1 text-xs rounded aspect-square"
       }
-      active={isActive}
+      active={isActive ? "true" : "false"}
       {...otherProps}
     >
       <span
@@ -155,7 +157,8 @@ function Element({ element, title, onSelect }) {
       className={
         (title === getLabelForBlockStyle(element)
           ? "font-bold bg-slate-400 border-gray-400 "
-          : "") + " ml-3 p-1 text-xs rounded aspect-square"
+          : "hover:bg-slate-400 hover:bg-opacity-30") +
+        " ml-3 p-1 text-xs rounded aspect-square"
       }
       onClick={() => {
         onSelect(element);
@@ -172,9 +175,9 @@ function ElementSelect(props) {
   return (
     <div className="border-r-2 border-gray-400 pr-3 inline-block my-2.5">
       {elements.map((element, index) => (
-        <>
+        <span key={index}>
           <Element element={element} title={title} onSelect={onSelect} />
-        </>
+        </span>
       ))}
     </div>
   );

@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 # Models & Serializers
 from .models import Note
-from .serializers import NoteSerializer
+from .serializers import NoteSerializer, NoteListSerializer
 # Session
 from users.session import getUserID
 from backend.utils import errorResponse, successResponse
@@ -37,7 +37,7 @@ def createNote(request):
     else:
         return Response(data=noteSerializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
-@api_view
+@api_view(['GET'])
 def readNote(noteid, request):
     user = getUserID(request)
     
@@ -45,6 +45,15 @@ def readNote(noteid, request):
         return Response(data=NoteSerializer(Note.objects.get(id=noteid, user=user)).data, status=status.HTTP_200_OK)
     except Note.DoesNotExist:
         return Response(data=errorResponse("This note does not exist.","N0404"), status=status.HTTP_404_NOT_FOUND)
+    
+@api_view(['GET'])
+def myNotes(request):
+    user = getUserID(request)
+    
+    try:
+        return Response(data=NoteListSerializer(Note.objects.filter(user=user).values('id','user','created','updated','title'), many=True).data, status=status.HTTP_200_OK)
+    except Note.DoesNotExist:
+        return Response(data=errorResponse("Could not find any notes.","N0411"), status=status.HTTP_404_NOT_FOUND)
 
 # Log Out function, requires token
 # -----------------------------------------------
@@ -70,6 +79,6 @@ def updateNote(request, noteid):
         note.updated = datetime.now(pytz.utc)
         note.save()
 
-        return Response(data=successResponse(),status=status.HTTP_200_OK)
+        return Response(data=NoteSerializer(note).data,status=status.HTTP_200_OK)
     except (Note.DoesNotExist) as err:
         return Response(data=errorResponse("This note does not exist.","N0403"),status=status.HTTP_400_BAD_REQUEST)
