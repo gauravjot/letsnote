@@ -437,31 +437,31 @@ h1,
 }
 
 h1 {
-  margin-top: 1rem;
+  margin-top: 1.25rem;
   margin-bottom: 0.5rem;
 }
 
 h2 {
-  margin-top: 0.875rem;
+  margin-top: 1.25rem;
   margin-bottom: 0.5rem;
 }
 
 h3 {
-  margin-top: 0.875rem;
+  margin-top: 1.25rem;
   margin-bottom: 0.5rem;
   font-size: 1.25rem;
   line-height: 1.75rem;
 }
 
 h4 {
-  margin-top: 0.875rem;
+  margin-top: 1rem;
   margin-bottom: 0.5rem;
   font-size: 1.125rem;
   line-height: 1.75rem;
 }
 
 p {
-  margin-top: 0.625rem;
+  margin-top: 0.5rem;
   margin-bottom: 0.625rem;
   font-size: 1rem;
   line-height: 1.5rem;
@@ -858,6 +858,11 @@ code {
   background-color: rgb(229 231 235 / var(--tw-bg-opacity));
 }
 
+.bg-slate-300 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(203 213 225 / var(--tw-bg-opacity));
+}
+
 .bg-gray-100 {
   --tw-bg-opacity: 1;
   background-color: rgb(243 244 246 / var(--tw-bg-opacity));
@@ -871,11 +876,6 @@ code {
 .bg-red-100 {
   --tw-bg-opacity: 1;
   background-color: rgb(254 226 226 / var(--tw-bg-opacity));
-}
-
-.bg-slate-300 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(203 213 225 / var(--tw-bg-opacity));
 }
 
 .bg-slate-400 {

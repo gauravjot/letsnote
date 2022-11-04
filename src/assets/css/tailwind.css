@@ -20,23 +20,23 @@
   }
 
   h1 {
-    @apply mt-4 mb-2;
+    @apply mt-5 mb-2;
   }
 
   h2 {
-    @apply mt-3.5 mb-2;
+    @apply mt-5 mb-2;
   }
 
   h3 {
-    @apply mt-3.5 mb-2 text-xl;
+    @apply mt-5 mb-2 text-xl;
   }
 
   h4 {
-    @apply mt-3.5 mb-2 text-lg;
+    @apply mt-4 mb-2 text-lg;
   }
 
   p {
-    @apply my-2.5 text-base;
+    @apply mt-2 mb-2.5 text-base;
   }
 
   code {

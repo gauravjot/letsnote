@@ -23,7 +23,7 @@ def createNote(request):
     noteSerializer = NoteSerializer(data=dict(
         id = uuid.uuid4(),
         title = request.data['title'],
-        content = "",
+        content = request.data['content'],
         user = user,
         created = dateStamp,
         updated = dateStamp
@@ -38,7 +38,7 @@ def createNote(request):
         return Response(data=noteSerializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-def readNote(noteid, request):
+def readNote(request, noteid):
     user = getUserID(request)
     
     try:

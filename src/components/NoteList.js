@@ -4,7 +4,7 @@ import { BACKEND_SERVER_DOMAIN } from "../config";
 import { useSelector } from "react-redux";
 import { dateTimePretty, monthYear } from "../utils/TimeSince";
 
-export default function NoteList() {
+export default function NoteList({ openNote, currentNote }) {
   const user = useSelector((state) => state.user);
   const [notes, setNotes] = React.useState([]);
   const [error, setError] = React.useState();
@@ -32,10 +32,6 @@ export default function NoteList() {
     console.log("edit");
   };
 
-  const openNote = (note) => {
-    console.log("open");
-  };
-
   let count;
 
   return (
@@ -46,7 +42,7 @@ export default function NoteList() {
       <ul className="bg-white mb-4 border border-gray-300 rounded-md py-2 shadow-md grid gap-1 max-h-96 overflow-y-scroll">
         {notes.map((note, index) => {
           return (
-            <>
+            <div key={index}>
               {monthYear(note.updated) !== count ? (
                 <div className="text-xs text-gray-500 font-medium bg-gray-200 border-b border-gray-300 px-3 py-1 pb-0 mb-0.5 user-select-none">
                   {(count = monthYear(note.updated))}
@@ -55,8 +51,12 @@ export default function NoteList() {
                 ""
               )}
               <li
-                key={index}
-                className="mx-2 relative px-2 py-1 rounded-md hover:bg-slate-200 cursor-default text-gray-500"
+                className={
+                  (note.id === currentNote
+                    ? "bg-slate-300 rounded-md"
+                    : "hover:bg-slate-200") +
+                  " mx-2 relative px-2 py-1 rounded-md cursor-default text-gray-500"
+                }
               >
                 <div
                   onClick={() => {
@@ -77,7 +77,7 @@ export default function NoteList() {
                   ></span>
                 </button>
               </li>
-            </>
+            </div>
           );
         })}
       </ul>
