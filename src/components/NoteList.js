@@ -34,7 +34,7 @@ export default function NoteList({ openNote, currentNote }) {
 
   let count;
 
-  return (
+  return notes.length > 0 ? (
     <>
       <div className="text-xl font-bold text-gray-900 px-2 mt-6 mb-2 font-mono user-select-none">
         Your notes
@@ -82,5 +82,7 @@ export default function NoteList({ openNote, currentNote }) {
         })}
       </ul>
     </>
+  ) : (
+    ""
   );
 }

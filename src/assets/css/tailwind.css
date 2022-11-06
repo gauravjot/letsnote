@@ -76,11 +76,15 @@ body {
 }
 
 .ab-btn-secondary {
-  @apply bg-slate-600 hover:bg-slate-500;
+  @apply bg-gray-400 hover:bg-gray-500 text-white;
 }
 
 .ab-btn-sm {
   @apply px-2.5 py-1.5 text-sm;
+}
+
+.ab-btn-xs {
+  @apply px-2.5 py-1.5 text-xs;
 }
 
 .ab-btn-big {
@@ -284,5 +288,10 @@ body {
 
 .ic-edit {
   background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTkuMzUgMzkuMDVoMS42TDMyLjcgMTcuMmwtMS42LTEuNkw5LjM1IDM3LjQ1Wm0zMC41LTIzLjk1LTYuNi02LjYgMS4wNS0xLjFxMS40LTEuNCAzLjMyNS0xLjQyNVEzOS41NSA1Ljk1IDQwLjk1IDcuM2wuOS45cTEuMTUgMS4xIDEuMDI1IDIuNTUtLjEyNSAxLjQ1LTEuMTI1IDIuNDVabS0yLjA1IDIuMDVMMTIuMzUgNDIuNmgtNi42VjM2bDI1LjQtMjUuNFptLTUuODUtLjc1LS44NS0uOCAxLjYgMS42WiIvPjwvc3ZnPg==);
+  background-size: contain;
+}
+
+.ic-add {
+  background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTIxLjY1IDM4Ljg1di0xMi41SDkuMTV2LTQuN2gxMi41VjkuMTVoNC43djEyLjVoMTIuNXY0LjdoLTEyLjV2MTIuNVoiLz48L3N2Zz4=);
   background-size: contain;
 }

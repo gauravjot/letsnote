@@ -1,5 +1,5 @@
-import { useCallback, useRef } from "react";
-import { Editable, Slate } from "slate-react";
+import { useCallback, useRef, useState } from "react";
+import { Editable, Slate, withReact } from "slate-react";
 import { createEditor } from "slate";
 
 import {
@@ -12,8 +12,8 @@ import useSelection from "../../hooks/useSelection";
 import LinkEditor from "./LinkEditor";
 import Toolbar from "./Toolbar";
 
-export default function Editor({ document, noteid, onChange }) {
-  const editor = createEditor();
+export default function Editor({ document, onChange }) {
+  const [editor] = useState(() => withReact(createEditor()));
   const editorRef = useRef(null);
   const { renderLeaf, renderElement, KeyBindings } = useEditorConfig(editor);
 
@@ -45,12 +45,7 @@ export default function Editor({ document, noteid, onChange }) {
   }
 
   return (
-    <Slate
-      editor={editor}
-      value={document}
-      onChange={onChangeLocal}
-      key={noteid ? noteid : 0}
-    >
+    <Slate editor={editor} value={document} onChange={onChangeLocal}>
       <div className={"editor-container"}>
         <Toolbar selection={selection} previousSelection={previousSelection} />
         <div>

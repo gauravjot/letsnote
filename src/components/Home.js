@@ -10,6 +10,7 @@ import ExampleDocument from "../utils/ExampleDocument";
 function Home() {
   const user = useSelector((state) => state.user);
   const [note, setNote] = useState();
+  const [currentNote, setCurrentNote] = useState();
   const [document, setDocument] = useState(ExampleDocument);
   const [error, setError] = useState();
 
@@ -76,11 +77,11 @@ function Home() {
           </div>
           <div className="min-h-screen lg:col-span-9 md:px-4">
             <Editor
-              noteid={note ? note.id : null}
               document={document}
               onChange={(value) => {
                 saveNote(JSON.stringify(value));
               }}
+              key={note !== undefined ? note.id : ""}
             />
           </div>
         </div>
