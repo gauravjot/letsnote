@@ -152,14 +152,12 @@ export default function Login() {
         </div>
       ) : (
         <>
-          <div className="bg-gray-300 bg-opacity-50 border-2 border-solid border-gray-300 rounded shadow-sm px-3.5">
-            <h4 className="flex">
-              <div className="flex-grow" style={{ lineHeight: "2.2rem" }}>
-                <span className="text-gray-800 font-medium">
-                  {user.user.full_name}
-                </span>
+          <div className="font-mono text-xl font-bold user-select-none text-gray-900 pl-2 mt-6 mb-2">
+            <div className="flex">
+              <div className="flex-grow">
+                <span className="align-middle">Welcome</span>
               </div>
-              <div className="flex-grow-0">
+              <div className="flex-grow-0 h-max">
                 <button
                   onClick={logOut}
                   className="ab-btn ab-btn-secondary ab-btn-sm bg-black bg-opacity-30 font-normal text-sm whitespace-nowrap"
@@ -167,7 +165,12 @@ export default function Login() {
                   <span className="ic ic-logout"></span>
                 </button>
               </div>
-            </h4>
+            </div>
+          </div>
+          <div className="bg-slate-300 bg-opacity-50 rounded-md px-3.5 py-2">
+            <span className="text-gray-600 font-medium">
+              {user.user.full_name}
+            </span>
           </div>
         </>
       )}
