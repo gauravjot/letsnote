@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import { Editable, Slate, withReact } from "slate-react";
 import { createEditor } from "slate";
+import { withHistory } from "slate-history";
 
 import {
   identifyLinksInTextIfAny,
@@ -13,7 +14,7 @@ import LinkEditor from "./LinkEditor";
 import Toolbar from "./Toolbar";
 
 export default function Editor({ document, onChange }) {
-  const [editor] = useState(() => withReact(createEditor()));
+  const [editor] = useState(() => withReact(withHistory(createEditor())));
   const editorRef = useRef(null);
   const { renderLeaf, renderElement, KeyBindings } = useEditorConfig(editor);
 
