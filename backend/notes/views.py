@@ -12,7 +12,7 @@ from .serializers import NoteSerializer, NoteListSerializer
 from users.session import getUserID
 from backend.utils import errorResponse, successResponse
 
-# Sign Up function
+# Create a note
 # -----------------------------------------------
 @api_view(['POST'])
 def createNote(request):
@@ -37,15 +37,8 @@ def createNote(request):
     else:
         return Response(data=noteSerializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET'])
-def readNote(request, noteid):
-    user = getUserID(request)
-    
-    try:
-        return Response(data=NoteSerializer(Note.objects.get(id=noteid, user=user)).data, status=status.HTTP_200_OK)
-    except Note.DoesNotExist:
-        return Response(data=errorResponse("This note does not exist.","N0404"), status=status.HTTP_404_NOT_FOUND)
-    
+# Get all notes
+# -----------------------------------------------
 @api_view(['GET'])
 def myNotes(request):
     user = getUserID(request)
@@ -55,10 +48,30 @@ def myNotes(request):
     except Note.DoesNotExist:
         return Response(data=errorResponse("Could not find any notes.","N0411"), status=status.HTTP_404_NOT_FOUND)
 
-# Log Out function, requires token
+
+# Read, update, delete a note
 # -----------------------------------------------
-@api_view(['DELETE'])
-def deleteNote(noteid, request):
+@api_view(['GET','DELETE','PUT','POST'])
+def noteOps(request, noteid):
+    if request.method == 'GET':
+        return readNote(request, noteid)
+    elif request.method == 'PUT':
+        return updateNote(request, noteid)
+    elif request.method == 'DELETE':
+        return deleteNote(request, noteid)
+    return Response(errorResponse("Cannot perform note action.","N0412"),status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# Read
+def readNote(request, noteid):
+    user = getUserID(request)
+    
+    try:
+        return Response(data=NoteSerializer(Note.objects.get(id=noteid, user=user)).data, status=status.HTTP_200_OK)
+    except Note.DoesNotExist:
+        return Response(data=errorResponse("This note does not exist.","N0404"), status=status.HTTP_404_NOT_FOUND)
+
+# Delete
+def deleteNote(request, noteid):
     user = getUserID(request)
     
     try:
@@ -67,9 +80,7 @@ def deleteNote(noteid, request):
     except Note.DoesNotExist:
         return Response(data=errorResponse("This note does not exist.","N0407"), status=status.HTTP_404_NOT_FOUND)
 
-# Verify Email, requires email verification token
-# -----------------------------------------------
-@api_view(['POST'])
+# Update
 def updateNote(request, noteid):
     user = getUserID(request)   
     try:

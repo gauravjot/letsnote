@@ -1,10 +1,10 @@
 from django.urls import path
-from .views import updateNote, createNote, readNote, deleteNote, myNotes
+from .views import createNote, myNotes, noteOps
 
 urlpatterns = [
-    path('api/note/update/<noteid>/', updateNote),
-    path('api/note/create/', createNote),
-    path('api/note/delete/<noteid>', deleteNote),
-    path('api/note/read/<noteid>/', readNote),
     path('api/note/all/', myNotes),
+    path('api/note/create/', createNote),
+    path('api/note/<noteid>/', noteOps),
+    path('api/note/<noteid>/', noteOps),
+    path('api/note/<noteid>/', noteOps),
 ]
