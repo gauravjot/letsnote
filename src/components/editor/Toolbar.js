@@ -12,15 +12,7 @@ import { useSlateStatic } from "slate-react";
 import useImageUploadHandler from "../../hooks/useImageUploadHandler";
 import { dateTimePretty } from "../../utils/TimeSince";
 
-const PARAGRAPH_STYLES = [
-  "paragraph",
-  "h1",
-  "h2",
-  "h3",
-  "h4",
-  "codeblock",
-  "quote",
-];
+const PARAGRAPH_STYLES = ["h1", "h2", "h3", "h4", "codeblock", "quote"];
 const CHARACTER_STYLES = [
   "bold",
   "italic",
@@ -41,6 +33,7 @@ export default function Toolbar({ selection, previousSelection, note }) {
         return;
       }
       toggleBlockType(editor, targetType);
+      editor.focus();
     },
     [editor]
   );
@@ -55,7 +48,13 @@ export default function Toolbar({ selection, previousSelection, note }) {
         <div className="px-3 pt-2 mb-1">
           <span className="text-lg font-serif font-medium">
             {note ? note.title : "Untitled"}
-          </span>{" "}
+          </span>
+          <button
+            className="line-height-0 h-fit ml-1 align-top p-1 py-1 cursor-pointer rounded-md hover:bg-gray-300"
+            onClick={() => {}}
+          >
+            <span className={"ic ic-gray-50 align-middle ic-edit"}></span>
+          </button>{" "}
           <span className="text-xs text-gray-500 align-middle">
             (created {note ? dateTimePretty(note.created) : "not yet"})
           </span>
@@ -121,14 +120,19 @@ function ToolBarButton(props) {
     <button
       variant=""
       className={
-        (isActive ? "font-bold bg-slate-300 " : "hover:bg-gray-300") +
-        " ml-3 p-1 text-xs rounded aspect-square"
+        (isActive
+          ? "bg-gray-300 hover:outline outline-1 outline-gray-400 "
+          : "hover:bg-gray-300") + " ml-3 p-1 text-xs aspect-square"
       }
       active={isActive ? "true" : "false"}
       {...otherProps}
     >
       <span
-        className={"ic ic-md ic-black align-middle " + getIconForButton(label)}
+        className={
+          (isActive ? "ic-black " : "ic-gray-50 ") +
+          "ic ic-md align-middle " +
+          getIconForButton(label)
+        }
       ></span>
     </button>
   );
@@ -193,14 +197,22 @@ function Element({ element, title, onSelect }) {
       variant=""
       className={
         (title === getLabelForBlockStyle(element)
-          ? "font-bold bg-slate-300 "
-          : "hover:bg-gray-300") + " ml-3 p-1 text-xs rounded aspect-square"
+          ? "bg-gray-300 hover:outline outline-1 outline-gray-400 "
+          : "hover:bg-gray-300") + " ml-3 p-1 text-xs aspect-square"
       }
       onClick={() => {
         onSelect(element);
       }}
     >
-      <span className={"ic ic-md ic-black align-middle ic-" + element}></span>
+      <span
+        className={
+          (title === getLabelForBlockStyle(element)
+            ? "ic-black "
+            : "ic-gray-50 ") +
+          "ic ic-md align-middle ic-" +
+          element
+        }
+      ></span>
     </button>
   );
 }

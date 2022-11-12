@@ -15,8 +15,7 @@ function Home() {
   const [error, setError] = useState();
 
   useEffect(() => {
-    if (user.token) {
-    } else {
+    if (!user.token) {
       setNote(undefined);
       setDocument(ExampleDocument);
     }
@@ -45,7 +44,7 @@ function Home() {
           .post(
             BACKEND_SERVER_DOMAIN +
               "/api/note/" +
-              (note ? "update/" + note.id + "/" : "create/"),
+              (note ? note.id + "/" : "create/"),
             JSON.stringify({ title: title, content: content }),
             config
           )
@@ -87,7 +86,7 @@ function Home() {
         },
       };
       axios
-        .get(BACKEND_SERVER_DOMAIN + "/api/note/read/" + note.id + "/", config)
+        .get(BACKEND_SERVER_DOMAIN + "/api/note/" + note.id + "/", config)
         .then(function (response) {
           setNote(response.data);
           setDocument(JSON.parse(response.data.content));

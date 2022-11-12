@@ -2,8 +2,9 @@ import React from "react";
 import axios from "axios";
 import { BACKEND_SERVER_DOMAIN } from "../config";
 import { useSelector } from "react-redux";
-import { dateTimePretty, monthYear } from "../utils/TimeSince";
 import MakeNewNote from "./MakeNewNote";
+import NoteItem from "./NoteItem";
+import { monthYear } from "../utils/TimeSince";
 
 export default function NoteList({ openNote, currentNote }) {
   const user = useSelector((state) => state.user);
@@ -12,6 +13,11 @@ export default function NoteList({ openNote, currentNote }) {
   const [showCreateBox, setShowCreateBox] = React.useState(false);
 
   React.useEffect(() => {
+    refreshNotes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const refreshNotes = () => {
     if (user.token) {
       let config = {
         headers: {
@@ -28,10 +34,6 @@ export default function NoteList({ openNote, currentNote }) {
           setError(error.response);
         });
     }
-  }, [user.token]);
-
-  const editNote = (note) => {
-    console.log("edit");
   };
 
   const newNoteCreated = (note) => {
@@ -76,10 +78,10 @@ export default function NoteList({ openNote, currentNote }) {
         onNewNoteCreated={newNoteCreated}
       />
       {notes.length > 0 ? (
-        <ul className="bg-gray-50 mb-4 border border-gray-300 rounded-md py-2 shadow-md grid gap-1 max-h-96 overflow-y-scroll">
-          {notes.map((note, index) => {
+        <ul className="bg-gray-50 mb-4 border border-gray-300 rounded-md py-2 shadow-md grid gap-1 max-h-96 overflow-y-scroll overflow-x-hidden">
+          {notes.map((note) => {
             return (
-              <div key={index}>
+              <div key={note.id}>
                 {monthYear(note.updated) !== count ? (
                   <div className="text-xs text-gray-500 font-medium bg-gray-300 bg-opacity-50 border-b border-gray-300 px-3 py-1 pb-0 mb-1.5 user-select-none">
                     {(count = monthYear(note.updated))}
@@ -87,37 +89,13 @@ export default function NoteList({ openNote, currentNote }) {
                 ) : (
                   ""
                 )}
-                <li
-                  className={
-                    (note.id === currentNote
-                      ? "bg-gray-300 rounded-md"
-                      : "hover:bg-gray-200") +
-                    " mx-2 mb-0.5 relative px-2 py-1 rounded-md cursor-default text-gray-500"
-                  }
-                >
-                  <div
-                    onClick={() => {
-                      openNote(note);
-                    }}
-                  >
-                    <div className="text-gray-900 font-medium">
-                      {note.title}
-                    </div>
-                    <div className="text-xs">
-                      {dateTimePretty(note.updated)}
-                    </div>
-                  </div>
-                  <button
-                    className="line-height-0 p-0.5 absolute m-1 top-0 right-0 cursor-pointer hover:bg-white rounded-md"
-                    onClick={() => {
-                      editNote(note);
-                    }}
-                  >
-                    <span
-                      className={"ic ic-md ic-opacity-50 align-middle ic-edit"}
-                    ></span>
-                  </button>
-                </li>
+                <NoteItem
+                  note={note}
+                  count={count}
+                  openNote={openNote}
+                  currentNote={currentNote}
+                  refreshNotes={refreshNotes}
+                />
               </div>
             );
           })}
