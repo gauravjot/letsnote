@@ -13,7 +13,7 @@ import useSelection from "../../hooks/useSelection";
 import LinkEditor from "./LinkEditor";
 import Toolbar from "./Toolbar";
 
-export default function Editor({ document, onChange }) {
+export default function Editor({ document, onChange, note }) {
   const [editor] = useState(() => withReact(withHistory(createEditor())));
   const editorRef = useRef(null);
   const { renderLeaf, renderElement, KeyBindings } = useEditorConfig(editor);
@@ -47,8 +47,12 @@ export default function Editor({ document, onChange }) {
 
   return (
     <Slate editor={editor} value={document} onChange={onChangeLocal}>
+      <Toolbar
+        selection={selection}
+        previousSelection={previousSelection}
+        note={note}
+      />
       <div className={"editor-container"}>
-        <Toolbar selection={selection} previousSelection={previousSelection} />
         <div>
           <div>
             <div className="editor" ref={editorRef}>

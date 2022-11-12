@@ -1,5 +1,5 @@
 import Editor from "./editor/Editor";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import axios from "axios";
 import { BACKEND_SERVER_DOMAIN } from "../config";
@@ -9,12 +9,25 @@ import ExampleDocument from "../utils/ExampleDocument";
 
 function Home() {
   const user = useSelector((state) => state.user);
-  const [note, setNote] = useState();
+  const [note, setNote] = useState(undefined);
   const [status, setStatus] = useState("");
   const [document, setDocument] = useState(ExampleDocument);
   const [error, setError] = useState();
 
+  useEffect(() => {
+    if (user.token) {
+    } else {
+      setNote(undefined);
+      setDocument(ExampleDocument);
+    }
+  }, [user]);
+
   const saveNote = (content) => {
+    setStatus(
+      <>
+        <span className="ic ic-cloud"></span>&nbsp; Saving...
+      </>
+    );
     _sendReq(content);
   };
 
@@ -37,12 +50,29 @@ function Home() {
             config
           )
           .then(function (response) {
-            setStatus("Synced");
+            setStatus(
+              <>
+                <span className="ic ic-cloud-done"></span>&nbsp; Synced
+              </>
+            );
             setNote(response.data);
           })
           .catch(function (error) {
+            setStatus(
+              <>
+                <span className="ic ic-cloud-fail"></span>&nbsp; Sync fail:
+                {JSON.stringify(error.response.data)}
+              </>
+            );
             setError(error.response);
           });
+      } else {
+        setStatus(
+          <>
+            <span className="ic ic-cloud-fail"></span>&nbsp; Saving failed. Try
+            again.
+          </>
+        );
       }
     }, 2000),
     [note]
@@ -78,21 +108,32 @@ function Home() {
               currentNote={note !== undefined ? note.id : null}
             />
           </div>
-          <div className="min-h-screen lg:col-span-9 md:px-4">
+          <div className="min-h-screen lg:col-span-9 md:px-4 bg-gray-200">
             <Editor
               document={document}
               onChange={(value) => {
                 setDocument(value);
-                setStatus("Saving...");
-                saveNote(JSON.stringify(value));
+                if (user.token) {
+                  saveNote(JSON.stringify(value));
+                } else {
+                  setStatus(<></>);
+                }
               }}
               key={note !== undefined ? note.id : ""}
+              note={note}
             />
-            {status === "" ? (
-              ""
+            {user.token ? (
+              status !== "" ? (
+                <div className="fixed bottom-0 right-0 bg-slate-800 shadow rounded-md px-2 py-1 font-medium text-sm text-white z-30 m-6">
+                  {status}
+                </div>
+              ) : (
+                ""
+              )
             ) : (
-              <div className="fixed bottom-0 right-0 bg-slate-800 shadow rounded-md px-2 py-1 font-medium text-sm text-white z-30 m-6">
-                {status}
+              <div className="fixed bottom-0 right-0 bg-red-900 shadow rounded-md px-2 py-1 font-medium text-sm text-white z-30 m-6">
+                <span className="ic ic-cloud-fail"></span>&nbsp; Sign-in to
+                auto-save
               </div>
             )}
           </div>

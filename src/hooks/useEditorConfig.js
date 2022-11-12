@@ -25,33 +25,49 @@ function renderElement(props) {
       return <Image {...props} />;
     case "paragraph":
       return (
-        <p {...attributes} content-editable={"true"}>
+        <p className="editor-p" {...attributes} content-editable={"true"}>
           {children}
         </p>
       );
     case "h1":
       return (
-        <h1 {...attributes} content-editable={"true"}>
+        <h1 className="editor-h1" {...attributes} content-editable={"true"}>
           {children}
         </h1>
       );
     case "h2":
       return (
-        <h2 {...attributes} content-editable={"true"}>
+        <h2 className="editor-h2" {...attributes} content-editable={"true"}>
           {children}
         </h2>
       );
     case "h3":
       return (
-        <h3 {...attributes} content-editable={"true"}>
+        <h3 className="editor-h3" {...attributes} content-editable={"true"}>
           {children}
         </h3>
       );
     case "h4":
       return (
-        <h4 {...attributes} content-editable={"true"}>
+        <h4 className="editor-h4" {...attributes} content-editable={"true"}>
           {children}
         </h4>
+      );
+    case "codeblock":
+      return (
+        <div
+          className="editor-codeblock"
+          {...attributes}
+          content-editable={"true"}
+        >
+          {children}
+        </div>
+      );
+    case "quote":
+      return (
+        <div className="editor-quote" {...attributes} content-editable={"true"}>
+          {children}
+        </div>
       );
     case "link":
       return <Link {...props} url={element.url} />;

@@ -10,11 +10,29 @@ import {
 import React, { useCallback } from "react";
 import { useSlateStatic } from "slate-react";
 import useImageUploadHandler from "../../hooks/useImageUploadHandler";
+import { dateTimePretty } from "../../utils/TimeSince";
 
-const PARAGRAPH_STYLES = ["paragraph", "h1", "h2", "h3", "h4"];
-const CHARACTER_STYLES = ["bold", "italic", "underline", "code"];
+const PARAGRAPH_STYLES = [
+  "paragraph",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "codeblock",
+  "quote",
+];
+const CHARACTER_STYLES = [
+  "bold",
+  "italic",
+  "underline",
+  "highlight",
+  "code",
+  "strike",
+  "sup",
+  "sub",
+];
 
-export default function Toolbar({ selection, previousSelection }) {
+export default function Toolbar({ selection, previousSelection, note }) {
   const editor = useSlateStatic();
 
   const onBlockTypeChange = useCallback(
@@ -33,7 +51,15 @@ export default function Toolbar({ selection, previousSelection }) {
 
   return (
     <div className="top-0 z-30 sticky" id="toolbar">
-      <div className="bg-slate-300 px-1 shadow-md mt-6 rounded ab-toolbar">
+      <div className="bg-gray-50 px-1 mt-1 shadow-md rounded ab-toolbar">
+        <div className="px-3 pt-2 mb-1">
+          <span className="text-lg font-serif">
+            {note ? note.title : "Untitled"}
+          </span>{" "}
+          <span className="text-xs text-gray-500 align-middle">
+            (created {note ? dateTimePretty(note.created) : "not yet"})
+          </span>
+        </div>
         {/* Dropdown for paragraph styles */}
         <ElementSelect
           title={getLabelForBlockStyle(blockType ?? "paragraph")}
@@ -42,7 +68,7 @@ export default function Toolbar({ selection, previousSelection }) {
         />
         {/* Buttons for character styles */}
         <div className="inline-block my-2.5">
-          <div className="border-r-2 border-gray-400 inline-block pr-3">
+          <div className="border-r-2 border-gray-300 inline-block pr-3">
             {CHARACTER_STYLES.map((style) => (
               <ToolBarButton
                 key={style}
@@ -62,7 +88,7 @@ export default function Toolbar({ selection, previousSelection }) {
             label={"link"}
             onMouseDown={() => toggleLinkAtSelection(editor)}
           />
-          {/* Image Upload Button */}
+          {/* Image Upload Button 
           <label
             className="ml-3 p-1 text-xs rounded aspect-square cursor-pointer"
             htmlFor="image-upload"
@@ -80,6 +106,7 @@ export default function Toolbar({ selection, previousSelection }) {
             accept="image/png, image/jpeg"
             onChange={onImageSelected}
           />
+          */}
         </div>
       </div>
     </div>
@@ -94,9 +121,7 @@ function ToolBarButton(props) {
     <button
       variant=""
       className={
-        (isActive
-          ? "font-bold bg-slate-400 border-gray-400 "
-          : "hover:bg-slate-400 hover:bg-opacity-30") +
+        (isActive ? "font-bold bg-slate-300 " : "hover:bg-gray-300") +
         " ml-3 p-1 text-xs rounded aspect-square"
       }
       active={isActive ? "true" : "false"}
@@ -119,6 +144,14 @@ function getIconForButton(style) {
       return "ic-inline-code";
     case "underline":
       return "ic-u";
+    case "highlight":
+      return "ic-highlight";
+    case "strike":
+      return "ic-strikethrough";
+    case "sub":
+      return "ic-substr";
+    case "sup":
+      return "ic-supstr";
     case "image":
       return "ic-add-photo";
     case "link":
@@ -143,6 +176,10 @@ function getLabelForBlockStyle(style) {
       return "Heading 4";
     case "paragraph":
       return "Paragraph";
+    case "codeblock":
+      return "Code Block";
+    case "quote":
+      return "Quotations";
     case "multiple":
       return "Multiple";
     default:
@@ -156,9 +193,8 @@ function Element({ element, title, onSelect }) {
       variant=""
       className={
         (title === getLabelForBlockStyle(element)
-          ? "font-bold bg-slate-400 border-gray-400 "
-          : "hover:bg-slate-400 hover:bg-opacity-30") +
-        " ml-3 p-1 text-xs rounded aspect-square"
+          ? "font-bold bg-slate-300 "
+          : "hover:bg-gray-300") + " ml-3 p-1 text-xs rounded aspect-square"
       }
       onClick={() => {
         onSelect(element);
@@ -173,7 +209,7 @@ function ElementSelect(props) {
   const { elements, title, onSelect } = props;
 
   return (
-    <div className="border-r-2 border-gray-400 pr-3 inline-block my-2.5">
+    <div className="border-r-2 border-gray-300 pr-3 inline-block my-2.5">
       {elements.map((element, index) => (
         <span key={index}>
           <Element element={element} title={title} onSelect={onSelect} />

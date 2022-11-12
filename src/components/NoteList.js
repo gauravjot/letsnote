@@ -42,12 +42,12 @@ export default function NoteList({ openNote, currentNote }) {
 
   let count;
 
-  return (
+  return user.token ? (
     <>
-      <div className="text-xl font-bold text-gray-900 pl-2 mt-6 mb-2 font-mono user-select-none">
+      <div className="text-xl font-bold text-gray-900 pl-2 mt-6 mb-2 user-select-none">
         <div className="flex">
           <div className="flex-grow">
-            <span className="align-middle">Your Notes</span>
+            <span className="font-sans align-middle">Your Notes</span>
           </div>
           <div className="flex-grow-0 h-max">
             <button
@@ -56,14 +56,15 @@ export default function NoteList({ openNote, currentNote }) {
               }}
               className={
                 (showCreateBox
-                  ? "bg-slate-400 border-solid hover:bg-slate-500"
-                  : "border-dashed hover:bg-slate-300") +
-                "  h-8 w-8 cursor-pointer align-middle rounded-md shadow border-2 border-slate-400 p-0"
+                  ? "bg-gray-400 border-solid hover:bg-gray-500 hover:border-gray-500"
+                  : "border-dashed hover:bg-gray-300") +
+                "  h-7 w-7 cursor-pointer align-middle rounded-md border-2 border-gray-400 p-0"
               }
             >
               <span
                 className={
-                  (showCreateBox ? "ic-close" : "ic-add ic-black") + " ic"
+                  (showCreateBox ? "ic-close" : "ic-add ic-black") +
+                  " inline-block align-baseline h-4 w-4 invert"
                 }
               ></span>
             </button>
@@ -75,12 +76,12 @@ export default function NoteList({ openNote, currentNote }) {
         onNewNoteCreated={newNoteCreated}
       />
       {notes.length > 0 ? (
-        <ul className="bg-white mb-4 border border-gray-300 rounded-md py-2 shadow-md grid gap-1 max-h-96 overflow-y-scroll">
+        <ul className="bg-gray-50 mb-4 border border-gray-300 rounded-md py-2 shadow-md grid gap-1 max-h-96 overflow-y-scroll">
           {notes.map((note, index) => {
             return (
               <div key={index}>
                 {monthYear(note.updated) !== count ? (
-                  <div className="text-xs text-gray-500 font-medium bg-gray-200 border-b border-gray-300 px-3 py-1 pb-0 mb-1.5 user-select-none">
+                  <div className="text-xs text-gray-500 font-medium bg-gray-300 bg-opacity-50 border-b border-gray-300 px-3 py-1 pb-0 mb-1.5 user-select-none">
                     {(count = monthYear(note.updated))}
                   </div>
                 ) : (
@@ -89,8 +90,8 @@ export default function NoteList({ openNote, currentNote }) {
                 <li
                   className={
                     (note.id === currentNote
-                      ? "bg-slate-300 rounded-md"
-                      : "hover:bg-slate-200") +
+                      ? "bg-gray-300 rounded-md"
+                      : "hover:bg-gray-200") +
                     " mx-2 mb-0.5 relative px-2 py-1 rounded-md cursor-default text-gray-500"
                   }
                 >
@@ -125,5 +126,7 @@ export default function NoteList({ openNote, currentNote }) {
         ""
       )}
     </>
+  ) : (
+    <></>
   );
 }
