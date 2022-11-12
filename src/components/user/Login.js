@@ -94,7 +94,7 @@ export default function Login() {
           <div>
             <h2 className="px-1">Sign-in</h2>
             <p className="text-gray-600 text-sm mb-2 mt-1 px-1">
-              Save your documents and edit later. All without a charge!
+              Write your documents and edit later.
             </p>
           </div>
           <div

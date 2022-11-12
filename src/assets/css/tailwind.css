@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100;400;500;700&family=Roboto+Serif:wght@100;400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -81,11 +81,11 @@ body {
 }
 
 .font-sans {
-  font-family: "Roboto", Helvetica, Arial, "Segoe UI", sans-serif;
+  font-family: "Open Sans", Arial, "Segoe UI", sans-serif;
 }
 
 .font-serif {
-  font-family: "Roboto Serif", "Times New Roman", Georgia, Times, serif;
+  font-family: "Playfair Display", "Times New Roman", Georgia, serif;
 }
 
 @media (max-width: 640px) {
