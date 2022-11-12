@@ -40,38 +40,57 @@ function Home() {
             Authorization: user.token,
           },
         };
-        axios
-          .post(
-            BACKEND_SERVER_DOMAIN +
-              "/api/note/" +
-              (note ? note.id + "/" : "create/"),
-            JSON.stringify({ title: title, content: content }),
-            config
-          )
-          .then(function (response) {
-            setStatus(
-              <>
-                <span className="ic ic-cloud-done"></span>&nbsp; Synced
-              </>
-            );
-            setNote(response.data);
-          })
-          .catch(function (error) {
-            setStatus(
-              <>
-                <span className="ic ic-cloud-fail"></span>&nbsp; Sync fail:
-                {JSON.stringify(error.response.data)}
-              </>
-            );
-            setError(error.response);
-          });
-      } else {
-        setStatus(
-          <>
-            <span className="ic ic-cloud-fail"></span>&nbsp; Saving failed. Try
-            again.
-          </>
-        );
+        if (note) {
+          // Update note
+          axios
+            .put(
+              BACKEND_SERVER_DOMAIN + "/api/note/" + note.id + "/",
+              JSON.stringify({ title: title, content: content }),
+              config
+            )
+            .then(function (response) {
+              setStatus(
+                <>
+                  <span className="ic ic-cloud-done"></span>&nbsp; Synced
+                </>
+              );
+              setNote(response.data);
+            })
+            .catch(function (error) {
+              setStatus(
+                <>
+                  <span className="ic ic-cloud-fail"></span>&nbsp; Sync fail:
+                  {JSON.stringify(error.response.data)}
+                </>
+              );
+              setError(error.response);
+            });
+        } else {
+          // Create note
+          axios
+            .post(
+              BACKEND_SERVER_DOMAIN + "/api/note/create/",
+              JSON.stringify({ title: title, content: content }),
+              config
+            )
+            .then(function (response) {
+              setStatus(
+                <>
+                  <span className="ic ic-cloud-done"></span>&nbsp; Created
+                </>
+              );
+              setNote(response.data);
+            })
+            .catch(function (error) {
+              setStatus(
+                <>
+                  <span className="ic ic-cloud-fail"></span>&nbsp; Sync fail:
+                  {JSON.stringify(error.response.data)}
+                </>
+              );
+              setError(error.response);
+            });
+        }
       }
     }, 2000),
     [note]
