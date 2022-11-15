@@ -53,7 +53,7 @@ export default function NoteItem({
 
   return (
     <div>
-      <li
+      <div
         className={
           (note.id === currentNote
             ? "bg-gray-300 rounded-md"
@@ -85,7 +85,7 @@ export default function NoteItem({
             ref={optionsRef}
             className={
               (menuOpen ? "" : "hidden ") +
-              "absolute right-0 bg-white rounded-md shadow-md z-20"
+              "absolute right-0 bg-white rounded-md shadow-md z-20 sidebar-note-menu"
             }
           >
             <button
@@ -106,7 +106,7 @@ export default function NoteItem({
             </button>
           </div>
         </div>
-      </li>
+      </div>
     </div>
   );
 }

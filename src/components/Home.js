@@ -1,6 +1,7 @@
 import Editor from "./editor/Editor";
 import { useState, useCallback, useEffect } from "react";
-import Sidebar from "./Sidebar";
+import Login from "./user/Login";
+import NoteList from "./NoteList";
 import axios from "axios";
 import { BACKEND_SERVER_DOMAIN } from "../config";
 import { useSelector } from "react-redux";
@@ -13,13 +14,14 @@ function Home() {
   const [status, setStatus] = useState("");
   const [document, setDocument] = useState(ExampleDocument);
   const [error, setError] = useState();
+  const [refreshNoteList, setRefreshNoteList] = useState(false);
 
   useEffect(() => {
     if (!user.token) {
       setNote(undefined);
       setDocument(ExampleDocument);
     }
-  }, [user]);
+  }, [user, note]);
 
   const saveNote = (content) => {
     setStatus(
@@ -80,6 +82,7 @@ function Home() {
                 </>
               );
               setNote(response.data);
+              setRefreshNoteList(!refreshNoteList);
             })
             .catch(function (error) {
               setStatus(
@@ -121,12 +124,17 @@ function Home() {
       <div className="App min-h-screen">
         <div className="xl:container mx-auto lg:grid lg:grid-cols-12 w-100">
           <div className="lg:col-span-3">
-            <Sidebar
-              openNote={openNote}
-              currentNote={note !== undefined ? note.id : null}
-            />
+            <div className="h-screen bg-gray-100 block px-4 border-r border-gray-300 border-solid sticky top-0">
+              <div className="font-serif font-bold text-3xl py-8">letsnote</div>
+              <Login />
+              <NoteList
+                openNote={openNote}
+                currentNote={note !== undefined ? note.id : null}
+                refresh={refreshNoteList}
+              />
+            </div>
           </div>
-          <div className="min-h-screen lg:col-span-9 md:px-4 bg-gray-200">
+          <div className="min-h-screen lg:col-span-9 md:px-4 bg-gray-200 relative">
             <Editor
               document={document}
               onChange={(value) => {

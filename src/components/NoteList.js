@@ -6,7 +6,7 @@ import MakeNewNote from "./MakeNewNote";
 import NoteItem from "./NoteItem";
 import { monthYear } from "../utils/TimeSince";
 
-export default function NoteList({ openNote, currentNote }) {
+export default function NoteList({ openNote, currentNote, refresh }) {
   const user = useSelector((state) => state.user);
   const [notes, setNotes] = React.useState([]);
   const [error, setError] = React.useState();
@@ -15,7 +15,7 @@ export default function NoteList({ openNote, currentNote }) {
   React.useEffect(() => {
     refreshNotes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user, refresh]);
 
   const refreshNotes = () => {
     if (user.token) {
@@ -78,7 +78,7 @@ export default function NoteList({ openNote, currentNote }) {
         onNewNoteCreated={newNoteCreated}
       />
       {notes.length > 0 ? (
-        <ul className="bg-gray-50 mb-4 border border-gray-300 rounded-md py-2 shadow-md grid gap-1 max-h-96 overflow-y-scroll overflow-x-hidden">
+        <div className="notelist bg-gray-50 mb-4 border border-gray-300 rounded-md py-2 shadow-md grid gap-1 min-h-fit max-h-96 overflow-y-scroll overflow-x-hidden">
           {notes.map((note) => {
             return (
               <div key={note.id}>
@@ -99,9 +99,11 @@ export default function NoteList({ openNote, currentNote }) {
               </div>
             );
           })}
-        </ul>
+        </div>
       ) : (
-        ""
+        <div className="px-2 py-2 text-xl text-gray-400 font-thin user-select-none">
+          It's so empty here. Make a note in editor!
+        </div>
       )}
     </>
   ) : (

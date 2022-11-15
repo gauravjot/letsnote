@@ -12,6 +12,7 @@ import useSelection from "../../hooks/useSelection";
 
 import LinkEditor from "./LinkEditor";
 import Toolbar from "./Toolbar";
+import ExampleDocument from "../../utils/ExampleDocument";
 
 export default function Editor({ document, onChange, note }) {
   const [editor] = useState(() => withReact(withHistory(createEditor())));
@@ -52,6 +53,13 @@ export default function Editor({ document, onChange, note }) {
         previousSelection={previousSelection}
         note={note}
       />
+      {document === ExampleDocument ? (
+        <div className="z-10 top-1/2 mx-auto left-0 right-0 text-center font-thin text-2xl text-gray-300 user-select-none absolute">
+          start typing and we'll auto save
+        </div>
+      ) : (
+        ""
+      )}
       <div className={"editor-container"}>
         <div>
           <div>
