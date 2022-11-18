@@ -15,6 +15,8 @@ function Home() {
   const [document, setDocument] = useState(ExampleDocument);
   const [error, setError] = useState();
   const [refreshNoteList, setRefreshNoteList] = useState(false);
+  const [isNoteLoading, setIsNoteLoading] = useState(false);
+  const [currentNoteID, setCurrentNoteID] = useState();
 
   useEffect(() => {
     if (!user.token) {
@@ -33,7 +35,10 @@ function Home() {
   };
 
   const _sendReq = useCallback(
-    _.debounce((content) => {
+    _.debounce((content, currentNoteID) => {
+      /* debouce keeps the old variables data, it creates
+        a snapshot. To use variables at runtime add as
+        parameters. */
       let title = note ? note.title : "Untitled";
       if (user.token) {
         let config = {
@@ -56,7 +61,9 @@ function Home() {
                   <span className="ic ic-cloud-done"></span>&nbsp; Synced
                 </>
               );
-              setNote(response.data);
+              if (currentNoteID === response.data.id) {
+                setNote(response.data);
+              }
             })
             .catch(function (error) {
               setStatus(
@@ -81,7 +88,12 @@ function Home() {
                   <span className="ic ic-cloud-done"></span>&nbsp; Created
                 </>
               );
-              setNote(response.data);
+              if (!currentNoteID) {
+                setCurrentNoteID(response.data.id);
+              }
+              if (currentNoteID === response.data.id) {
+                setNote(response.data);
+              }
               setRefreshNoteList(!refreshNoteList);
             })
             .catch(function (error) {
@@ -100,6 +112,8 @@ function Home() {
   );
 
   const openNote = (note) => {
+    setIsNoteLoading(true);
+    setCurrentNoteID(note.id);
     if (user.token) {
       let config = {
         headers: {
@@ -112,9 +126,11 @@ function Home() {
         .then(function (response) {
           setNote(response.data);
           setDocument(JSON.parse(response.data.content));
+          setIsNoteLoading(false);
         })
         .catch(function (error) {
           setError(error.response);
+          setIsNoteLoading(false);
         });
     }
   };
@@ -129,38 +145,50 @@ function Home() {
               <Login />
               <NoteList
                 openNote={openNote}
-                currentNote={note !== undefined ? note.id : null}
+                currentNote={currentNoteID !== undefined ? currentNoteID : null}
                 refresh={refreshNoteList}
               />
             </div>
           </div>
           <div className="min-h-screen lg:col-span-9 md:px-4 bg-gray-200 relative">
-            <Editor
-              document={document}
-              onChange={(value) => {
-                setDocument(value);
-                if (user.token) {
-                  saveNote(JSON.stringify(value));
-                } else {
-                  setStatus(<></>);
-                }
-              }}
-              key={note !== undefined ? note.id : ""}
-              note={note}
-            />
-            {user.token ? (
-              status !== "" ? (
-                <div className="fixed bottom-0 right-0 bg-slate-800 shadow rounded-md px-2 py-1 font-medium text-sm text-white z-30 m-6">
-                  {status}
-                </div>
+            <div className={isNoteLoading ? "blur-sm" : ""}>
+              <Editor
+                document={document}
+                onChange={(value) => {
+                  setDocument(value);
+                  if (user.token) {
+                    saveNote(JSON.stringify(value));
+                  } else {
+                    setStatus(<></>);
+                  }
+                }}
+                key={note !== undefined ? note.id : ""}
+                note={note}
+              />
+              {user.token ? (
+                status !== "" ? (
+                  <div className="fixed bottom-0 right-0 bg-slate-800 shadow rounded-md px-2 py-1 font-medium text-sm text-white z-30 m-6">
+                    {status}
+                  </div>
+                ) : (
+                  ""
+                )
               ) : (
-                ""
-              )
-            ) : (
-              <div className="fixed bottom-0 right-0 bg-red-900 shadow rounded-md px-2 py-1 font-medium text-sm text-white z-30 m-6">
-                <span className="ic ic-cloud-fail"></span>&nbsp; Sign-in to
-                auto-save
+                <div className="fixed bottom-0 right-0 bg-red-900 shadow rounded-md px-2 py-1 font-medium text-sm text-white z-30 m-6">
+                  <span className="ic ic-cloud-fail"></span>&nbsp; Sign-in to
+                  auto-save
+                </div>
+              )}
+            </div>
+            {isNoteLoading ? (
+              <div className="absolute z-30 top-0 left-0 h-full w-full text-center">
+                <div className="lds-ripple">
+                  <div></div>
+                  <div></div>
+                </div>
               </div>
+            ) : (
+              ""
             )}
           </div>
         </div>
