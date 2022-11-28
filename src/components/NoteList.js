@@ -73,10 +73,14 @@ export default function NoteList({ openNote, currentNote, refresh }) {
           </div>
         </div>
       </div>
-      <MakeNewNote
-        showCreateBox={showCreateBox}
-        onNewNoteCreated={newNoteCreated}
-      />
+      <div
+        className={
+          (showCreateBox ? "max-h-96" : "max-h-0") +
+          " transition-all duration-500 delay-75 ease-linear overflow-hidden"
+        }
+      >
+        <MakeNewNote onNewNoteCreated={newNoteCreated} />
+      </div>
       {notes.length > 0 ? (
         <div className="notelist bg-gray-50 mb-4 border border-gray-300 rounded-md py-2 shadow-md grid gap-1 min-h-fit max-h-96 overflow-y-scroll overflow-x-hidden">
           {notes.map((note) => {

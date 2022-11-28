@@ -54,7 +54,8 @@ export default function Login() {
       .catch(function (error) {
         if (formRef.current) {
           formRef.current.removeAttribute("disabled");
-          formRef.current.className = "";
+          formRef.current.className =
+            "bg-white rounded-md shadow border p-3 pt-2";
         }
         setAPIResponse(
           error.response.status > 499 ? (

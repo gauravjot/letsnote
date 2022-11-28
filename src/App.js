@@ -54,6 +54,7 @@ export default function App() {
           <div>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/note/:noteid" element={<Home />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </div>

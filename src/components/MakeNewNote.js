@@ -4,7 +4,7 @@ import { BACKEND_SERVER_DOMAIN } from "../config";
 import axios from "axios";
 import ExampleDocument from "../utils/ExampleDocument";
 
-export default function MakeNewNote({ showCreateBox, onNewNoteCreated }) {
+export default function MakeNewNote({ onNewNoteCreated }) {
   const user = useSelector((state) => state.user);
   const [title, setTitle] = React.useState("");
   const [isCallingAPI, setIsCallingAPI] = React.useState(false);
@@ -48,12 +48,8 @@ export default function MakeNewNote({ showCreateBox, onNewNoteCreated }) {
 
   return user.token ? (
     <div className={isCallingAPI ? "opacity-50 grayscale" : ""}>
-      <div
-        className={
-          (showCreateBox ? "block" : "hidden") + " font-sans mb-4 mt-3"
-        }
-      >
-        <div className="rounded-md shadow bg-white px-3 py-3">
+      <div className="font-sans mb-4 mt-1">
+        <div className="rounded-md border-gray-200 border-solid border shadow bg-white px-3 py-3">
           <div className="font-medium text-sm text-gray-500 mb-1">
             Creating new note
           </div>
@@ -62,7 +58,7 @@ export default function MakeNewNote({ showCreateBox, onNewNoteCreated }) {
             value={title}
             onChange={handleTitle}
             placeholder="Type note title here"
-            className="rounded bg-gray-200 w-full px-3 py-1.5 mt-2 text-sm focus-visible:outline-gray-400"
+            className="rounded bg-gray-200 font-medium w-full px-3 py-1.5 mt-2 text-sm text-gray-700 focus-visible:outline-gray-300"
             disabled={isCallingAPI ? "disabled" : ""}
           />
           <button

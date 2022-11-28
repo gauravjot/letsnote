@@ -7,8 +7,12 @@ import { BACKEND_SERVER_DOMAIN } from "../config";
 import { useSelector } from "react-redux";
 import _ from "lodash";
 import ExampleDocument from "../utils/ExampleDocument";
+import { Helmet } from "react-helmet";
+import { useParams, useNavigate } from "react-router-dom";
 
 function Home() {
+  let { noteid } = useParams();
+  let navigate = useNavigate();
   const user = useSelector((state) => state.user);
   const [note, setNote] = useState(undefined);
   const [status, setStatus] = useState("");
@@ -22,6 +26,9 @@ function Home() {
     if (!user.token) {
       setNote(undefined);
       setDocument(ExampleDocument);
+    }
+    if (noteid && !note) {
+      openNote({ id: noteid });
     }
   }, [user, note]);
 
@@ -112,9 +119,9 @@ function Home() {
   );
 
   const openNote = (note) => {
-    setIsNoteLoading(true);
-    setCurrentNoteID(note.id);
     if (user.token) {
+      setIsNoteLoading(true);
+      setCurrentNoteID(note.id);
       let config = {
         headers: {
           "Content-Type": "application/json",
@@ -127,16 +134,22 @@ function Home() {
           setNote(response.data);
           setDocument(JSON.parse(response.data.content));
           setIsNoteLoading(false);
+          navigate("/note/" + note.id);
         })
         .catch(function (error) {
           setError(error.response);
           setIsNoteLoading(false);
         });
+    } else {
+      navigate("/");
     }
   };
 
   return (
     <>
+      <Helmet>
+        <title>{note ? "Letsnote: " + note.title : "Letsnote"}</title>
+      </Helmet>
       <div className="App min-h-screen">
         <div className="xl:container mx-auto lg:grid lg:grid-cols-12 w-100">
           <div className="lg:col-span-3">
