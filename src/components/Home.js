@@ -12,7 +12,7 @@ import { useParams, useNavigate } from "react-router-dom";
 
 function Home() {
   let { noteid } = useParams();
-  let navigate = useNavigate();
+  const navigate = useNavigate();
   const user = useSelector((state) => state.user);
   const [note, setNote] = useState(undefined);
   const [status, setStatus] = useState("");
@@ -20,7 +20,7 @@ function Home() {
   const [error, setError] = useState();
   const [refreshNoteList, setRefreshNoteList] = useState(false);
   const [isNoteLoading, setIsNoteLoading] = useState(false);
-  const [currentNoteID, setCurrentNoteID] = useState();
+  const [currentNoteID, setCurrentNoteID] = useState(null);
 
   useEffect(() => {
     if (!user.token) {
@@ -79,7 +79,7 @@ function Home() {
                   {JSON.stringify(error.response.data)}
                 </>
               );
-              setError(error.response);
+              setError(error.response.data);
             });
         } else {
           // Create note
@@ -95,13 +95,10 @@ function Home() {
                   <span className="ic ic-cloud-done"></span>&nbsp; Created
                 </>
               );
-              if (!currentNoteID) {
-                setCurrentNoteID(response.data.id);
-              }
-              if (currentNoteID === response.data.id) {
-                setNote(response.data);
-              }
+              setCurrentNoteID(response.data.id);
+              setNote(response.data);
               setRefreshNoteList(!refreshNoteList);
+              navigate("/note/" + response.data.id);
             })
             .catch(function (error) {
               setStatus(
@@ -110,7 +107,7 @@ function Home() {
                   {JSON.stringify(error.response.data)}
                 </>
               );
-              setError(error.response);
+              setError(error.response.data);
             });
         }
       }
@@ -139,6 +136,10 @@ function Home() {
         .catch(function (error) {
           setError(error.response);
           setIsNoteLoading(false);
+          if (error.response.data.code === "N0404") {
+            // Note not found
+            navigate("/");
+          }
         });
     } else {
       navigate("/");

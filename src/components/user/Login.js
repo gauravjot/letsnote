@@ -33,6 +33,8 @@ export default function Login() {
           All fields are required.
         </span>
       );
+      formRef.current.removeAttribute("disabled");
+      formRef.current.className = "";
       return;
     }
 
@@ -54,8 +56,7 @@ export default function Login() {
       .catch(function (error) {
         if (formRef.current) {
           formRef.current.removeAttribute("disabled");
-          formRef.current.className =
-            "bg-white rounded-md shadow border p-3 pt-2";
+          formRef.current.className = "";
         }
         setAPIResponse(
           error.response.status > 499 ? (
@@ -98,58 +99,57 @@ export default function Login() {
               Write your documents and edit later.
             </p>
           </div>
-          <div
-            className="bg-white rounded-md shadow border p-3 pt-2"
-            ref={formRef}
-          >
-            {apiResponse}
-            <div>
-              <label
-                className="text-sm font-medium text-gray-600 my-1 px-1"
-                htmlFor="email"
-              >
-                Email
-              </label>
-              <input
-                className="block bg-gray-50 w-full border border-gray-200 border-solid py-2 font-medium px-3 text-sm rounded-lg mt-1 focus-visible:outline-gray-400 focus-visible:bg-gray-100"
-                placeholder="you@company.com"
-                type="email"
-                id="email"
-                onChange={handleEmail}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    login();
-                  }
-                }}
-              />
-            </div>
-            <div className="mt-1.5">
-              <label
-                className="text-sm font-medium text-gray-600 my-1 px-1"
-                htmlFor="password"
-              >
-                Password
-              </label>
-              <input
-                className="block bg-gray-50 w-full border border-gray-200 border-solid py-2 font-medium px-3 text-sm rounded-lg mt-1 focus-visible:outline-gray-400 focus-visible:bg-gray-100"
-                placeholder="••••••••"
-                type="password"
-                id="password"
-                onChange={handlePassword}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    login();
-                  }
-                }}
-              />
-            </div>
-            <div className="text-right">
-              <input
-                className="ab-btn ab-btn-sm ab-btn-long mt-4 cursor-pointer"
-                type="submit"
-                onClick={login}
-                value="Login"
-              />
+          <div ref={formRef}>
+            <div className="bg-white rounded-md shadow border p-3 pt-2">
+              {apiResponse}
+              <div>
+                <label
+                  className="text-sm font-medium text-gray-600 my-1 px-1"
+                  htmlFor="email"
+                >
+                  Email
+                </label>
+                <input
+                  className="block bg-gray-50 w-full border border-gray-200 border-solid py-2 font-medium px-3 text-sm rounded-lg mt-1 focus-visible:outline-gray-400 focus-visible:bg-gray-100"
+                  placeholder="you@company.com"
+                  type="email"
+                  id="email"
+                  onChange={handleEmail}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      login();
+                    }
+                  }}
+                />
+              </div>
+              <div className="mt-1.5">
+                <label
+                  className="text-sm font-medium text-gray-600 my-1 px-1"
+                  htmlFor="password"
+                >
+                  Password
+                </label>
+                <input
+                  className="block bg-gray-50 w-full border border-gray-200 border-solid py-2 font-medium px-3 text-sm rounded-lg mt-1 focus-visible:outline-gray-400 focus-visible:bg-gray-100"
+                  placeholder="••••••••"
+                  type="password"
+                  id="password"
+                  onChange={handlePassword}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      login();
+                    }
+                  }}
+                />
+              </div>
+              <div className="text-right">
+                <input
+                  className="ab-btn ab-btn-sm ab-btn-long mt-4 cursor-pointer"
+                  type="submit"
+                  onClick={login}
+                  value="Login"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -163,9 +163,10 @@ export default function Login() {
               <div className="flex-grow-0 h-max">
                 <button
                   onClick={logOut}
-                  className="ab-btn ab-btn-secondary ab-btn-sm bg-black bg-opacity-30 font-normal text-sm whitespace-nowrap"
+                  className="infotrig ab-btn ab-btn-secondary ab-btn-sm bg-black bg-opacity-30 font-normal text-sm whitespace-nowrap"
                 >
                   <span className="ic ic-logout"></span>
+                  <div className="infomsg mt-2 whitespace-nowrap">Logout</div>
                 </button>
               </div>
             </div>

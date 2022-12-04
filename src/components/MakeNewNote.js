@@ -37,7 +37,6 @@ export default function MakeNewNote({ onNewNoteCreated }) {
         })
         .catch(function (error) {
           setIsCallingAPI(false);
-          setError(error.response);
         });
     }
   };

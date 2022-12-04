@@ -38,6 +38,18 @@
     -ms-user-select: none; /* IE10+/Edge */
     user-select: none; /* Standard */
   }
+
+  .line-height-125 {
+    line-height: 1.25rem;
+  }
+
+  .line-height-150 {
+    line-height: 1.5rem;
+  }
+
+  .line-height-175 {
+    line-height: 1.75rem;
+  }
 }
 
 /* width */
@@ -81,6 +93,18 @@ body {
 
 .container {
   margin: 0 auto;
+}
+
+.infotrig {
+  position: relative;
+}
+
+.infomsg {
+  @apply opacity-0 hidden absolute left-0 max-w-6xl bg-slate-500 text-white rounded px-1.5 py-0.5 text-xs font-medium;
+}
+
+.infotrig:hover .infomsg {
+  @apply opacity-100 block w-auto h-auto;
 }
 
 @media (max-width: 640px) {

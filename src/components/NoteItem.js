@@ -67,8 +67,10 @@ export default function NoteItem({
             openNote(note);
           }}
         >
-          <div className="text-gray-900 font-medium">{note.title}</div>
-          <div className="text-xs">{dateTimePretty(note.updated)}</div>
+          <div className="text-gray-900 font-medium line-height-125 h-5 overflow-hidden">
+            {note.title}
+          </div>
+          <div className="text-xs mt-1">{dateTimePretty(note.updated)}</div>
         </div>
         <div className="h-fit self-center relative">
           <button

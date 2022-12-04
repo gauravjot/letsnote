@@ -122,7 +122,7 @@ function ToolBarButton(props) {
       className={
         (isActive
           ? "bg-gray-300 hover:outline outline-1 outline-gray-400 "
-          : "hover:bg-gray-300") + " ml-3 p-1 text-xs aspect-square"
+          : "hover:bg-gray-300") + " infotrig ml-3 p-1 text-xs aspect-square"
       }
       active={isActive ? "true" : "false"}
       {...otherProps}
@@ -134,6 +134,9 @@ function ToolBarButton(props) {
           getIconForButton(label)
         }
       ></span>
+      <div className="infomsg mt-2 whitespace-nowrap">
+        {getTitleForTool(label)}
+      </div>
     </button>
   );
 }
@@ -166,6 +169,46 @@ function getIconForButton(style) {
   }
 }
 
+function getTitleForTool(tool) {
+  switch (tool) {
+    case "bold":
+      return "Bold";
+    case "italic":
+      return "Italic";
+    case "code":
+      return "Inline Code";
+    case "underline":
+      return "Underline";
+    case "highlight":
+      return "Text Highlight";
+    case "strike":
+      return "Text Strikethrough";
+    case "sub":
+      return "Subscript";
+    case "sup":
+      return "Superscript";
+    case "image":
+      return "Add Image";
+    case "link":
+      return "Add Link";
+    case "h1":
+      return "Heading 1";
+    case "h2":
+      return "Heading 2";
+    case "h3":
+      return "Heading 3";
+    case "h4":
+      return "Heading 4";
+    case "paragraph":
+      return "Paragraph";
+    case "codeblock":
+      return "Code Block";
+    case "quote":
+      return "Quotations";
+    default:
+      return "Option";
+  }
+}
 // Element Select
 
 function getLabelForBlockStyle(style) {
@@ -198,7 +241,7 @@ function Element({ element, title, onSelect }) {
       className={
         (title === getLabelForBlockStyle(element)
           ? "bg-gray-300 hover:outline outline-1 outline-gray-400 "
-          : "hover:bg-gray-300") + " ml-3 p-1 text-xs aspect-square"
+          : "hover:bg-gray-300") + " infotrig ml-3 p-1 text-xs aspect-square"
       }
       onClick={() => {
         onSelect(element);
@@ -213,6 +256,9 @@ function Element({ element, title, onSelect }) {
           element
         }
       ></span>
+      <div className="infomsg mt-2 whitespace-nowrap">
+        {getTitleForTool(element)}
+      </div>
     </button>
   );
 }

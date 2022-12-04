@@ -75,8 +75,8 @@ export default function NoteList({ openNote, currentNote, refresh }) {
       </div>
       <div
         className={
-          (showCreateBox ? "max-h-96" : "max-h-0") +
-          " transition-all duration-500 delay-75 ease-linear overflow-hidden"
+          (showCreateBox ? "max-h-36" : "max-h-0") +
+          " transition-all duration-500 ease-linear overflow-hidden"
         }
       >
         <MakeNewNote onNewNoteCreated={newNoteCreated} />
