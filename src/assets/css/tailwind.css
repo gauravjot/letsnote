@@ -95,12 +95,23 @@ body {
   margin: 0 auto;
 }
 
+.w-transition {
+  transition: width 0.5s ease-out;
+}
+.w-sidebar {
+  width: 100%;
+}
+@media (min-width: 1024px) {
+  .lg\:w-sidebar {
+    width: 28rem;
+  }
+}
 .infotrig {
   position: relative;
 }
 
 .infomsg {
-  @apply opacity-0 hidden absolute left-0 max-w-6xl bg-slate-500 text-white rounded px-1.5 py-0.5 text-xs font-medium;
+  @apply opacity-0 hidden absolute max-w-6xl bg-slate-500 text-white rounded px-1.5 py-0.5 text-xs font-medium;
 }
 
 .infotrig:hover .infomsg {

@@ -49,7 +49,9 @@ export default function NoteList({ openNote, currentNote, refresh }) {
       <div className="text-xl font-bold text-gray-900 pl-2 mt-6 mb-2 user-select-none">
         <div className="flex">
           <div className="flex-grow">
-            <span className="font-sans align-middle">Your Notes</span>
+            <span className="font-sans align-middle whitespace-nowrap overflow-hidden">
+              Your Notes
+            </span>
           </div>
           <div className="flex-grow-0 h-max">
             <button
@@ -66,7 +68,7 @@ export default function NoteList({ openNote, currentNote, refresh }) {
               <span
                 className={
                   (showCreateBox ? "ic-close" : "ic-add ic-black") +
-                  " inline-block align-baseline h-4 w-4 invert"
+                  " inline-block align-baseline h-4 w-4 p-1 invert"
                 }
               ></span>
             </button>

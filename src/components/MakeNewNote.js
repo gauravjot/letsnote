@@ -64,7 +64,7 @@ export default function MakeNewNote({ onNewNoteCreated }) {
             onClick={() => {
               createNewNote();
             }}
-            className="ab-btn ab-btn-xs ab-btn-long mt-2"
+            className="ab-btn ab-btn-xs ab-btn-long mt-2 py-2"
             disabled={isCallingAPI ? "disabled" : ""}
           >
             Create

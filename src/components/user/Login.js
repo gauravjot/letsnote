@@ -165,8 +165,10 @@ export default function Login() {
                   onClick={logOut}
                   className="infotrig ab-btn ab-btn-secondary ab-btn-sm bg-black bg-opacity-30 font-normal text-sm whitespace-nowrap"
                 >
-                  <span className="ic ic-logout"></span>
-                  <div className="infomsg mt-2 whitespace-nowrap">Logout</div>
+                  <span className="ic ic-logout align-middle"></span>
+                  <div className="infomsg mt-3 bottom-9 right-0 whitespace-nowrap">
+                    Logout
+                  </div>
                 </button>
               </div>
             </div>

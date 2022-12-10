@@ -134,7 +134,7 @@ function ToolBarButton(props) {
           getIconForButton(label)
         }
       ></span>
-      <div className="infomsg mt-2 whitespace-nowrap">
+      <div className="infomsg mt-3 z-30 whitespace-nowrap">
         {getTitleForTool(label)}
       </div>
     </button>
@@ -256,7 +256,7 @@ function Element({ element, title, onSelect }) {
           element
         }
       ></span>
-      <div className="infomsg mt-2 whitespace-nowrap">
+      <div className="infomsg mt-3 z-30 whitespace-nowrap">
         {getTitleForTool(element)}
       </div>
     </button>

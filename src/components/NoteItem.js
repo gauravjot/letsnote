@@ -70,7 +70,9 @@ export default function NoteItem({
           <div className="text-gray-900 font-medium line-height-125 h-5 overflow-hidden">
             {note.title}
           </div>
-          <div className="text-xs mt-1">{dateTimePretty(note.updated)}</div>
+          <div className="text-xs mt-1 whitespace-nowrap overflow-hidden">
+            {dateTimePretty(note.updated)}
+          </div>
         </div>
         <div className="h-fit self-center relative">
           <button
@@ -87,24 +89,24 @@ export default function NoteItem({
             ref={optionsRef}
             className={
               (menuOpen ? "" : "hidden ") +
-              "absolute right-0 bg-white rounded-md shadow-md z-20 sidebar-note-menu"
+              "absolute right-0 bg-gray-600 border border-gray-700 border-solid text-white rounded-md shadow-md z-20 sidebar-note-menu"
             }
           >
             <button
-              className="text-xs border-b px-3 py-1.5 w-full text-left rounded-t-md hover:bg-gray-500 hover:text-white"
+              className="text-sm font-medium border-b border-gray-700 px-4 py-2 w-full text-left rounded-t-md hover:bg-gray-800 hover:text-white"
               onClick={() => {
                 renameNote();
               }}
             >
-              rename&nbsp;&nbsp;&nbsp;
+              Rename&nbsp;&nbsp;&nbsp;
             </button>
             <button
-              className="text-xs px-3 py-1.5 w-full text-left rounded-b-md hover:bg-gray-500 hover:text-white"
+              className="text-sm font-medium px-4 py-2 w-full text-left rounded-b-md hover:bg-gray-800 hover:text-white"
               onClick={() => {
                 deleteNote();
               }}
             >
-              delete
+              Delete
             </button>
           </div>
         </div>

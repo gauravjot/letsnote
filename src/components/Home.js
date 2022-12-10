@@ -1,5 +1,5 @@
 import Editor from "./editor/Editor";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Login from "./user/Login";
 import NoteList from "./NoteList";
 import axios from "axios";
@@ -12,6 +12,7 @@ import { useParams, useNavigate } from "react-router-dom";
 
 function Home() {
   let { noteid } = useParams();
+  let sidebarRef = useRef();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
   const [note, setNote] = useState(undefined);
@@ -21,6 +22,7 @@ function Home() {
   const [refreshNoteList, setRefreshNoteList] = useState(false);
   const [isNoteLoading, setIsNoteLoading] = useState(false);
   const [currentNoteID, setCurrentNoteID] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
     if (!user.token) {
@@ -146,15 +148,26 @@ function Home() {
     }
   };
 
+  const toggleSidebar = () => {
+    if (sidebarRef.current) {
+      if (sidebarOpen) {
+        sidebarRef.current.className = "w-transition w-0";
+      } else {
+        sidebarRef.current.className = "w-transition lg:w-sidebar";
+      }
+      setSidebarOpen(!sidebarOpen);
+    }
+  };
+
   return (
     <>
       <Helmet>
-        <title>{note ? "Letsnote: " + note.title : "Letsnote"}</title>
+        <title>{note ? note.title + " | " : ""}Letsnote</title>
       </Helmet>
       <div className="App min-h-screen">
-        <div className="xl:container mx-auto lg:grid lg:grid-cols-12 w-100">
-          <div className="lg:col-span-3">
-            <div className="h-screen bg-gray-100 block px-4 border-r border-gray-300 border-solid sticky top-0">
+        <div className="mx-auto lg:flex w-full">
+          <div ref={sidebarRef} className="w-transition lg:w-sidebar">
+            <div className="h-screen w-full min-w-min bg-gray-100 block px-4 border-r border-gray-300 border-solid sticky top-0">
               <div className="font-serif font-bold text-3xl py-8">letsnote</div>
               <Login />
               <NoteList
@@ -164,7 +177,23 @@ function Home() {
               />
             </div>
           </div>
-          <div className="min-h-screen lg:col-span-9 md:px-4 bg-gray-200 relative">
+          <div className="min-h-screen w-full md:px-4 bg-gray-200 relative">
+            {/*
+             * Toggle to close the sidebar
+             */}
+            <div className="sticky top-2 z-40 -ml-4 left-0 h-0">
+              <button
+                className="border-1 px-2 py-1 pt-2 w-8 bg-gray-600 shadow-md border-t border-r border-b rounded-tr-md rounded-br-md border-solid border-gray-300"
+                onClick={toggleSidebar}
+              >
+                <span
+                  className={
+                    "ic ic-double-arrow align-text-top" +
+                    (sidebarOpen ? " rotate-180" : "")
+                  }
+                ></span>
+              </button>
+            </div>
             <div className={isNoteLoading ? "blur-sm" : ""}>
               <Editor
                 document={document}
