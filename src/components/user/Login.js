@@ -3,7 +3,6 @@ import axios from "axios";
 import { BACKEND_SERVER_DOMAIN } from "../../config";
 import { useSelector, useDispatch } from "react-redux";
 import { setUser, logoutUser } from "../../redux/actions";
-import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const user = useSelector((state) => state.user);
@@ -12,7 +11,6 @@ export default function Login() {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [apiResponse, setAPIResponse] = React.useState(<></>);
-  const navigate = useNavigate();
 
   const handleEmail = ({ target }) => {
     setEmail(target.value);

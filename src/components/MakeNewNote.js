@@ -57,14 +57,14 @@ export default function MakeNewNote({ onNewNoteCreated }) {
             value={title}
             onChange={handleTitle}
             placeholder="Type note title here"
-            className="rounded bg-gray-200 font-medium w-full px-3 py-1.5 mt-2 text-sm text-gray-700 focus-visible:outline-gray-300"
+            className="rounded bg-gray-200 font-medium w-full px-3 py-1.5 mt-2 text-sm text-gray-700 focus-visible:outline-gray-400"
             disabled={isCallingAPI ? "disabled" : ""}
           />
           <button
             onClick={() => {
               createNewNote();
             }}
-            className="ab-btn ab-btn-xs ab-btn-long mt-2 py-2"
+            className="ab-btn ab-btn-sm ab-btn-long mt-2 py-2"
             disabled={isCallingAPI ? "disabled" : ""}
           >
             Create

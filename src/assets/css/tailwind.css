@@ -129,7 +129,7 @@ body {
 }
 
 .ab-btn-secondary {
-  @apply bg-gray-400 hover:bg-gray-500 text-white;
+  @apply bg-gray-500 hover:bg-gray-700 text-white;
 }
 
 .ab-btn-sm {
@@ -176,9 +176,14 @@ body {
   * Sidebar
 */
 
+.notelist .sidebar-note-menu button {
+  letter-spacing: 0.25px;
+}
+
 .notelist > div:last-child .sidebar-note-menu {
   bottom: -0.5rem;
   right: 2rem;
+  transform-origin: bottom right;
 }
 
 /*
@@ -195,7 +200,7 @@ body {
 }
 
 .editor > div[role="textbox"] {
-  @apply max-w-4xl rounded-none px-6 py-4 sm:px-8 sm:py-6 lg:px-16 lg:py-12 xl:px-20 xl:py-16 my-8 sm:rounded-md shadow-sm bg-white mx-auto min-h-[calc(100vh-7rem)];
+  @apply max-w-4xl my-10 lg:mb-16 px-6 py-4 sm:px-8 sm:py-6 sm:pb-36 lg:px-16 lg:py-12 lg:pb-48 xl:px-20 xl:py-16 xl:pb-64 sm:rounded-md shadow-sm bg-white mx-auto min-h-[calc(100vh-7rem)];
 }
 
 .editor a {

@@ -3,6 +3,7 @@ import { dateTimePretty } from "../utils/TimeSince";
 import axios from "axios";
 import { BACKEND_SERVER_DOMAIN } from "../config";
 import { useSelector } from "react-redux";
+import { redirect } from "react-router-dom";
 
 export default function NoteItem({
   note,
@@ -31,22 +32,33 @@ export default function NoteItem({
   };
 
   const deleteNote = () => {
-    let config = {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: user.token,
-      },
-    };
-    axios
-      .delete(BACKEND_SERVER_DOMAIN + "/api/note/" + note.id + "/", config)
-      .then(function (response) {
-        if (response.data.action) {
-          refreshNotes();
-        }
-      })
-      .catch(function (err) {
-        console.log(err);
-      });
+    if (
+      window.confirm(
+        "Are you sure you want to delete this note?\nThis cannot be reversed.\n\nTitle: " +
+          note.title +
+          "\nCreated: " +
+          dateTimePretty(note.created) +
+          "\n"
+      )
+    ) {
+      let config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: user.token,
+        },
+      };
+      axios
+        .delete(BACKEND_SERVER_DOMAIN + "/api/note/" + note.id + "/", config)
+        .then(function (response) {
+          // if (response.data.action) {
+          //   refreshNotes();
+          // }
+          window.location.replace("/");
+        })
+        .catch(function (err) {
+          console.log(err);
+        });
+    }
   };
 
   const renameNote = () => {};
@@ -88,8 +100,8 @@ export default function NoteItem({
           <div
             ref={optionsRef}
             className={
-              (menuOpen ? "" : "hidden ") +
-              "absolute right-0 bg-gray-600 border border-gray-700 border-solid text-white rounded-md shadow-md z-20 sidebar-note-menu"
+              (menuOpen ? "scale-100 " : "scale-0 ") +
+              "transition-all origin-top-right absolute right-0 bg-gray-600 border border-gray-700 border-solid text-white rounded-md shadow-md z-20 sidebar-note-menu"
             }
           >
             <button

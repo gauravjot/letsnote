@@ -45,7 +45,7 @@ export default function Toolbar({ selection, previousSelection, note }) {
   return (
     <div className="top-0 z-30 sticky" id="toolbar">
       <div className="bg-gray-50 px-1 mt-1 shadow-md rounded ab-toolbar">
-        <div className="px-3 pt-2 mb-1">
+        <div className="px-3 pt-2 mb-1 ml-1">
           <span className="text-lg font-serif font-medium">
             {note ? note.title : "Untitled"}
           </span>

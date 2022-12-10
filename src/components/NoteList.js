@@ -60,9 +60,9 @@ export default function NoteList({ openNote, currentNote, refresh }) {
               }}
               className={
                 (showCreateBox
-                  ? "bg-gray-400 border-solid hover:bg-gray-500 hover:border-gray-500"
+                  ? "bg-gray-500 border-solid hover:bg-gray-700 hover:border-gray-700"
                   : "border-dashed hover:bg-gray-300") +
-                "  h-7 w-7 cursor-pointer align-middle rounded-md border-2 border-gray-400 p-0"
+                "  h-7 w-7 cursor-pointer align-middle rounded-md border-2 border-gray-500 p-0"
               }
             >
               <span
@@ -78,7 +78,7 @@ export default function NoteList({ openNote, currentNote, refresh }) {
       <div
         className={
           (showCreateBox ? "max-h-36" : "max-h-0") +
-          " transition-all duration-500 ease-linear overflow-hidden"
+          " transition-all duration-200 ease-linear overflow-hidden"
         }
       >
         <MakeNewNote onNewNoteCreated={newNoteCreated} />

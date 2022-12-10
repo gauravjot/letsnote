@@ -24,6 +24,12 @@ function Home() {
   const [currentNoteID, setCurrentNoteID] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
+  const savingStatus = (
+    <>
+      <span className="ic align-middle ic-cloud"></span>&nbsp; Saving...
+    </>
+  );
+
   useEffect(() => {
     if (!user.token) {
       setNote(undefined);
@@ -35,11 +41,11 @@ function Home() {
   }, [user, note]);
 
   const saveNote = (content) => {
-    setStatus(
-      <>
-        <span className="ic ic-cloud"></span>&nbsp; Saving...
-      </>
-    );
+    setStatus(savingStatus);
+    window.onbeforeunload = function () {
+      alert("Note is not yet saved. Please wait!");
+      return true;
+    };
     _sendReq(content);
   };
 
@@ -67,21 +73,25 @@ function Home() {
             .then(function (response) {
               setStatus(
                 <>
-                  <span className="ic ic-cloud-done"></span>&nbsp; Synced
+                  <span className="ic align-middle ic-cloud-done"></span>&nbsp;
+                  Synced
                 </>
               );
               if (currentNoteID === response.data.id) {
                 setNote(response.data);
               }
+              window.onbeforeunload = null;
             })
             .catch(function (error) {
               setStatus(
                 <>
-                  <span className="ic ic-cloud-fail"></span>&nbsp; Sync fail:
+                  <span className="ic align-middle ic-cloud-fail"></span>&nbsp;
+                  Sync fail:
                   {JSON.stringify(error.response.data)}
                 </>
               );
               setError(error.response.data);
+              window.onbeforeunload = null;
             });
         } else {
           // Create note
@@ -94,22 +104,26 @@ function Home() {
             .then(function (response) {
               setStatus(
                 <>
-                  <span className="ic ic-cloud-done"></span>&nbsp; Created
+                  <span className="ic align-middle ic-cloud-done"></span>&nbsp;
+                  Created
                 </>
               );
               setCurrentNoteID(response.data.id);
               setNote(response.data);
               setRefreshNoteList(!refreshNoteList);
+              window.onbeforeunload = null;
               navigate("/note/" + response.data.id);
             })
             .catch(function (error) {
               setStatus(
                 <>
-                  <span className="ic ic-cloud-fail"></span>&nbsp; Sync fail:
+                  <span className="ic align-middle ic-cloud-fail"></span>&nbsp;
+                  Sync fail:
                   {JSON.stringify(error.response.data)}
                 </>
               );
               setError(error.response.data);
+              window.onbeforeunload = null;
             });
         }
       }
@@ -181,19 +195,26 @@ function Home() {
             {/*
              * Toggle to close the sidebar
              */}
-            <div className="sticky top-2 z-40 -ml-4 left-0 h-0">
-              <button
-                className="border-1 px-2 py-1 pt-2 w-8 bg-gray-600 shadow-md border-t border-r border-b rounded-tr-md rounded-br-md border-solid border-gray-300"
-                onClick={toggleSidebar}
-              >
-                <span
+            {user.token ? (
+              <div className="sticky top-2 z-40 -ml-4 left-0 h-0">
+                <button
                   className={
-                    "ic ic-double-arrow align-text-top" +
-                    (sidebarOpen ? " rotate-180" : "")
+                    "border-1 px-2 py-1 pt-2 w-8 shadow-md border-t border-r border-b rounded-tr-md rounded-br-md border-solid border-gray-300" +
+                    (sidebarOpen ? " bg-gray-400" : " bg-gray-600")
                   }
-                ></span>
-              </button>
-            </div>
+                  onClick={toggleSidebar}
+                >
+                  <span
+                    className={
+                      "ic ic-double-arrow align-text-top" +
+                      (sidebarOpen ? " rotate-180" : "")
+                    }
+                  ></span>
+                </button>
+              </div>
+            ) : (
+              ""
+            )}
             <div className={isNoteLoading ? "blur-sm" : ""}>
               <Editor
                 document={document}
@@ -218,8 +239,8 @@ function Home() {
                 )
               ) : (
                 <div className="fixed bottom-0 right-0 bg-red-900 shadow rounded-md px-2 py-1 font-medium text-sm text-white z-30 m-6">
-                  <span className="ic ic-cloud-fail"></span>&nbsp; Sign-in to
-                  auto-save
+                  <span className="ic align-middle ic-cloud-fail"></span>&nbsp;
+                  Sign-in to auto-save
                 </div>
               )}
             </div>
