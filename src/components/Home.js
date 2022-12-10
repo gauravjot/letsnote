@@ -199,7 +199,7 @@ function Home() {
               <div className="sticky top-2 z-40 -ml-4 left-0 h-0">
                 <button
                   className={
-                    "border-1 px-2 py-1 pt-2 w-8 shadow-md border-t border-r border-b rounded-tr-md rounded-br-md border-solid border-gray-300" +
+                    "border-1 hover:bg-gray-500 px-2 py-1 pt-2 w-8 shadow-md border-t border-r border-b rounded-tr-md rounded-br-md border-solid border-gray-300" +
                     (sidebarOpen ? " bg-gray-400" : " bg-gray-600")
                   }
                   onClick={toggleSidebar}
