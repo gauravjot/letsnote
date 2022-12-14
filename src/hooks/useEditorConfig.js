@@ -2,10 +2,12 @@ import { DefaultElement } from "slate-react";
 import Image from "../components/editor/Image";
 import Link from "../components/editor/Link";
 import LinkEditor from "../components/editor/LinkEditor";
-import React from "react";
-import StyledText from "../components/editor/StyledText";
 import isHotkey from "is-hotkey";
-import { toggleStyle, insertContent } from "../utils/EditorUtils";
+import {
+  toggleStyle,
+  insertContent,
+  toggleBlockType,
+} from "../utils/EditorUtils";
 
 export default function useEditorConfig(editor) {
   const { isVoid } = editor;
@@ -20,61 +22,37 @@ export default function useEditorConfig(editor) {
 
 function renderElement(props) {
   const { element, children, attributes } = props;
+  const style = { textAlign: element.align };
   switch (element.type) {
     case "image":
       return <Image {...props} />;
     case "paragraph":
       return (
-        <p
-          className="editor-p"
-          {...attributes}
-          contentEditable={"true"}
-          suppressContentEditableWarning={true}
-        >
+        <p className="editor-p" style={style} {...attributes}>
           {children}
         </p>
       );
     case "h1":
       return (
-        <h1
-          className="editor-h1"
-          {...attributes}
-          contentEditable={"true"}
-          suppressContentEditableWarning={true}
-        >
+        <h1 className="editor-h1" style={style} {...attributes}>
           {children}
         </h1>
       );
     case "h2":
       return (
-        <h2
-          className="editor-h2"
-          {...attributes}
-          contentEditable={"true"}
-          suppressContentEditableWarning={true}
-        >
+        <h2 className="editor-h2" style={style} {...attributes}>
           {children}
         </h2>
       );
     case "h3":
       return (
-        <h3
-          className="editor-h3"
-          {...attributes}
-          contentEditable={"true"}
-          suppressContentEditableWarning={true}
-        >
+        <h3 className="editor-h3" style={style} {...attributes}>
           {children}
         </h3>
       );
     case "h4":
       return (
-        <h4
-          className="editor-h4"
-          {...attributes}
-          contentEditable={"true"}
-          suppressContentEditableWarning={true}
-        >
+        <h4 className="editor-h4" style={style} {...attributes}>
           {children}
         </h4>
       );
@@ -82,22 +60,16 @@ function renderElement(props) {
       return (
         <div
           className="editor-codeblock"
+          style={style}
           {...attributes}
-          contentEditable={"true"}
           spellCheck="false"
-          suppressContentEditableWarning={true}
         >
           {children}
         </div>
       );
     case "quote":
       return (
-        <div
-          className="editor-quote"
-          {...attributes}
-          contentEditable={"true"}
-          suppressContentEditableWarning={true}
-        >
+        <div className="editor-quote" style={style} {...attributes}>
           {children}
         </div>
       );
@@ -117,42 +89,89 @@ function renderLeaf(props) {
 const KeyBindings = {
   onKeyDown: (editor, event) => {
     if (isHotkey("mod+b", event)) {
+      event.preventDefault();
       toggleStyle(editor, "bold");
       return;
     }
     if (isHotkey("mod+i", event)) {
+      event.preventDefault();
       toggleStyle(editor, "italic");
       return;
     }
     if (isHotkey("mod+u", event)) {
+      event.preventDefault();
       toggleStyle(editor, "underline");
       return;
     }
     if (isHotkey("tab", event)) {
       event.preventDefault();
-      event.stopPropagation();
       insertContent(editor, "	");
       return;
     }
-    if (isHotkey("mod+opt+`", event)) {
-      console.log("paragraph");
+    if (isHotkey("mod+shift+`", event)) {
+      event.preventDefault();
+      toggleBlockType(editor, "paragraph");
       return;
     }
-    if (isHotkey("mod+opt+1", event)) {
-      console.log("h1");
+    if (isHotkey("mod+shift+1", event)) {
+      event.preventDefault();
+      toggleBlockType(editor, "h1");
       return;
     }
-    if (isHotkey("mod+opt+2", event)) {
-      console.log("h2");
+    if (isHotkey("mod+shift+2", event)) {
+      event.preventDefault();
+      toggleBlockType(editor, "h2");
       return;
     }
-    if (isHotkey("mod+opt+3", event)) {
-      console.log("h3");
+    if (isHotkey("mod+shift+3", event)) {
+      event.preventDefault();
+      toggleBlockType(editor, "h3");
       return;
     }
-    if (isHotkey("mod+opt+4", event)) {
-      console.log("h4");
+    if (isHotkey("mod+shift+4", event)) {
+      event.preventDefault();
+      toggleBlockType(editor, "h4");
       return;
     }
   },
 };
+
+function StyledText({ attributes, children, leaf }) {
+  if (leaf.bold) {
+    children = <strong {...attributes}>{children}</strong>;
+  }
+
+  if (leaf.code) {
+    children = <code {...attributes}>{children}</code>;
+  }
+
+  if (leaf.italic) {
+    children = <em {...attributes}>{children}</em>;
+  }
+
+  if (leaf.underline) {
+    children = <u {...attributes}>{children}</u>;
+  }
+
+  if (leaf.strike) {
+    children = <s {...attributes}>{children}</s>;
+  }
+
+  if (leaf.sub) {
+    children = <sub {...attributes}>{children}</sub>;
+  }
+
+  if (leaf.sup) {
+    children = <sup {...attributes}>{children}</sup>;
+  }
+
+  if (leaf.highlight) {
+    children = (
+      <span className="editor-highlight" {...attributes}>
+        {children}
+      </span>
+    );
+  }
+
+  return <span {...attributes}>{children}</span>;
+}

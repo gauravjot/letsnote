@@ -165,9 +165,10 @@ function Home() {
   const toggleSidebar = () => {
     if (sidebarRef.current) {
       if (sidebarOpen) {
-        sidebarRef.current.className = "w-transition w-0";
+        sidebarRef.current.className = "w-transition w-0 opacity-0 z-20";
       } else {
-        sidebarRef.current.className = "w-transition lg:w-sidebar";
+        sidebarRef.current.className =
+          "w-transition opacity-100 lg:w-sidebar z-20";
       }
       setSidebarOpen(!sidebarOpen);
     }
@@ -180,8 +181,11 @@ function Home() {
       </Helmet>
       <div className="App min-h-screen">
         <div className="mx-auto lg:flex w-full">
-          <div ref={sidebarRef} className="w-transition lg:w-sidebar">
-            <div className="h-screen w-full min-w-min bg-gray-100 block px-4 border-r border-gray-300 border-solid sticky top-0">
+          <div
+            ref={sidebarRef}
+            className="w-transition opacity-100 lg:w-sidebar z-20"
+          >
+            <div className="h-screen min-w-0 w-full bg-gray-100 block px-4 border-r border-gray-300 border-solid sticky top-0">
               <div className="font-serif font-bold text-3xl py-8">letsnote</div>
               <Login />
               <NoteList
@@ -191,12 +195,12 @@ function Home() {
               />
             </div>
           </div>
-          <div className="min-h-screen w-full md:px-4 bg-gray-200 relative">
+          <div className="min-h-screen w-full md:px-4 bg-gray-200 relative z-40">
             {/*
              * Toggle to close the sidebar
              */}
             {user.token ? (
-              <div className="sticky top-2 z-40 -ml-4 left-0 h-0">
+              <div className="hidden lg:block sticky top-2 z-40 -ml-4 left-0 h-0">
                 <button
                   className={
                     "border-1 hover:bg-gray-500 px-2 py-1 pt-2 w-8 shadow-md border-t border-r border-b rounded-tr-md rounded-br-md border-solid border-gray-300" +
@@ -215,7 +219,7 @@ function Home() {
             ) : (
               ""
             )}
-            <div className={isNoteLoading ? "blur-sm" : ""}>
+            <div className={isNoteLoading ? "blur-sm z-40" : "z-40"}>
               <Editor
                 document={document}
                 onChange={(value) => {

@@ -79,7 +79,7 @@ export default function NoteItem({
             openNote(note);
           }}
         >
-          <div className="text-gray-900 font-medium line-height-125 h-5 overflow-hidden">
+          <div className="text-gray-900 max-w-12 text-ellipsis font-medium line-height-125 whitespace-nowrap overflow-hidden">
             {note.title}
           </div>
           <div className="text-xs mt-1 whitespace-nowrap overflow-hidden">

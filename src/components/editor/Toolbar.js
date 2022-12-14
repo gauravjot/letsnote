@@ -1,13 +1,14 @@
 import {
   getActiveStyles,
   getTextBlockStyle,
+  getTextAlignStyle,
   hasActiveLinkAtSelection,
   toggleBlockType,
   toggleLinkAtSelection,
   toggleStyle,
 } from "../../utils/EditorUtils";
 
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { useSlateStatic } from "slate-react";
 import useImageUploadHandler from "../../hooks/useImageUploadHandler";
 import { dateTimePretty } from "../../utils/TimeSince";
@@ -23,6 +24,7 @@ const CHARACTER_STYLES = [
   "sup",
   "sub",
 ];
+const TEXT_ALIGN = ["left", "center", "right", "justify"];
 
 export default function Toolbar({ selection, previousSelection, note }) {
   const editor = useSlateStatic();
@@ -33,7 +35,6 @@ export default function Toolbar({ selection, previousSelection, note }) {
         return;
       }
       toggleBlockType(editor, targetType);
-      editor.focus();
     },
     [editor]
   );
@@ -60,14 +61,17 @@ export default function Toolbar({ selection, previousSelection, note }) {
           </span>
         </div>
         {/* Dropdown for paragraph styles */}
-        <ElementSelect
-          title={getLabelForBlockStyle(blockType ?? "paragraph")}
-          elements={PARAGRAPH_STYLES}
-          onSelect={onBlockTypeChange}
-        />
+        <div className="border-r-2 border-gray-300 pr-3 inline-block my-2.5">
+          <ElementSelect
+            title={getLabelForBlockStyle(blockType ?? "paragraph")}
+            elements={PARAGRAPH_STYLES}
+            onSelect={onBlockTypeChange}
+          />
+        </div>
+
         {/* Buttons for character styles */}
         <div className="inline-block my-2.5">
-          <div className="border-r-2 border-gray-300 inline-block pr-3">
+          <div className="inline-block">
             {CHARACTER_STYLES.map((style) => (
               <ToolBarButton
                 key={style}
@@ -82,11 +86,14 @@ export default function Toolbar({ selection, previousSelection, note }) {
             ))}
           </div>
           {/* Link Button */}
-          <ToolBarButton
-            isActive={hasActiveLinkAtSelection(editor)}
-            label={"link"}
-            onMouseDown={() => toggleLinkAtSelection(editor)}
-          />
+          <div className="border-r-2 border-gray-300 inline-block pr-3">
+            <ToolBarButton
+              isActive={hasActiveLinkAtSelection(editor)}
+              label={"link"}
+              onMouseDown={() => toggleLinkAtSelection(editor)}
+            />
+          </div>
+
           {/* Image Upload Button 
           <label
             className="ml-3 p-1 text-xs rounded aspect-square cursor-pointer"
@@ -107,13 +114,22 @@ export default function Toolbar({ selection, previousSelection, note }) {
           />
           */}
         </div>
+        {/* Options for text Alignment */}
+        <div className="pr-3 inline-block my-2.5">
+          <ElementSelect
+            title={getLabelForBlockStyle(
+              getTextAlignStyle(editor) ?? "paragraph"
+            )}
+            elements={TEXT_ALIGN}
+            onSelect={onBlockTypeChange}
+          />
+        </div>
       </div>
     </div>
   );
 }
 
 // Text Formatting
-
 function ToolBarButton(props) {
   const { label, isActive, ...otherProps } = props;
   return (
@@ -191,22 +207,8 @@ function getTitleForTool(tool) {
       return "Add Image";
     case "link":
       return "Add Link";
-    case "h1":
-      return "Heading 1";
-    case "h2":
-      return "Heading 2";
-    case "h3":
-      return "Heading 3";
-    case "h4":
-      return "Heading 4";
-    case "paragraph":
-      return "Paragraph";
-    case "codeblock":
-      return "Code Block";
-    case "quote":
-      return "Quotations";
     default:
-      return "Option";
+      return getLabelForBlockStyle(tool);
   }
 }
 // Element Select
@@ -229,6 +231,14 @@ function getLabelForBlockStyle(style) {
       return "Quotations";
     case "multiple":
       return "Multiple";
+    case "left":
+      return "Align Left";
+    case "right":
+      return "Align Right";
+    case "center":
+      return "Align Center";
+    case "justify":
+      return "Justify Block";
     default:
       throw new Error(`Unhandled style in getLabelForBlockStyle: ${style}`);
   }
@@ -239,7 +249,8 @@ function Element({ element, title, onSelect }) {
     <button
       variant=""
       className={
-        (title === getLabelForBlockStyle(element)
+        (title === getLabelForBlockStyle(element) ||
+        element.align === getLabelForBlockStyle(element)
           ? "bg-gray-300 hover:outline outline-1 outline-gray-400 "
           : "hover:bg-gray-300") + " infotrig ml-3 p-1 text-xs aspect-square"
       }
@@ -265,9 +276,8 @@ function Element({ element, title, onSelect }) {
 
 function ElementSelect(props) {
   const { elements, title, onSelect } = props;
-
   return (
-    <div className="border-r-2 border-gray-300 pr-3 inline-block my-2.5">
+    <div className="inline-block">
       {elements.map((element, index) => (
         <span key={index}>
           <Element element={element} title={title} onSelect={onSelect} />

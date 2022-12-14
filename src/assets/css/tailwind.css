@@ -50,6 +50,20 @@
   .line-height-175 {
     line-height: 1.75rem;
   }
+
+  .max-w-12 {
+    max-width: 12rem;
+  }
+  @media (min-width: 1280px) {
+    .max-w-12 {
+      max-width: 14rem;
+    }
+  }
+  @media (min-width: 1536px) {
+    .max-w-12 {
+      max-width: 16rem;
+    }
+  }
 }
 
 /* width */
@@ -96,7 +110,8 @@ body {
 }
 
 .w-transition {
-  transition: width 0.5s ease-out;
+  transition-property: width, opacity;
+  transition: 0.5s ease-out;
 }
 .w-sidebar {
   width: 100%;
@@ -207,9 +222,10 @@ body {
   @apply underline text-sky-700 hover:text-blue-700;
 }
 
-code {
+.editor code {
   font-size: 0.95rem;
-  @apply bg-gray-300 bg-opacity-70 rounded px-1 text-orange-900;
+  color: rgb(169, 2, 2);
+  @apply bg-gray-300 bg-opacity-70 rounded-sm px-1;
 }
 
 .editor-h1 {
@@ -237,7 +253,7 @@ code {
   @apply mt-3;
 }
 .editor-highlight {
-  @apply bg-yellow-200;
+  @apply bg-yellow-100;
 }
 
 .editor-p {

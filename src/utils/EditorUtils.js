@@ -35,6 +35,34 @@ export function getTextBlockStyle(editor) {
   return blockType !== "image" ? blockType : null;
 }
 
+export function getTextAlignStyle(editor) {
+  const selection = editor.selection;
+  if (selection == null) {
+    return null;
+  }
+
+  const topLevelBlockNodesInSelection = Editor.nodes(editor, {
+    at: editor.selection,
+    mode: "highest",
+    match: (n) => Editor.isBlock(editor, n),
+  });
+
+  let blockType = null;
+  let nodeEntry = topLevelBlockNodesInSelection.next();
+  while (!nodeEntry.done) {
+    const [node] = nodeEntry.value;
+    if (blockType == null) {
+      blockType = node.align;
+    } else if (blockType !== node.align) {
+      return "left";
+    }
+
+    nodeEntry = topLevelBlockNodesInSelection.next();
+  }
+
+  return blockType;
+}
+
 export function toggleStyle(editor, style) {
   const activeStyles = getActiveStyles(editor);
   if (activeStyles.has(style)) {
@@ -49,14 +77,24 @@ export function insertContent(editor, content) {
 }
 
 export function toggleBlockType(editor, blockType) {
+  const TEXT_ALIGN_TYPES = ["left", "center", "right", "justify"];
   const currentBlockType = getTextBlockStyle(editor);
   const changeTo = currentBlockType === blockType ? "paragraph" : blockType;
-  Transforms.setNodes(
-    editor,
-    { type: changeTo },
-    { at: editor.selection, match: (n) => Editor.isBlock(editor, n) },
-    { at: Editor.start(editor, [0]) }
-  );
+  if (TEXT_ALIGN_TYPES.includes(changeTo)) {
+    Transforms.setNodes(
+      editor,
+      { type: currentBlockType, align: changeTo },
+      { at: editor.selection, match: (n) => Editor.isBlock(editor, n) },
+      { at: Editor.start(editor, [0]) }
+    );
+  } else {
+    Transforms.setNodes(
+      editor,
+      { type: changeTo },
+      { at: editor.selection, match: (n) => Editor.isBlock(editor, n) },
+      { at: Editor.start(editor, [0]) }
+    );
+  }
 }
 
 export function hasActiveLinkAtSelection(editor) {

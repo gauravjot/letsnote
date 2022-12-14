@@ -81,6 +81,7 @@ export default function Editor({ document, onChange, note }) {
                 renderElement={renderElement}
                 renderLeaf={renderLeaf}
                 onKeyDown={onKeyDown}
+                spellCheck
               />
             </div>
           </div>

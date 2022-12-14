@@ -628,16 +628,16 @@ h1,
   bottom: 2.25rem;
 }
 
+.z-20{
+  z-index: 20;
+}
+
 .z-40{
   z-index: 40;
 }
 
 .z-30{
   z-index: 30;
-}
-
-.z-20{
-  z-index: 20;
 }
 
 .z-10{
@@ -777,10 +777,6 @@ h1,
   height: 100%;
 }
 
-.h-5{
-  height: 1.25rem;
-}
-
 .h-fit{
   height: -webkit-fit-content;
   height: -moz-fit-content;
@@ -842,9 +838,8 @@ h1,
   width: 1rem;
 }
 
-.min-w-min{
-  min-width: -webkit-min-content;
-  min-width: min-content;
+.min-w-0{
+  min-width: 0px;
 }
 
 .flex-grow{
@@ -906,6 +901,10 @@ h1,
 
 .overflow-y-scroll{
   overflow-y: scroll;
+}
+
+.text-ellipsis{
+  text-overflow: ellipsis;
 }
 
 .whitespace-nowrap{
@@ -1279,6 +1278,14 @@ h1,
   text-decoration-line: underline;
 }
 
+.opacity-0{
+  opacity: 0;
+}
+
+.opacity-100{
+  opacity: 1;
+}
+
 .opacity-50{
   opacity: 0.5;
 }
@@ -1366,6 +1373,22 @@ h1,
   line-height: 1.25rem;
 }
 
+.max-w-12 {
+  max-width: 12rem;
+}
+
+@media (min-width: 1280px) {
+  .max-w-12 {
+    max-width: 14rem;
+  }
+}
+
+@media (min-width: 1536px) {
+  .max-w-12 {
+    max-width: 16rem;
+  }
+}
+
 /* width */
 
 ::-webkit-scrollbar{
@@ -1423,7 +1446,8 @@ body {
 }
 
 .w-transition {
-  transition: width 0.5s ease-out;
+  transition-property: width, opacity;
+  transition: 0.5s ease-out;
 }
 
 .w-sidebar {
@@ -1710,15 +1734,14 @@ body {
   color: rgb(29 78 216 / var(--tw-text-opacity));
 }
 
-code {
+.editor code {
   font-size: 0.95rem;
-  border-radius: 0.25rem;
+  color: rgb(169, 2, 2);
+  border-radius: 0.125rem;
   background-color: rgb(209 213 219 / var(--tw-bg-opacity));
   --tw-bg-opacity: 0.7;
   padding-left: 0.25rem;
   padding-right: 0.25rem;
-  --tw-text-opacity: 1;
-  color: rgb(124 45 18 / var(--tw-text-opacity));
 }
 
 .editor-h1{
@@ -1768,7 +1791,7 @@ code {
 
 .editor-highlight{
   --tw-bg-opacity: 1;
-  background-color: rgb(254 240 138 / var(--tw-bg-opacity));
+  background-color: rgb(254 249 195 / var(--tw-bg-opacity));
 }
 
 .editor-p {
@@ -2080,6 +2103,10 @@ code {
 }
 
 @media (min-width: 1024px){
+  .lg\:block{
+    display: block;
+  }
+
   .lg\:flex{
     display: flex;
   }
