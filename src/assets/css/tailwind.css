@@ -51,6 +51,14 @@
     line-height: 1.75rem;
   }
 
+  .line-height-200 {
+    line-height: 2rem;
+  }
+
+  .line-height-225 {
+    line-height: 2.25rem;
+  }
+
   .max-w-12 {
     max-width: 12rem;
   }
@@ -211,11 +219,11 @@ body {
 
 .editor {
   position: relative;
-  @apply mt-12;
+  @apply mt-8;
 }
 
 .editor > div[role="textbox"] {
-  @apply max-w-4xl my-10 lg:mb-16 px-6 py-4 sm:px-8 sm:py-6 sm:pb-36 lg:px-16 lg:py-12 lg:pb-48 xl:px-20 xl:py-16 xl:pb-64 sm:rounded-md shadow-sm bg-white mx-auto min-h-[calc(100vh-7rem)];
+  @apply max-w-4xl mb-10 lg:mb-16 px-6 py-4 sm:px-8 sm:py-6 sm:pb-36 lg:px-16 lg:py-12 lg:pb-48 xl:px-20 xl:py-16 xl:pb-64 sm:rounded-md shadow-sm bg-white mx-auto min-h-[calc(100vh-7rem)];
 }
 
 .editor a {
@@ -259,6 +267,7 @@ body {
 .editor-p {
   line-height: 1.6rem;
   font-size: 1.05rem;
+  white-space: pre-line;
   @apply my-2.5 text-gray-900;
 }
 

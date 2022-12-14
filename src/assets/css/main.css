@@ -663,11 +663,6 @@ h1,
   margin-bottom: 0.5rem;
 }
 
-.my-2\.5{
-  margin-top: 0.625rem;
-  margin-bottom: 0.625rem;
-}
-
 .my-1{
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
@@ -885,6 +880,12 @@ h1,
 
 .gap-1{
   gap: 0.25rem;
+}
+
+.space-y-1 > :not([hidden]) ~ :not([hidden]){
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.25rem * var(--tw-space-y-reverse));
 }
 
 .self-center{
@@ -1139,6 +1140,10 @@ h1,
   padding-bottom: 0px;
 }
 
+.pb-2{
+  padding-bottom: 0.5rem;
+}
+
 .pr-3{
   padding-right: 0.75rem;
 }
@@ -1371,6 +1376,10 @@ h1,
 
 .line-height-125 {
   line-height: 1.25rem;
+}
+
+.line-height-150 {
+  line-height: 1.5rem;
 }
 
 .max-w-12 {
@@ -1673,14 +1682,13 @@ body {
 
 .editor {
   position: relative;
-  margin-top: 3rem;
+  margin-top: 2rem;
 }
 
 .editor > div[role="textbox"]{
-  margin-top: 2.5rem;
-  margin-bottom: 2.5rem;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 2.5rem;
   min-height: calc(100vh - 7rem);
   max-width: 56rem;
   --tw-bg-opacity: 1;
@@ -1797,6 +1805,7 @@ body {
 .editor-p {
   line-height: 1.6rem;
   font-size: 1.05rem;
+  white-space: pre-line;
   margin-top: 0.625rem;
   margin-bottom: 0.625rem;
   --tw-text-opacity: 1;

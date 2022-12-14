@@ -172,7 +172,7 @@ export default function Login() {
             </div>
           </div>
           <div className="bg-gray-200 rounded-md px-3.5 py-2">
-            <span className="text-gray-800 font-medium">
+            <span className="block text-gray-800 font-medium whitespace-nowrap max-w-12 overflow-hidden text-ellipsis">
               {user.user.full_name}
             </span>
           </div>
