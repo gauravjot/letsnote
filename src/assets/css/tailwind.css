@@ -263,12 +263,12 @@ body {
 
 .editor > div[role="textbox"] > .editor-ul,
 .editor > div[role="textbox"] > .editor-ol {
-  @apply ml-8 pb-1;
+  @apply ml-6;
 }
 
 .editor-ul > .editor-li,
 .editor-ol > .editor-li {
-  @apply my-0.5 pl-1;
+  @apply my-1.5 pl-1;
 }
 
 .editor-ol .editor-ol {
