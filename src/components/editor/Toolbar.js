@@ -13,7 +13,16 @@ import { useSlateStatic } from "slate-react";
 import useImageUploadHandler from "../../hooks/useImageUploadHandler";
 import { dateTimePretty } from "../../utils/TimeSince";
 
-const PARAGRAPH_STYLES = ["h1", "h2", "h3", "h4", "codeblock", "quote"];
+const PARAGRAPH_STYLES = [
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "codeblock",
+  "quote",
+  "ul",
+  "ol",
+];
 const CHARACTER_STYLES = [
   "bold",
   "italic",
@@ -241,6 +250,10 @@ function getLabelForBlockStyle(style) {
       return "Align Center";
     case "justify":
       return "Justify Block";
+    case "ul":
+      return "Unordered List";
+    case "ol":
+      return "Ordered List";
     default:
       throw new Error(`Unhandled style in getLabelForBlockStyle: ${style}`);
   }

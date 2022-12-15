@@ -60,16 +60,26 @@
   }
 
   .max-w-12 {
-    max-width: 12rem;
+    max-width: 11rem;
+  }
+
+  .max-w-14 {
+    max-width: 14rem;
   }
   @media (min-width: 1280px) {
     .max-w-12 {
-      max-width: 14rem;
+      max-width: 13rem;
+    }
+    .max-w-14 {
+      max-width: 16rem;
     }
   }
   @media (min-width: 1536px) {
     .max-w-12 {
-      max-width: 16rem;
+      max-width: 15rem;
+    }
+    .max-w-14 {
+      max-width: 18rem;
     }
   }
 }
@@ -226,8 +236,8 @@ body {
   @apply max-w-4xl mb-10 lg:mb-16 px-6 py-4 sm:px-8 sm:py-6 sm:pb-36 lg:px-16 lg:py-12 lg:pb-48 xl:px-20 xl:py-16 xl:pb-64 sm:rounded-md shadow-sm bg-white mx-auto min-h-[calc(100vh-7rem)];
 }
 
-.editor a {
-  @apply underline text-sky-700 hover:text-blue-700;
+.editor a[data-slate-node] {
+  @apply text-sky-700 border-b border-solid border-sky-700 hover:text-blue-700;
 }
 
 .editor code {
@@ -235,6 +245,49 @@ body {
   color: rgb(169, 2, 2);
   @apply bg-gray-300 bg-opacity-70 rounded-sm px-1;
 }
+
+/*
+ * Ordered and Unoredered lists
+*/
+.editor-ul {
+  @apply list-disc;
+}
+.editor-ol {
+  @apply list-decimal;
+}
+
+.editor-ul,
+.editor-ol {
+  @apply ml-4 pb-1;
+}
+
+.editor > div[role="textbox"] > .editor-ul,
+.editor > div[role="textbox"] > .editor-ol {
+  @apply ml-8 pb-1;
+}
+
+.editor-ul > .editor-li,
+.editor-ol > .editor-li {
+  @apply my-0.5 pl-1;
+}
+
+.editor-ol .editor-ol {
+  list-style: lower-alpha;
+}
+.editor-ol .editor-ol .editor-ol {
+  list-style: lower-roman;
+}
+
+.editor-ul .editor-ul {
+  list-style: circle;
+}
+.editor-ul .editor-ul .editor-ul {
+  list-style: square;
+}
+
+/*
+ * Block Elements
+*/
 
 .editor-h1 {
   @apply mt-5 mb-1.5 text-4xl font-serif;
@@ -254,11 +307,11 @@ body {
 
 .editor-h2 + .editor-h3,
 .editor-h2 + .editor-h4 {
-  @apply mt-3;
+  @apply mt-4;
 }
 
 .editor-h3 + .editor-h4 {
-  @apply mt-3;
+  @apply mt-4;
 }
 .editor-highlight {
   @apply bg-yellow-100;
@@ -267,8 +320,15 @@ body {
 .editor-p {
   line-height: 1.6rem;
   font-size: 1.05rem;
-  white-space: pre-line;
-  @apply my-2.5 text-gray-900;
+  @apply block my-2 text-gray-900;
+}
+
+.editor-p > span {
+  display: inline;
+}
+
+.editor-p + .editor-p {
+  @apply mt-3;
 }
 
 .editor-codeblock {
@@ -280,7 +340,7 @@ body {
 }
 
 .editor-p + .editor-codeblock {
-  @apply pt-0.5 -mt-0.5;
+  @apply pt-0.5;
 }
 
 .editor-codeblock + .editor-quote,
@@ -293,7 +353,7 @@ body {
 }
 
 .editor-codeblock + .editor-p {
-  @apply mt-4;
+  margin-top: 1.125rem;
 }
 
 .editor-p + .editor-h2,
@@ -322,10 +382,6 @@ body {
 .editor-h4 + .editor-codeblock,
 .editor-quote + .editor-codeblock {
   @apply mt-3;
-}
-
-.editor-p + .editor-p {
-  @apply mt-4;
 }
 
 /*

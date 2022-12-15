@@ -1,5 +1,5 @@
 import { Editor, Element } from "slate";
-import { Point, Range, Text, Transforms } from "slate";
+import { Point, Range, Text, Transforms, Element as SlateElement } from "slate";
 
 import isUrl from "is-url";
 
@@ -78,24 +78,76 @@ export function insertContent(editor, content) {
 
 export function toggleBlockType(editor, blockType) {
   const TEXT_ALIGN_TYPES = ["left", "center", "right", "justify"];
+  const LIST_TYPES = ["ol", "ul"];
   const currentBlockType = getTextBlockStyle(editor);
   const changeTo = currentBlockType === blockType ? "paragraph" : blockType;
-  if (TEXT_ALIGN_TYPES.includes(changeTo)) {
-    Transforms.setNodes(
-      editor,
-      { type: currentBlockType, align: changeTo },
-      { at: editor.selection, match: (n) => Editor.isBlock(editor, n) },
-      { at: Editor.start(editor, [0]) }
-    );
+  // if (TEXT_ALIGN_TYPES.includes(changeTo)) {
+  //   Transforms.setNodes(
+  //     editor,
+  //     { type: currentBlockType, align: changeTo },
+  //     { at: editor.selection, match: (n) => Editor.isBlock(editor, n) },
+  //     { at: Editor.start(editor, [0]) }
+  //   );
+  // } else {
+  //   Transforms.setNodes(
+  //     editor,
+  //     { type: changeTo },
+  //     { at: editor.selection, match: (n) => Editor.isBlock(editor, n) },
+  //     { at: Editor.start(editor, [0]) }
+  //   );
+  // }
+
+  ////
+  let format = changeTo;
+  const isActive = isBlockActive(
+    editor,
+    format,
+    TEXT_ALIGN_TYPES.includes(format) ? "align" : "type"
+  );
+  const isList = LIST_TYPES.includes(format);
+
+  Transforms.unwrapNodes(editor, {
+    match: (n) =>
+      !Editor.isEditor(n) &&
+      SlateElement.isElement(n) &&
+      LIST_TYPES.includes(n.type) &&
+      !TEXT_ALIGN_TYPES.includes(format),
+    split: true,
+  });
+  let newProperties;
+  if (TEXT_ALIGN_TYPES.includes(format)) {
+    newProperties = {
+      align: isActive ? undefined : format,
+    };
   } else {
-    Transforms.setNodes(
-      editor,
-      { type: changeTo },
-      { at: editor.selection, match: (n) => Editor.isBlock(editor, n) },
-      { at: Editor.start(editor, [0]) }
-    );
+    newProperties = {
+      type: isActive ? "paragraph" : isList ? "li" : format,
+    };
+  }
+  Transforms.setNodes(editor, newProperties);
+
+  if (!isActive && isList) {
+    const block = { type: format, children: [] };
+    Transforms.wrapNodes(editor, block);
   }
 }
+
+const isBlockActive = (editor, format, blockType = "type") => {
+  const { selection } = editor;
+  if (!selection) return false;
+
+  const [match] = Array.from(
+    Editor.nodes(editor, {
+      at: Editor.unhangRange(editor, selection),
+      match: (n) =>
+        !Editor.isEditor(n) &&
+        SlateElement.isElement(n) &&
+        n[blockType] === format,
+    })
+  );
+
+  return !!match;
+};
 
 export function hasActiveLinkAtSelection(editor) {
   return isLinkNodeAtSelection(editor, editor.selection);

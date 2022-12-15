@@ -1383,18 +1383,30 @@ h1,
 }
 
 .max-w-12 {
-  max-width: 12rem;
+  max-width: 11rem;
+}
+
+.max-w-14 {
+  max-width: 14rem;
 }
 
 @media (min-width: 1280px) {
   .max-w-12 {
-    max-width: 14rem;
+    max-width: 13rem;
+  }
+
+  .max-w-14 {
+    max-width: 16rem;
   }
 }
 
 @media (min-width: 1536px) {
   .max-w-12 {
-    max-width: 16rem;
+    max-width: 15rem;
+  }
+
+  .max-w-14 {
+    max-width: 18rem;
   }
 }
 
@@ -1731,13 +1743,16 @@ body {
   }
 }
 
-.editor a{
+.editor a[data-slate-node]{
+  border-bottom-width: 1px;
+  border-style: solid;
+  --tw-border-opacity: 1;
+  border-color: rgb(3 105 161 / var(--tw-border-opacity));
   --tw-text-opacity: 1;
   color: rgb(3 105 161 / var(--tw-text-opacity));
-  text-decoration-line: underline;
 }
 
-.editor a:hover{
+.editor a[data-slate-node]:hover{
   --tw-text-opacity: 1;
   color: rgb(29 78 216 / var(--tw-text-opacity));
 }
@@ -1751,6 +1766,57 @@ body {
   padding-left: 0.25rem;
   padding-right: 0.25rem;
 }
+
+/*
+ * Ordered and Unoredered lists
+*/
+
+.editor-ul{
+  list-style-type: disc;
+}
+
+.editor-ol{
+  list-style-type: decimal;
+}
+
+.editor-ul,
+.editor-ol{
+  margin-left: 1rem;
+  padding-bottom: 0.25rem;
+}
+
+.editor > div[role="textbox"] > .editor-ul,
+.editor > div[role="textbox"] > .editor-ol{
+  margin-left: 2rem;
+  padding-bottom: 0.25rem;
+}
+
+.editor-ul > .editor-li,
+.editor-ol > .editor-li{
+  margin-top: 0.125rem;
+  margin-bottom: 0.125rem;
+  padding-left: 0.25rem;
+}
+
+.editor-ol .editor-ol {
+  list-style: lower-alpha;
+}
+
+.editor-ol .editor-ol .editor-ol {
+  list-style: lower-roman;
+}
+
+.editor-ul .editor-ul {
+  list-style: circle;
+}
+
+.editor-ul .editor-ul .editor-ul {
+  list-style: square;
+}
+
+/*
+ * Block Elements
+*/
 
 .editor-h1{
   margin-top: 1.25rem;
@@ -1790,11 +1856,11 @@ body {
 
 .editor-h2 + .editor-h3,
 .editor-h2 + .editor-h4{
-  margin-top: 0.75rem;
+  margin-top: 1rem;
 }
 
 .editor-h3 + .editor-h4{
-  margin-top: 0.75rem;
+  margin-top: 1rem;
 }
 
 .editor-highlight{
@@ -1805,11 +1871,19 @@ body {
 .editor-p {
   line-height: 1.6rem;
   font-size: 1.05rem;
-  white-space: pre-line;
-  margin-top: 0.625rem;
-  margin-bottom: 0.625rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  display: block;
   --tw-text-opacity: 1;
   color: rgb(17 24 39 / var(--tw-text-opacity));
+}
+
+.editor-p > span {
+  display: inline;
+}
+
+.editor-p + .editor-p{
+  margin-top: 0.75rem;
 }
 
 .editor-codeblock{
@@ -1844,7 +1918,6 @@ body {
 }
 
 .editor-p + .editor-codeblock{
-  margin-top: -0.125rem;
   padding-top: 0.125rem;
 }
 
@@ -1857,8 +1930,8 @@ body {
   margin-top: 0.875rem;
 }
 
-.editor-codeblock + .editor-p{
-  margin-top: 1rem;
+.editor-codeblock + .editor-p {
+  margin-top: 1.125rem;
 }
 
 .editor-p + .editor-h2,
@@ -1887,10 +1960,6 @@ body {
 .editor-h4 + .editor-codeblock,
 .editor-quote + .editor-codeblock{
   margin-top: 0.75rem;
-}
-
-.editor-p + .editor-p{
-  margin-top: 1rem;
 }
 
 /*

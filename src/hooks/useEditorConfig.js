@@ -73,6 +73,28 @@ function renderElement(props) {
           {children}
         </div>
       );
+
+    case "ul":
+      return (
+        <ul className="editor-ul" style={style} {...attributes}>
+          {children}
+        </ul>
+      );
+
+    case "ol":
+      return (
+        <ol className="editor-ol" style={style} {...attributes}>
+          {children}
+        </ol>
+      );
+
+    case "li":
+      return (
+        <li className="editor-li" style={style} {...attributes}>
+          {children}
+        </li>
+      );
+
     case "link":
       return <Link {...props} url={element.url} />;
     case "link-editor":
@@ -98,9 +120,19 @@ const KeyBindings = {
       toggleStyle(editor, "italic");
       return;
     }
+    if (isHotkey("mod+h", event)) {
+      event.preventDefault();
+      toggleStyle(editor, "highlight");
+      return;
+    }
     if (isHotkey("mod+u", event)) {
       event.preventDefault();
       toggleStyle(editor, "underline");
+      return;
+    }
+    if (isHotkey("mod+`", event)) {
+      event.preventDefault();
+      toggleStyle(editor, "code");
       return;
     }
     if (isHotkey("tab", event)) {
@@ -110,7 +142,7 @@ const KeyBindings = {
     }
     if (isHotkey("mod+shift+`", event)) {
       event.preventDefault();
-      toggleBlockType(editor, "paragraph");
+      toggleBlockType(editor, "codeblock");
       return;
     }
     if (isHotkey("mod+shift+1", event)) {
