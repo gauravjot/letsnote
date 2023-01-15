@@ -1,4 +1,5 @@
 import pytz, json, uuid
+import hashlib
 from datetime import datetime
 from django.shortcuts import render
 # RestFramework
@@ -6,11 +7,12 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 # Models & Serializers
-from .models import Note
+from .models import Note, ShareExternal
 from .serializers import NoteSerializer, NoteListSerializer
+from users.models import User
 # Session
 from users.session import getUserID
-from backend.utils import errorResponse, successResponse
+from backend.utils import errorResponse, successResponse, hashThis
 
 # Create a note
 # -----------------------------------------------
@@ -44,7 +46,7 @@ def myNotes(request):
     user = getUserID(request)
     
     try:
-        return Response(data=NoteListSerializer(Note.objects.filter(user=user).values('id','user','created','updated','title'), many=True).data, status=status.HTTP_200_OK)
+        return Response(data=NoteListSerializer(Note.objects.filter(user=user).values('id','user','created','updated','title').order_by('updated'), many=True).data, status=status.HTTP_200_OK)
     except Note.DoesNotExist:
         return Response(data=errorResponse("Could not find any notes.","N0411"), status=status.HTTP_404_NOT_FOUND)
 
@@ -91,5 +93,63 @@ def updateNote(request, noteid):
         note.save()
 
         return Response(data=NoteSerializer(note).data,status=status.HTTP_200_OK)
-    except (Note.DoesNotExist) as err:
+    except Note.DoesNotExist:
         return Response(data=errorResponse("This note does not exist.","N0403"),status=status.HTTP_400_BAD_REQUEST)
+    
+# Share a note via unique URL
+# -----------------------------------------------
+# Create a URL
+@api_view(['POST'])
+def createNoteShareExternal(request, noteid):
+    user = getUserID(request)
+    
+    # Check if the user requesting is the owner
+    # try:
+    if user == Note.objects.get(id=noteid).user: 
+        rid = uuid.uuid4()
+        expire = request.data['expire'] if type(request.data['expire']) is int else 0
+        title = request.data['title']
+        anon = request.data['anonymous'] if type(request.data['anonymous']) is bool else True
+        row = ShareExternal(
+            id = uuid.uuid4(),
+            title = title,
+            key = hashThis(rid),
+            noteid = noteid,
+            expire = expire,
+            creator = user,
+            created = datetime.now(pytz.utc),
+            anonymous = anon
+        )
+        row.save()
+        
+        return Response(data=dict(title=title, urlkey=rid, expire=expire, anonymous=anon), status=status.HTTP_201_CREATED)
+    # except:
+    #     return Response(data=errorResponse("The request could not be processed.","N1012"), status=status.HTTP_400_BAD_REQUEST)
+        
+    return Response(data=errorResponse("The request is invalid.","N1001"), status=status.HTTP_400_BAD_REQUEST)
+    
+# Read
+@api_view(['GET'])
+def readNoteShareExternal(request, permkey):
+    # try:
+    noteShareExternal = ShareExternal.objects.get(key=hashThis(permkey))
+    note = Note.objects.get(id=noteShareExternal.noteid)
+    
+    # We keep person who externally shared the note anonymous
+    response = dict(
+        noteTitle = note.title,
+        noteContent = note.content,
+        noteCreated = note.created,
+        noteUpdated = note.updated,
+        noteSharedOn = noteShareExternal.created,
+        noteExpiry = noteShareExternal.expire
+    )
+    # If person expicitly asked not to be anonymous
+    if noteShareExternal.anonymous is False:
+        user = User.objects.get(id=noteShareExternal.creator)
+        response['noteSharedBy'] = user.full_name
+        response['noteSharedByUID'] = user.id
+    
+    return Response(data=response, status=status.HTTP_200_OK)
+    # except (ShareExternal.DoesNotExist, Note.DoesNotExist):
+    #     return Response(data=errorResponse("This note does not exist.","N1404"), status=status.HTTP_404_NOT_FOUND)

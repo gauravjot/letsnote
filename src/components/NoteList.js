@@ -6,7 +6,12 @@ import MakeNewNote from "./MakeNewNote";
 import NoteItem from "./NoteItem";
 import { monthYear } from "../utils/TimeSince";
 
-export default function NoteList({ openNote, currentNote, refresh }) {
+export default function NoteList({
+  openNote,
+  shareNote,
+  currentNote,
+  refresh,
+}) {
   const user = useSelector((state) => state.user);
   const [notes, setNotes] = React.useState([]);
   const [error, setError] = React.useState();
@@ -99,6 +104,7 @@ export default function NoteList({ openNote, currentNote, refresh }) {
                   note={note}
                   count={count}
                   openNote={openNote}
+                  shareNote={shareNote}
                   currentNote={currentNote}
                   refreshNotes={refreshNotes}
                 />

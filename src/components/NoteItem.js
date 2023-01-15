@@ -9,6 +9,7 @@ export default function NoteItem({
   note,
   openNote,
   currentNote,
+  shareNote,
   refreshNotes,
 }) {
   const optionsRef = React.useRef();
@@ -111,6 +112,16 @@ export default function NoteItem({
               }}
             >
               Rename&nbsp;&nbsp;&nbsp;
+            </button>
+            <button
+              className="text-sm font-medium border-b border-gray-700 px-4 py-2 w-full text-left hover:bg-gray-800 hover:text-white"
+              onClick={() => {
+                shareNote(note);
+                setMenuOpen(false);
+                document.removeEventListener("mousedown", closeOpenMenus);
+              }}
+            >
+              Share
             </button>
             <button
               className="text-sm font-medium px-4 py-2 w-full text-left rounded-b-md hover:bg-gray-800 hover:text-white"

@@ -2,6 +2,7 @@ import Editor from "./editor/Editor";
 import { useState, useCallback, useEffect, useRef } from "react";
 import Login from "./user/Login";
 import NoteList from "./NoteList";
+import ShareNotePopup from "./ShareNotePopup";
 import axios from "axios";
 import { BACKEND_SERVER_DOMAIN } from "../config";
 import { useSelector } from "react-redux";
@@ -23,6 +24,7 @@ function Home() {
   const [isNoteLoading, setIsNoteLoading] = useState(false);
   const [currentNoteID, setCurrentNoteID] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sharePopupNote, setSharePopupNote] = useState();
 
   const savingStatus = (
     <>
@@ -162,6 +164,18 @@ function Home() {
     }
   };
 
+  const closeSharePopup = () => {
+    setSharePopupNote(<></>);
+  };
+
+  const shareNote = (note) => {
+    setSharePopupNote(
+      <>
+        <ShareNotePopup note={note} closePopup={closeSharePopup} />
+      </>
+    );
+  };
+
   const toggleSidebar = () => {
     if (sidebarRef.current) {
       if (sidebarOpen) {
@@ -190,6 +204,7 @@ function Home() {
               <Login />
               <NoteList
                 openNote={openNote}
+                shareNote={shareNote}
                 currentNote={currentNoteID !== undefined ? currentNoteID : null}
                 refresh={refreshNoteList}
               />
@@ -260,6 +275,7 @@ function Home() {
             )}
           </div>
         </div>
+        {sharePopupNote}
       </div>
     </>
   );

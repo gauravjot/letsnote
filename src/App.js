@@ -13,6 +13,7 @@ import allReducers from "./redux/reducers";
 import { Provider } from "react-redux";
 
 import Home from "./components/Home";
+import Shared from "./components/noteshare/Shared";
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
@@ -54,6 +55,7 @@ export default function App() {
           <div>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/note/shared/:shareid" element={<Shared />} />
               <Route path="/note/:noteid" element={<Home />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

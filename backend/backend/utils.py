@@ -11,4 +11,4 @@ def tokenResponse(token):
     return dict(token = token)
 
 def hashThis(value):
-    return hashlib.sha256(value.encode('utf-8')).hexdigest()
+    return hashlib.sha256(str(value).encode('utf-8')).hexdigest()
