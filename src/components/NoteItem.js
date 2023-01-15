@@ -102,7 +102,7 @@ export default function NoteItem({
             ref={optionsRef}
             className={
               (menuOpen ? "scale-100 " : "scale-0 ") +
-              "transition-all origin-top-right absolute right-0 bg-gray-600 border border-gray-700 border-solid text-white rounded-md shadow-md z-20 sidebar-note-menu"
+              "transition-all origin-bottom-right absolute right-8 -bottom-2 bg-gray-600 border border-gray-700 border-solid text-white rounded-md shadow-md z-20 sidebar-note-menu"
             }
           >
             <button

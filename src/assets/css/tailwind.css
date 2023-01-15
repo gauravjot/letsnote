@@ -39,6 +39,10 @@
     user-select: none; /* Standard */
   }
 
+  .min-h-64 {
+    min-height: 16rem;
+  }
+
   .line-height-125 {
     line-height: 1.25rem;
   }
@@ -213,10 +217,11 @@ body {
   letter-spacing: 0.25px;
 }
 
-.notelist > div:last-child .sidebar-note-menu {
-  bottom: -0.5rem;
-  right: 2rem;
-  transform-origin: bottom right;
+.notelist > div:first-child .sidebar-note-menu {
+  top: 2rem;
+  bottom: auto;
+  right: 0;
+  transform-origin: top right;
 }
 
 /*

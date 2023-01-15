@@ -89,12 +89,12 @@ export default function NoteList({
         <MakeNewNote onNewNoteCreated={newNoteCreated} />
       </div>
       {notes.length > 0 ? (
-        <div className="notelist bg-gray-50 mb-4 border border-gray-300 rounded-md py-2 shadow-md grid gap-1 min-h-fit max-h-96 overflow-y-scroll overflow-x-hidden">
+        <div className="block notelist bg-gray-50 mb-4 border border-gray-300 rounded-md py-2 shadow-md gap-1 min-h-fit max-h-96 min-h-64 overflow-y-scroll overflow-x-hidden">
           {notes.map((note) => {
             return (
               <div key={note.id}>
                 {monthYear(note.updated) !== count ? (
-                  <div className="text-xs text-gray-500 font-medium bg-gray-300 bg-opacity-50 border-b border-gray-300 px-3 py-1 pb-0 mb-1.5 user-select-none">
+                  <div className="text-xs text-gray-500 font-medium bg-gray-300 bg-opacity-50 border-b border-gray-300 px-3 py-1 pb-0 mb-1.5 user-select-none whitespace-nowrap overflow-hidden">
                     {(count = monthYear(note.updated))}
                   </div>
                 ) : (
