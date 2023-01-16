@@ -12,7 +12,7 @@ from rest_framework.decorators import api_view
 from .models import User, Verify
 from .serializers import UserSerializer, VerifySerializer
 # Session
-from .session import getUserID, issueToken, dropSession
+from .session import issueToken, dropSession
 from backend.utils import tokenResponse, errorResponse, successResponse, hashThis
 
 # Sign Up function

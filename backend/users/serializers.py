@@ -7,7 +7,9 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'full_name', 'email', 'email_verified', 'password', 'created', 'updated']
         extra_kwargs = {
             'password': {'write_only':True, 'required':True},
-            'email': {'required':True}
+            'email': {'required':True},
+            'created': {'write_only':True},
+            'updated': {'write_only':True}
         }
 
 class VerifySerializer(serializers.ModelSerializer):

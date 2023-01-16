@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 # Models & Serializers
 from .models import Note, ShareExternal
-from .serializers import NoteSerializer, NoteListSerializer
+from .serializers import NoteSerializer, NoteListSerializer, ShareExternalSerializer
 from users.models import User
 # Session
 from users.session import getUserID
@@ -110,46 +110,57 @@ def createNoteShareExternal(request, noteid):
         expire = request.data['expire'] if type(request.data['expire']) is int else 0
         title = request.data['title']
         anon = request.data['anonymous'] if type(request.data['anonymous']) is bool else True
+        created = datetime.now(pytz.utc)
+        dbid = uuid.uuid4()
         row = ShareExternal(
-            id = uuid.uuid4(),
+            id = dbid,
             title = title,
             key = hashThis(rid),
             noteid = noteid,
             expire = expire,
             creator = user,
-            created = datetime.now(pytz.utc),
+            created = created,
             anonymous = anon
         )
         row.save()
         
-        return Response(data=dict(title=title, urlkey=rid, expire=expire, anonymous=anon), status=status.HTTP_201_CREATED)
+        return Response(data=dict(title=title, urlkey=rid, expire=expire, anonymous=anon, id=dbid, created=created), status=status.HTTP_201_CREATED)
     # except:
     #     return Response(data=errorResponse("The request could not be processed.","N1012"), status=status.HTTP_400_BAD_REQUEST)
         
     return Response(data=errorResponse("The request is invalid.","N1001"), status=status.HTTP_400_BAD_REQUEST)
     
-# Read
+# Read the note
 @api_view(['GET'])
 def readNoteShareExternal(request, permkey):
-    # try:
-    noteShareExternal = ShareExternal.objects.get(key=hashThis(permkey))
-    note = Note.objects.get(id=noteShareExternal.noteid)
+    try:
+        noteShareExternal = ShareExternal.objects.get(key=hashThis(permkey))
+        note = Note.objects.get(id=noteShareExternal.noteid)
+        
+        # We keep person who externally shared the note anonymous
+        response = dict(
+            noteTitle = note.title,
+            noteContent = note.content,
+            noteCreated = note.created,
+            noteUpdated = note.updated,
+            noteSharedOn = noteShareExternal.created,
+            noteExpiry = noteShareExternal.expire
+        )
+        # If person expicitly asked not to be anonymous
+        if noteShareExternal.anonymous is False:
+            user = User.objects.get(id=noteShareExternal.creator)
+            response['noteSharedBy'] = user.full_name
+            response['noteSharedByUID'] = user.id
+        
+        return Response(data=response, status=status.HTTP_200_OK)
+    except (ShareExternal.DoesNotExist, Note.DoesNotExist):
+        return Response(data=errorResponse("This note does not exist.","N1404"), status=status.HTTP_404_NOT_FOUND)
     
-    # We keep person who externally shared the note anonymous
-    response = dict(
-        noteTitle = note.title,
-        noteContent = note.content,
-        noteCreated = note.created,
-        noteUpdated = note.updated,
-        noteSharedOn = noteShareExternal.created,
-        noteExpiry = noteShareExternal.expire
-    )
-    # If person expicitly asked not to be anonymous
-    if noteShareExternal.anonymous is False:
-        user = User.objects.get(id=noteShareExternal.creator)
-        response['noteSharedBy'] = user.full_name
-        response['noteSharedByUID'] = user.id
-    
-    return Response(data=response, status=status.HTTP_200_OK)
-    # except (ShareExternal.DoesNotExist, Note.DoesNotExist):
-    #     return Response(data=errorResponse("This note does not exist.","N1404"), status=status.HTTP_404_NOT_FOUND)
+# Read all share links for the note
+@api_view(['GET'])
+def readAllLinksNoteShareExt(request, noteid):
+    user = getUserID(request)
+    links = ShareExternalSerializer(ShareExternal.objects.filter(noteid=noteid,creator=user).values('id','anonymous','created','title').order_by('created'), many=True).data
+    return Response(data=links, status=status.HTTP_200_OK)
+    # except ShareExternal.DoesNotExist:
+    #     return Response(data=errorResponse("No share links for this note yet.", "N1410"), status=status.HTTP_404_NOT_FOUND)
