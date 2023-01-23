@@ -8,8 +8,9 @@ import {
 import { CookiesProvider } from "react-cookie";
 import { useCookies } from "react-cookie";
 
-import { createStore, compose } from "redux";
-import allReducers from "./redux/reducers";
+import { compose } from "redux";
+import { configureStore } from "@reduxjs/toolkit";
+import userReducer from "./redux/reducers";
 import { Provider } from "react-redux";
 
 import Home from "./components/Home";
@@ -25,6 +26,7 @@ export default function App() {
       const serializedState = JSON.stringify(state);
       setCookie("user", encodeURIComponent(serializedState), {
         path: "/",
+        expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
       });
     } catch (e) {
       console.log(e);
@@ -44,7 +46,16 @@ export default function App() {
 
   const persistedState = loadFromCookies();
 
-  const store = createStore(allReducers, persistedState, composeEnhancers());
+  // old redux
+  // const store = createStore(allReducers, persistedState, composeEnhancers());
+
+  const store = configureStore({
+    reducer: {
+      user: userReducer,
+    },
+    enhancers: composeEnhancers,
+    preloadedState: persistedState,
+  });
 
   store.subscribe(() => saveToCookies(store.getState()));
 

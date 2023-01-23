@@ -1,4 +1,3 @@
-import { combineReducers } from "redux";
 import { SET_USER, LOGOUT_USER } from "./actions";
 
 const userReducer = (state = {}, action) => {
@@ -13,6 +12,4 @@ const userReducer = (state = {}, action) => {
   }
 };
 
-const allReducers = combineReducers({ user: userReducer });
-
-export default allReducers;
+export default userReducer;

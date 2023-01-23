@@ -111,11 +111,18 @@ export default function ShareNotePopup({ closePopup, note }) {
                 <div className="font-sans mt-4 mb-2">
                   Your link is ready.{" "}
                   <button
+                    id="copy-button"
                     className="text-sky-600 text-xs ml-2 border border-gray-200 px-2 rounded hover:bg-gray-200"
                     onClick={() => {
                       navigator.clipboard.writeText(
-                        BACKEND_SERVER_DOMAIN + "/note/shared/" + link.urlkey
+                        BACKEND_SERVER_DOMAIN +
+                          "/note/shared/" +
+                          note.id.split("-")[0] +
+                          "/" +
+                          link.urlkey
                       );
+                      document.querySelector("#copy-button").innerText =
+                        "Copied!";
                     }}
                   >
                     Copy
@@ -128,7 +135,13 @@ export default function ShareNotePopup({ closePopup, note }) {
                 <input
                   type="text"
                   className="w-full border border-gray-300 rounded py-1 px-2 bg-sky-100 text-sm"
-                  value={BACKEND_SERVER_DOMAIN + "/note/shared/" + link.urlkey}
+                  value={
+                    BACKEND_SERVER_DOMAIN +
+                    "/note/shared/" +
+                    note.id.split("-")[0] +
+                    "/" +
+                    link.urlkey
+                  }
                   readOnly
                 />
                 <div className="text-sm my-1 mt-2">
