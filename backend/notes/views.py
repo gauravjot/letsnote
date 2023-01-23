@@ -132,9 +132,9 @@ def createNoteShareExternal(request, noteid):
     
 # Read the note
 @api_view(['GET'])
-def readNoteShareExternal(request, permkey):
+def readNoteShareExternal(request, nui, permkey):
     try:
-        noteShareExternal = ShareExternal.objects.get(key=hashThis(permkey))
+        noteShareExternal = ShareExternal.objects.get(key=hashThis(permkey),noteid__startswith=nui)
         note = Note.objects.get(id=noteShareExternal.noteid)
         
         # We keep person who externally shared the note anonymous

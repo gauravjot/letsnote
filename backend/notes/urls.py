@@ -7,5 +7,5 @@ urlpatterns = [
     path('api/note/<noteid>/', noteOps),
     path('api/note/share/<noteid>/', createNoteShareExternal),
     path('api/note/share/links/<noteid>/', readAllLinksNoteShareExt),
-    path('api/note/shared/<permkey>/', readNoteShareExternal),
+    path('api/note/shared/<nui>/<permkey>/', readNoteShareExternal),
 ]

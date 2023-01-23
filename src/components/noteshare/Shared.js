@@ -8,9 +8,10 @@ import useEditorConfig from "../../hooks/useEditorConfig";
 import { createEditor } from "slate";
 import { Slate, Editable, withReact } from "slate-react";
 import { dateTimePretty, timeSince } from "../../utils/TimeSince";
+import ErrorPage from "../../utils/ErrorPage";
 
 export default function Shared() {
-  let { shareid } = useParams();
+  let { nui, shareid } = useParams();
   const [document, setDocument] = React.useState();
   const [error, setError] = React.useState();
   const [response, setResponse] = React.useState();
@@ -24,13 +25,16 @@ export default function Shared() {
       },
     };
     axios
-      .get(BACKEND_SERVER_DOMAIN + "/api/note/shared/" + shareid + "/", config)
+      .get(
+        BACKEND_SERVER_DOMAIN + "/api/note/shared/" + nui + "/" + shareid + "/",
+        config
+      )
       .then(function (response) {
         setDocument(JSON.parse(response.data.noteContent));
         setResponse(response.data);
       })
       .catch(function (error) {
-        setError(error.response);
+        setError(error.response.data);
       });
   }, []);
   return (
@@ -40,12 +44,21 @@ export default function Shared() {
       </Helmet>
       <div className="App min-h-screen">
         <div className="mx-auto lg:flex w-full">
-          <div className="w-transition opacity-100 lg:w-sidebar z-20">
-            <div className="h-screen min-w-0 w-full bg-gray-100 block px-4 border-r border-gray-300 border-solid sticky top-0">
-              <div className="font-serif font-bold text-3xl py-8">letsnote</div>
-              {error}
-              {response ? (
-                <>
+          {error ? (
+            <>
+              <ErrorPage error={error} />
+            </>
+          ) : (
+            <></>
+          )}
+          {response ? (
+            <>
+              <div className="w-transition opacity-100 lg:w-sidebar z-20">
+                <div className="h-screen min-w-0 w-full bg-gray-100 block px-4 border-r border-gray-300 border-solid sticky top-0">
+                  <div className="font-serif font-bold text-3xl py-8">
+                    letsnote
+                  </div>
+
                   <div className="text-xl font-bold text-gray-900 pl-2 mt-6 mb-2">
                     <span className="font-sans align-middle whitespace-nowrap overflow-hidden">
                       Details
@@ -82,33 +95,33 @@ export default function Shared() {
                     </div>
                     <div>{dateTimePretty(response.noteSharedOn)}</div>
                   </div>
-                </>
-              ) : (
-                ""
-              )}
-            </div>
-          </div>
-          <div className="min-h-screen w-full md:px-4 bg-gray-200 relative z-40">
-            <div className="z-40">
-              {document ? (
-                <Slate editor={editor} value={document}>
-                  <div className="editor-container">
-                    <div className="editor">
-                      <div role="textbox">
-                        <Editable
-                          readOnly
-                          renderElement={renderElement}
-                          renderLeaf={renderLeaf}
-                        />
+                </div>
+              </div>
+              <div className="min-h-screen w-full md:px-4 bg-gray-200 relative z-40">
+                <div className="z-40">
+                  {document ? (
+                    <Slate editor={editor} value={document}>
+                      <div className="editor-container">
+                        <div className="editor">
+                          <div role="textbox">
+                            <Editable
+                              readOnly
+                              renderElement={renderElement}
+                              renderLeaf={renderLeaf}
+                            />
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </Slate>
-              ) : (
-                ""
-              )}
-            </div>
-          </div>
+                    </Slate>
+                  ) : (
+                    ""
+                  )}
+                </div>
+              </div>
+            </>
+          ) : (
+            ""
+          )}
         </div>
       </div>
     </>

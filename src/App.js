@@ -66,7 +66,7 @@ export default function App() {
           <div>
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/note/shared/:shareid" element={<Shared />} />
+              <Route path="/note/shared/:nui/:shareid" element={<Shared />} />
               <Route path="/note/:noteid" element={<Home />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
