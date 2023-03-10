@@ -24,7 +24,8 @@ function Home() {
 	const [isNoteLoading, setIsNoteLoading] = useState(false);
 	const [currentNoteID, setCurrentNoteID] = useState(null);
 	const [sidebarOpen, setSidebarOpen] = useState(true);
-	const [sharePopupNote, setSharePopupNote] = useState();
+	const [sharePopupNote, setSharePopupNote] = useState(false);
+	const [shareNote, setShareNote] = useState();
 
 	const savingStatus = (
 		<>
@@ -171,15 +172,12 @@ function Home() {
 	};
 
 	const closeSharePopup = () => {
-		setSharePopupNote(<></>);
+		setSharePopupNote(false);
 	};
 
-	const shareNote = (note) => {
-		setSharePopupNote(
-			<>
-				<ShareNotePopup note={note} closePopup={closeSharePopup} />
-			</>
-		);
+	const openShareNote = (note) => {
+		setShareNote(note);
+		setSharePopupNote(true);
 	};
 
 	const toggleSidebar = () => {
@@ -206,14 +204,16 @@ function Home() {
 						ref={sidebarRef}
 						className="w-transition opacity-100 lg:w-sidebar z-20"
 					>
-						<div className="h-screen max-h-screen min-w-0 w-full bg-white block border-r border-gray-300 border-solid sticky top-0">
-							<div className="font-serif font-bold text-3xl py-8 px-4">
-								letsnote
+						<div className="h-screen max-h-screen overflow-y-auto min-w-0 w-full bg-white block border-r border-gray-300 border-solid sticky top-0">
+							<div className="text-[1.75rem] py-8 px-4 leading-4 border-blue-100 border-b shadow-smb">
+								<span className="font-sans font-medium py-0.5">
+									letsnote.io
+								</span>
 							</div>
 							<Login />
 							<NoteList
 								openNote={openNote}
-								shareNote={shareNote}
+								shareNote={openShareNote}
 								currentNote={
 									currentNoteID !== undefined
 										? currentNoteID
@@ -292,7 +292,15 @@ function Home() {
 						)}
 					</div>
 				</div>
-				{sharePopupNote}
+				{shareNote || note ? (
+					<ShareNotePopup
+						note={shareNote ? shareNote : note}
+						closePopup={closeSharePopup}
+						open={sharePopupNote}
+					/>
+				) : (
+					<></>
+				)}
 			</div>
 		</>
 	);

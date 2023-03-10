@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&family=Source+Code+Pro:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&Merriweather:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&family=Source+Code+Pro:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -109,7 +109,7 @@
 }
 
 .font-sans {
-	font-family: "Roboto", Arial, "Segoe UI", sans-serif;
+	font-family: "DM Sans", Arial, "Segoe UI", sans-serif;
 }
 
 .font-serif {
@@ -222,26 +222,46 @@ body {
 	letter-spacing: 0.25px;
 }
 
-.notelist > div:first-child .sidebar-note-menu {
+.notelist > div:nth-child(1) .sidebar-note-menu {
 	top: 2rem;
 	bottom: auto;
 	right: 0;
 	transform-origin: top right;
 }
 
+.sidebar-note-menu[aria-expanded="true"] {
+	@apply scale-100;
+}
+.sidebar-note-menu[aria-expanded="false"] {
+	@apply scale-0;
+}
+
 .sidebar-make-note-popup {
-	@apply transition-all h-7 w-7 bg-gray-200 border-2 border-solid border-black border-opacity-10 hover:bg-blue-300 hover:border-solid rounded-md flex items-center justify-center;
+	border-radius: 0.125rem;
+	@apply transition-all duration-300 h-7 w-7 absolute top-0 right-6 border-2 border-solid border-black border-opacity-10 hover:bg-blue-600 hover:border-solid flex items-center justify-center;
 }
 .sidebar-make-note-popup[aria-selected="true"] {
-	@apply shadow-inner bg-red-200 hover:bg-red-300 border-solid;
+	border-radius: 50%;
+	background: rgb(197, 46, 46);
+	@apply hover:bg-[rgb(226,56,56)] border-solid border-black border-opacity-20 top-[1.6rem] right-4;
+}
+.sidebar-make-note-popup[aria-selected="false"] {
+	border-radius: 0.125rem;
+	@apply top-0 right-6 bg-transparent border-transparent hover:bg-blue-500;
 }
 .sidebar-make-note-popup span {
-	@apply duration-200 transition-transform;
+	filter: invert(1);
+	@apply duration-200 transition-all;
+}
+.sidebar-make-note-popup[aria-selected="false"]:hover span {
+	filter: invert(1);
 }
 .sidebar-make-note-popup[aria-selected="false"] span {
+	filter: invert(0);
 	@apply rotate-45;
 }
 .sidebar-make-note-popup[aria-selected="true"] span {
+	filter: invert(1);
 	@apply rotate-0;
 }
 
@@ -275,6 +295,24 @@ body {
 .ab-link-share-row:hover .ab-link-share-delete {
 	display: block;
 }
+.share-sidebar {
+	transition: opacity 0.2s ease;
+}
+.share-sidebar[aria-expanded="true"] {
+	@apply opacity-100 z-40;
+}
+.share-sidebar[aria-expanded="false"] {
+	@apply opacity-0 z-0;
+}
+.share-sidebar > div {
+	@apply transition-all duration-300;
+}
+.share-sidebar[aria-expanded="true"] > div {
+	@apply 2xl:w-[34rem] lg:w-[28rem] max-w-[80%];
+}
+.share-sidebar[aria-expanded="false"] > div {
+	@apply w-0;
+}
 
 /*
   * Editor
@@ -286,6 +324,7 @@ body {
 
 .editor {
 	position: relative;
+	font-family: "Roboto";
 	@apply mt-8;
 }
 
@@ -581,4 +620,8 @@ li {
 		height: 72px;
 		opacity: 0;
 	}
+}
+
+.shadow-smb {
+	box-shadow: 0px 2px 5px -2px rgb(0 0 0 / 20%);
 }

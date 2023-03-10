@@ -3,7 +3,6 @@ import { dateTimePretty } from "../utils/TimeSince";
 import axios from "axios";
 import { BACKEND_SERVER_DOMAIN } from "../config";
 import { useSelector } from "react-redux";
-import { redirect } from "react-router-dom";
 
 export default function NoteItem({
 	note,
@@ -16,20 +15,24 @@ export default function NoteItem({
 	const user = useSelector((state) => state.user);
 	const [menuOpen, setMenuOpen] = React.useState(false);
 
-	const openMenu = () => {
-		if (menuOpen) {
-			closeOpenMenus();
-		} else {
-			document.addEventListener("mousedown", closeOpenMenus);
-			setMenuOpen(true);
+	const closeOpenMenus = (e) => {
+		if (optionsRef.current && !optionsRef.current.contains(e.target)) {
+			window.removeEventListener("mousedown", closeOpenMenus);
+			setMenuOpen(false);
 		}
 	};
 
-	const closeOpenMenus = (e) => {
-		if (optionsRef.current && !optionsRef.current.contains(e.target)) {
-			setMenuOpen(false);
-			document.removeEventListener("mousedown", closeOpenMenus);
-		}
+	const openMenu = () => {
+		setMenuOpen((val) => {
+			if (val === true) {
+				console.log("Y");
+				window.removeEventListener("mousedown", closeOpenMenus);
+			} else {
+				console.log("X");
+				window.addEventListener("mousedown", closeOpenMenus);
+			}
+			return !val;
+		});
 	};
 
 	const deleteNote = () => {
@@ -89,9 +92,7 @@ export default function NoteItem({
 			<div className="h-fit self-center relative">
 				<button
 					className="line-height-0 p-1 ml-2 cursor-pointer hover:rotate-90 focus:rotate-90 focus-within:rotate-90 transition-all rounded-md"
-					onClick={() => {
-						openMenu();
-					}}
+					onClick={() => openMenu()}
 				>
 					<span
 						className={
@@ -101,10 +102,8 @@ export default function NoteItem({
 				</button>
 				<div
 					ref={optionsRef}
-					className={
-						(menuOpen ? "scale-100 " : "scale-0 ") +
-						"transition-all origin-bottom-right absolute right-8 -bottom-2 bg-gray-600 border border-gray-700 border-solid text-white rounded-md shadow-md z-20 sidebar-note-menu"
-					}
+					aria-expanded={menuOpen}
+					className="transition-all scale-0 origin-bottom-right absolute right-8 -bottom-2 bg-gray-600 border border-gray-700 border-solid text-white rounded-md shadow-md z-20 sidebar-note-menu"
 				>
 					<button
 						className="text-sm font-medium border-b border-gray-700 px-4 py-2 w-full text-left rounded-t-md hover:bg-gray-800 hover:text-white"

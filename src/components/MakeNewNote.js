@@ -47,8 +47,8 @@ export default function MakeNewNote({ onNewNoteCreated }) {
 
 	return user.token ? (
 		<div className={isCallingAPI ? "opacity-50 grayscale" : ""}>
-			<div className="font-sans mb-4 mx-4 rounded mt-1 px-3 py-3 border-b border-gray-300 bg-gray-200 shadow-inner">
-				<div className="font-medium text-[0.85rem] text-gray-500 mb-1">
+			<div className="font-sans px-4 pt-3 pb-4 border-b border-gray-300 bg-slate-700 shadow-black shadow-inner">
+				<div className="font-normal tracking-wide text-[0.85rem] text-white text-opacity-80 mb-2">
 					Creating new note
 				</div>
 				<input
@@ -56,14 +56,19 @@ export default function MakeNewNote({ onNewNoteCreated }) {
 					value={title}
 					onChange={handleTitle}
 					placeholder="Type note title here"
-					className="rounded-md bg-white border border-gray-300 font-medium tracking-wide w-full px-3 py-1.5 mt-2 text-sm text-gray-900 outline-4 outline outline-transparent focus-visible:outline-[rgba(2,87,199,0.2)] hover:outline-gray-300"
+					className="rounded-md bg-slate-900 bg-opacity-70 border border-black border-opacity-80 font-normal tracking-wide w-full px-3 py-1.5 text-sm text-white outline-4 outline outline-transparent focus-visible:outline-[rgba(2,87,199,0.5)] focus-visible:bg-opacity-100 hover:outline-[rgba(0,99,230,0.2)]"
 					disabled={isCallingAPI ? "disabled" : ""}
+					onKeyDown={(event) => {
+						if (event.key === "Enter") {
+							createNewNote();
+						}
+					}}
 				/>
 				<button
 					onClick={() => {
 						createNewNote();
 					}}
-					className="ab-btn ab-btn-sm tracking-wide ab-btn-long mt-2 py-2"
+					className="ab-btn ab-btn-sm tracking-wide ab-btn-long mt-3 py-2"
 					disabled={isCallingAPI ? "disabled" : ""}
 				>
 					Create
