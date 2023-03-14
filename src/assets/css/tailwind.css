@@ -344,7 +344,7 @@ code {
 .editor code {
 	font-size: 0.94rem;
 	font-family: "Source Code Pro", "Consolas", monospace;
-	@apply bg-slate-800 text-blue-200 tracking-tight bg-opacity-70 rounded-sm px-1 font-medium;
+	@apply bg-slate-900 text-blue-300 tracking-tight bg-opacity-70 rounded-sm px-1 font-medium;
 }
 
 /*
