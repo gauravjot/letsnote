@@ -1,0 +1,10 @@
+.env
+.venv/
+venv/
+venv
+
+# django
+__pycache__/
+migrations/
+/apis/media
+/storage/*
