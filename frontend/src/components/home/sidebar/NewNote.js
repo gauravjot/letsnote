@@ -1,10 +1,10 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { BACKEND_SERVER_DOMAIN } from "../config";
+import { BACKEND_SERVER_DOMAIN } from "config";
 import axios from "axios";
-import ExampleDocument from "../utils/ExampleDocument";
+import ExampleDocument from "utils/ExampleDocument";
 
-export default function MakeNewNote({ onNewNoteCreated }) {
+export default function NewNote({ onNewNoteCreated }) {
 	const user = useSelector((state) => state.user);
 	const [title, setTitle] = React.useState("");
 	const [isCallingAPI, setIsCallingAPI] = React.useState(false);

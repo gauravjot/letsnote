@@ -1,7 +1,7 @@
 import React from "react";
-import { dateTimePretty } from "../utils/TimeSince";
+import { dateTimePretty } from "utils/TimeSince";
 import axios from "axios";
-import { BACKEND_SERVER_DOMAIN } from "../config";
+import { BACKEND_SERVER_DOMAIN } from "config";
 import { useSelector } from "react-redux";
 
 export default function NoteItem({
@@ -52,10 +52,7 @@ export default function NoteItem({
 				},
 			};
 			axios
-				.delete(
-					BACKEND_SERVER_DOMAIN + "/api/note/" + note.id + "/",
-					config
-				)
+				.delete(BACKEND_SERVER_DOMAIN + "/api/note/" + note.id + "/", config)
 				.then(function (response) {
 					// if (response.data.action) {
 					//   refreshNotes();
@@ -71,14 +68,11 @@ export default function NoteItem({
 	const renameNote = () => {};
 
 	return (
-		<div
-			className="sidebar-notelist-item"
-			aria-current={note.id === currentNote}
-		>
+		<div className="sidebar-notelist-item" aria-current={note.id === currentNote}>
 			<div
 				className="flex-grow pr-2 py-2 cursor-pointer"
 				onClick={() => {
-					openNote(note);
+					openNote(note.id);
 				}}
 			>
 				<div className="text-gray-900 max-w-12 text-ellipsis font-medium line-height-125 whitespace-nowrap overflow-hidden">
@@ -95,9 +89,7 @@ export default function NoteItem({
 					onClick={() => openMenu()}
 				>
 					<span
-						className={
-							"ic ic-md ic-gray-50 align-middle ic-options-vertical"
-						}
+						className={"ic ic-md ic-gray-50 align-middle ic-options-vertical"}
 					></span>
 				</button>
 				<div
@@ -118,10 +110,7 @@ export default function NoteItem({
 						onClick={() => {
 							shareNote(note);
 							setMenuOpen(false);
-							document.removeEventListener(
-								"mousedown",
-								closeOpenMenus
-							);
+							document.removeEventListener("mousedown", closeOpenMenus);
 						}}
 					>
 						Share

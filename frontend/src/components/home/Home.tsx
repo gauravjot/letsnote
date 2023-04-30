@@ -1,31 +1,33 @@
 import Editor from "./editor/Editor";
-import { useState, useCallback, useEffect, useRef } from "react";
-import Login from "./user/Login";
-import NoteList from "./NoteList";
+import { useState, useCallback, useEffect, useRef, ReactNode } from "react";
+import Login from "components/home/sidebar/Login";
+import NoteList from "components/home/sidebar/NoteList";
 import ShareNotePopup from "./ShareNotePopup";
 import axios from "axios";
-import { BACKEND_SERVER_DOMAIN } from "../config";
+import { BACKEND_SERVER_DOMAIN } from "config";
 import { useSelector } from "react-redux";
 import _ from "lodash";
-import ExampleDocument from "../utils/ExampleDocument";
+import ExampleDocument, { SlateNodeType } from "utils/ExampleDocument";
 import { Helmet } from "react-helmet";
 import { useParams, useNavigate } from "react-router-dom";
+import { createNote, updateNoteContent } from "lib/note/note";
+import { RootState } from "App";
+import { NoteType } from "types/api";
 
 function Home() {
 	let { noteid } = useParams();
-	let sidebarRef = useRef();
+	let sidebarRef = useRef<HTMLDivElement>(null);
 	const navigate = useNavigate();
-	const user = useSelector((state) => state.user);
-	const [note, setNote] = useState(undefined);
-	const [status, setStatus] = useState("");
-	const [document, setDocument] = useState(ExampleDocument);
-	const [error, setError] = useState();
+	const user = useSelector((state: RootState) => state.user);
+	const [note, setNote] = useState<NoteType | null>(null);
+	const [status, setStatus] = useState<ReactNode>("");
+	const [document, setDocument] = useState<SlateNodeType[]>(ExampleDocument);
 	const [refreshNoteList, setRefreshNoteList] = useState(false);
 	const [isNoteLoading, setIsNoteLoading] = useState(false);
-	const [currentNoteID, setCurrentNoteID] = useState(null);
+	const [currentNoteID, setCurrentNoteID] = useState<string | null>(null);
 	const [sidebarOpen, setSidebarOpen] = useState(true);
 	const [sharePopupNote, setSharePopupNote] = useState(false);
-	const [shareNote, setShareNote] = useState();
+	const [shareNote, setShareNote] = useState<NoteType | null>(null);
 
 	const savingStatus = (
 		<>
@@ -34,23 +36,74 @@ function Home() {
 	);
 
 	useEffect(() => {
-		if (!user.token) {
-			setNote(undefined);
+		if (!user) {
+			setNote(null);
 			setDocument(ExampleDocument);
 		}
 		if (noteid && !note) {
-			openNote({ id: noteid });
+			openNote(noteid);
 		}
 	}, [user, note]);
 
-	const saveNote = (content) => {
+	const saveNote = (content: string) => {
 		setStatus(savingStatus);
 		window.onbeforeunload = function () {
 			alert("Note is not yet saved. Please wait!");
 			return true;
 		};
-		_sendReq(content);
+		if (note) {
+			_sendReq(content, note.id);
+		}
 	};
+
+	async function updateNote(note: string, title: string, content: string) {
+		const req = await updateNoteContent(user.token, note, title, content);
+		if (req.success) {
+			setStatus(
+				<>
+					<span className="ic align-middle ic-cloud-done"></span>
+					&nbsp; Synced
+				</>
+			);
+			if (note === req.res.id) {
+				setNote(req.res);
+			}
+			window.onbeforeunload = null;
+		} else {
+			setStatus(
+				<>
+					<span className="ic align-middle ic-cloud-fail"></span>
+					&nbsp; Sync fail:
+					{JSON.stringify(req.res)}
+				</>
+			);
+		}
+	}
+
+	async function createNewNote(title: string, content: string) {
+		const req = await createNote(user.token, title, content);
+		if (req.success) {
+			setStatus(
+				<>
+					<span className="ic align-middle ic-cloud-done"></span>
+					&nbsp; Created
+				</>
+			);
+			setCurrentNoteID(req.res.id);
+			setNote(req.res);
+			setRefreshNoteList(!refreshNoteList);
+			window.onbeforeunload = null;
+			navigate("/note/" + req.res.id);
+		} else {
+			setStatus(
+				<>
+					<span className="ic align-middle ic-cloud-fail"></span>
+					&nbsp; Sync fail:
+					{JSON.stringify(req.res)}
+				</>
+			);
+		}
+	}
 
 	const _sendReq = useCallback(
 		_.debounce((content, currentNoteID) => {
@@ -59,88 +112,22 @@ function Home() {
         parameters. */
 			let title = note ? note.title : "Untitled";
 			if (user.token) {
-				let config = {
-					headers: {
-						"Content-Type": "application/json",
-						Authorization: user.token,
-					},
-				};
 				if (note) {
 					// Update note
-					axios
-						.put(
-							BACKEND_SERVER_DOMAIN +
-								"/api/note/" +
-								note.id +
-								"/",
-							JSON.stringify({ title: title, content: content }),
-							config
-						)
-						.then(function (response) {
-							setStatus(
-								<>
-									<span className="ic align-middle ic-cloud-done"></span>
-									&nbsp; Synced
-								</>
-							);
-							if (currentNoteID === response.data.id) {
-								setNote(response.data);
-							}
-							window.onbeforeunload = null;
-						})
-						.catch(function (error) {
-							setStatus(
-								<>
-									<span className="ic align-middle ic-cloud-fail"></span>
-									&nbsp; Sync fail:
-									{JSON.stringify(error.response.data)}
-								</>
-							);
-							setError(error.response.data);
-							window.onbeforeunload = null;
-						});
+					updateNote(currentNoteID, title, content);
 				} else {
 					// Create note
-					axios
-						.post(
-							BACKEND_SERVER_DOMAIN + "/api/note/create/",
-							JSON.stringify({ title: title, content: content }),
-							config
-						)
-						.then(function (response) {
-							setStatus(
-								<>
-									<span className="ic align-middle ic-cloud-done"></span>
-									&nbsp; Created
-								</>
-							);
-							setCurrentNoteID(response.data.id);
-							setNote(response.data);
-							setRefreshNoteList(!refreshNoteList);
-							window.onbeforeunload = null;
-							navigate("/note/" + response.data.id);
-						})
-						.catch(function (error) {
-							setStatus(
-								<>
-									<span className="ic align-middle ic-cloud-fail"></span>
-									&nbsp; Sync fail:
-									{JSON.stringify(error.response.data)}
-								</>
-							);
-							setError(error.response.data);
-							window.onbeforeunload = null;
-						});
+					createNewNote(title, content);
 				}
 			}
 		}, 2000),
 		[note]
 	);
 
-	const openNote = (note) => {
-		if (user.token) {
+	const openNote = (n_id: string) => {
+		if (user) {
 			setIsNoteLoading(true);
-			setCurrentNoteID(note.id);
+			setCurrentNoteID(n_id);
 			let config = {
 				headers: {
 					"Content-Type": "application/json",
@@ -148,18 +135,14 @@ function Home() {
 				},
 			};
 			axios
-				.get(
-					BACKEND_SERVER_DOMAIN + "/api/note/" + note.id + "/",
-					config
-				)
+				.get(BACKEND_SERVER_DOMAIN + "/api/note/" + n_id + "/", config)
 				.then(function (response) {
 					setNote(response.data);
 					setDocument(JSON.parse(response.data.content));
 					setIsNoteLoading(false);
-					navigate("/note/" + note.id);
+					navigate("/note/" + n_id);
 				})
 				.catch(function (error) {
-					setError(error.response);
 					setIsNoteLoading(false);
 					if (error.response.data.code === "N0404") {
 						// Note not found
@@ -175,7 +158,7 @@ function Home() {
 		setSharePopupNote(false);
 	};
 
-	const openShareNote = (note) => {
+	const openShareNote = (note: NoteType) => {
 		setShareNote(note);
 		setSharePopupNote(true);
 	};
@@ -183,8 +166,7 @@ function Home() {
 	const toggleSidebar = () => {
 		if (sidebarRef.current) {
 			if (sidebarOpen) {
-				sidebarRef.current.className =
-					"w-transition w-0 opacity-0 z-20";
+				sidebarRef.current.className = "w-transition w-0 opacity-0 z-20";
 			} else {
 				sidebarRef.current.className =
 					"w-transition opacity-100 lg:w-sidebar z-20";
@@ -205,8 +187,8 @@ function Home() {
 						className="w-transition opacity-100 lg:w-sidebar z-20"
 					>
 						<div className="h-screen max-h-screen overflow-y-auto min-w-0 w-full bg-white block border-r border-gray-300 border-solid sticky top-0">
-							<div className="text-[1.75rem] py-8 px-4 leading-4 border-blue-100 border-b shadow-smb">
-								<span className="font-sans font-medium py-0.5">
+							<div className="p-5 border-b border-gray-300 shadow-smb">
+								<span className="font-sans font-black tracking-tighter text-[1.75rem] py-0.5">
 									letsnote.io
 								</span>
 							</div>
@@ -215,9 +197,7 @@ function Home() {
 								openNote={openNote}
 								shareNote={openShareNote}
 								currentNote={
-									currentNoteID !== undefined
-										? currentNoteID
-										: null
+									currentNoteID !== undefined ? currentNoteID : null
 								}
 								refresh={refreshNoteList}
 							/>
@@ -227,14 +207,12 @@ function Home() {
 						{/*
 						 * Toggle to close the sidebar
 						 */}
-						{user.token ? (
+						{user ? (
 							<div className="hidden lg:block sticky top-2 z-40 -ml-4 left-0 h-0">
 								<button
 									className={
 										"border-1 hover:bg-gray-500 px-2 py-1 pt-2 w-8 shadow-md border-t border-r border-b rounded-tr-md rounded-br-md border-solid border-gray-300" +
-										(sidebarOpen
-											? " bg-gray-400"
-											: " bg-gray-600")
+										(sidebarOpen ? " bg-gray-400" : " bg-gray-600")
 									}
 									onClick={toggleSidebar}
 								>
@@ -249,23 +227,23 @@ function Home() {
 						) : (
 							""
 						)}
-						<div
-							className={isNoteLoading ? "blur-sm z-40" : "z-40"}
-						>
+						<div className={isNoteLoading ? "blur-sm z-40" : "z-40"}>
 							<Editor
 								document={document}
-								onChange={(value) => {
-									setDocument(value);
-									if (user.token) {
-										saveNote(JSON.stringify(value));
-									} else {
-										setStatus(<></>);
+								onChange={(value: SlateNodeType[]) => {
+									if (!_.isEqual(document, value)) {
+										setDocument(value);
+										if (user.token) {
+											saveNote(JSON.stringify(value));
+										} else {
+											setStatus(<></>);
+										}
 									}
 								}}
-								key={note !== undefined ? note.id : ""}
+								key={note !== null ? note.id : ""}
 								note={note}
 							/>
-							{user.token ? (
+							{user ? (
 								status !== "" ? (
 									<div className="fixed bottom-0 right-0 bg-slate-800 shadow rounded-md px-2 py-1 font-medium text-sm text-white z-30 m-6">
 										{status}
@@ -292,9 +270,15 @@ function Home() {
 						)}
 					</div>
 				</div>
-				{shareNote || note ? (
+				{shareNote !== null ? (
 					<ShareNotePopup
-						note={shareNote ? shareNote : note}
+						note={shareNote}
+						closePopup={closeSharePopup}
+						open={sharePopupNote}
+					/>
+				) : note !== null ? (
+					<ShareNotePopup
+						note={note}
 						closePopup={closeSharePopup}
 						open={sharePopupNote}
 					/>

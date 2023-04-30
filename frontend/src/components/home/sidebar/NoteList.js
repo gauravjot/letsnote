@@ -1,17 +1,12 @@
 import React from "react";
 import axios from "axios";
-import { BACKEND_SERVER_DOMAIN } from "../config";
+import { BACKEND_SERVER_DOMAIN } from "config";
 import { useSelector } from "react-redux";
-import MakeNewNote from "./MakeNewNote";
+import MakeNewNote from "./NewNote";
 import NoteItem from "./NoteItem";
-import { monthYear } from "../utils/TimeSince";
+import { monthYear } from "utils/TimeSince";
 
-export default function NoteList({
-	openNote,
-	shareNote,
-	currentNote,
-	refresh,
-}) {
+export default function NoteList({ openNote, shareNote, currentNote, refresh }) {
 	const user = useSelector((state) => state.user);
 	const [notes, setNotes] = React.useState([]);
 	const [error, setError] = React.useState();
@@ -25,7 +20,7 @@ export default function NoteList({
 
 	const refreshNotes = () => {
 		setIsLoading(true);
-		if (user.token) {
+		if (user) {
 			let config = {
 				headers: {
 					"Content-Type": "application/json",
@@ -53,7 +48,7 @@ export default function NoteList({
 
 	let count;
 
-	return user.token ? (
+	return user ? (
 		<div className="bg-white">
 			<div className="relative mt-6 user-select-none flex flex-wrap">
 				<div className="flex-1 ml-6 mb-2.5">
