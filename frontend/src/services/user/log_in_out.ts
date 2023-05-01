@@ -1,7 +1,8 @@
 import axios from "axios";
 import { LOGIN_EP, LOGOUT_EP } from "config";
+import { ResponseType } from "types/query";
 
-export function userLogin(email: string, password: string) {
+export function userLogin(email: string, password: string): Promise<ResponseType> {
 	return axios
 		.post(LOGIN_EP, JSON.stringify({ email: email, password: password }), {
 			headers: {

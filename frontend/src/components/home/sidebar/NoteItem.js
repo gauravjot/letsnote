@@ -25,10 +25,8 @@ export default function NoteItem({
 	const openMenu = () => {
 		setMenuOpen((val) => {
 			if (val === true) {
-				console.log("Y");
 				window.removeEventListener("mousedown", closeOpenMenus);
 			} else {
-				console.log("X");
 				window.addEventListener("mousedown", closeOpenMenus);
 			}
 			return !val;

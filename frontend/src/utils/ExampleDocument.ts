@@ -16,4 +16,6 @@ export interface SlateNodeType {
 	}[];
 }
 
+export type SlateDocumentType = ReturnType<typeof Array<SlateNodeType>>;
+
 export default ExampleDocument;

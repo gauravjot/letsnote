@@ -132,19 +132,6 @@ code {
 .container {
 	margin: 0 auto;
 }
-
-.w-transition {
-	transition-property: width, opacity;
-	transition: 0.5s ease-out;
-}
-.w-sidebar {
-	width: 100%;
-}
-@media (min-width: 1024px) {
-	.lg\:w-sidebar {
-		width: 28rem;
-	}
-}
 .infotrig {
 	position: relative;
 }
@@ -214,6 +201,37 @@ code {
 /*
   * Sidebar
 */
+
+/* Trigger */
+.sidebar-hide-able {
+	transition-property: width, opacity;
+	transition: 0.5s ease-out;
+	@apply relative z-20;
+}
+.sidebar-hide-able[aria-hidden="false"] {
+	@apply opacity-100 w-full lg:w-[28rem];
+}
+.sidebar-hide-able[aria-hidden="true"] {
+	@apply w-0 opacity-0;
+}
+.sidebar-expand-btn {
+	@apply hover:bg-gray-500 transition-all pl-0.5 pr-1.5 py-1 pt-2 shadow-md border-t border-r border-b rounded-tr-md rounded-br-md border-solid border-gray-300;
+}
+.sidebar-expand-btn:hover {
+	@apply pl-1.5;
+}
+.sidebar-expand-btn[aria-expanded="true"] {
+	@apply bg-gray-400;
+}
+.sidebar-expand-btn[aria-expanded="true"] span.ic {
+	@apply rotate-180;
+}
+.sidebar-expand-btn[aria-expanded="false"] {
+	@apply bg-gray-600;
+}
+.sidebar-expand-btn[aria-expanded="false"] span.ic {
+	@apply rotate-0;
+}
 
 .notelist .sidebar-note-menu button {
 	letter-spacing: 0.25px;

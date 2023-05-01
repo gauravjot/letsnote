@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setUser, logoutUser } from "redux/actions";
-import { userLogout, userLogin } from "lib/user/log_in_out";
+import { userLogout, userLogin } from "services/user/log_in_out";
 import { RootState } from "App";
 
 export default function Login() {

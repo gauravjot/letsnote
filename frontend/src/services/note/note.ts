@@ -1,16 +1,26 @@
 import axios from "axios";
 import { NEW_NOTE_EP, NOTE_EP } from "config";
+import { ResponseType } from "types/query";
+import { SlateDocumentType } from "utils/ExampleDocument";
 
 // read a note
 // create a note
-export function createNote(token: string, title: string, content: string) {
+export function createNote(
+	token: string,
+	title: string,
+	content: SlateDocumentType
+): Promise<ResponseType> {
 	return axios
-		.post(NEW_NOTE_EP, JSON.stringify({ title: title, content: content }), {
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: token,
-			},
-		})
+		.post(
+			NEW_NOTE_EP,
+			JSON.stringify({ title: title, content: JSON.stringify(content) }),
+			{
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: token,
+				},
+			}
+		)
 		.then(function (response) {
 			return {
 				success: true,
@@ -33,15 +43,19 @@ export function updateNoteContent(
 	token: string,
 	note: string,
 	title: string,
-	content: string
-) {
+	content: SlateDocumentType
+): Promise<ResponseType> {
 	return axios
-		.put(NOTE_EP(note), JSON.stringify({ title: title, content: content }), {
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: token,
-			},
-		})
+		.put(
+			NOTE_EP(note),
+			JSON.stringify({ title: title, content: JSON.stringify(content) }),
+			{
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: token,
+				},
+			}
+		)
 		.then(function (response) {
 			return {
 				success: true,
