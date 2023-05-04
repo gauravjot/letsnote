@@ -1,4 +1,9 @@
-export interface ResponseType {
+export interface ResponseType<T> {
 	success: boolean;
-	res: any;
+	res: T;
+}
+
+export interface ApiError {
+	statusCode: string;
+	message: string;
 }

@@ -9,7 +9,7 @@ import { CookiesProvider } from "react-cookie";
 import { useCookies } from "react-cookie";
 /* Components */
 import Home from "components/home/Home";
-import Shared from "components/shared/Shared";
+import Shared from "components/shared/SharePage";
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof _store.getState>;

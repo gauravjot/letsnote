@@ -11,7 +11,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { createNote, updateNoteContent } from "services/note/note";
 import { RootState } from "App";
 import { NoteType } from "types/api";
-import Sidebar from "./sidebar/Sidebar";
+import HomeSidebar from "./sidebar/HomeSidebar";
+import Sidebar from "components/Sidebar";
 
 interface SavingState {
 	icon: "ic-cloud" | "ic-cloud-done" | "ic-cloud-fail";
@@ -64,13 +65,14 @@ export default function Home() {
 	async function updateNote(nid: string, title: string, content: SlateDocumentType) {
 		const req = await updateNoteContent(user.token, nid, title, content);
 		if (req.success) {
+			let response = req.res as NoteType;
 			setStatus({
 				icon: "ic-cloud-done",
 				color: "bg-green-800",
 				message: "Synced",
 			});
-			if (note === req.res.id) {
-				setNote(req.res);
+			if (note?.id === response.id) {
+				setNote(req.res as NoteType);
 			}
 			window.onbeforeunload = null;
 		} else {
@@ -85,16 +87,17 @@ export default function Home() {
 	async function createNewNote(title: string, content: SlateDocumentType) {
 		const req = await createNote(user.token, title, content);
 		if (req.success) {
+			let response = req.res as NoteType;
 			setStatus({
 				icon: "ic-cloud-done",
 				color: "bg-sky-600",
 				message: "Created",
 			});
-			setCurrentNoteID(req.res.id);
-			setNote(req.res);
+			setCurrentNoteID(response.id);
+			setNote(response);
 			setRefreshNoteList(!refreshNoteList);
 			window.onbeforeunload = null;
-			navigate("/note/" + req.res.id);
+			navigate("/note/" + response.id);
 		} else {
 			setStatus({
 				icon: "ic-cloud-fail",
@@ -129,8 +132,9 @@ export default function Home() {
 		[note]
 	);
 
-	const openNote = (n_id: string) => {
+	const openNote = (n_id: NoteType["id"]) => {
 		if (user) {
+			console.log("hello");
 			setIsNoteLoading(true);
 			setCurrentNoteID(n_id);
 			let config = {
@@ -198,10 +202,14 @@ export default function Home() {
 						className="sidebar-hide-able"
 					>
 						<Sidebar
-							currentNoteID={currentNoteID}
-							refresh={refreshNoteList}
-							openNote={openNote}
-							openShareNote={openShareNote}
+							component={
+								<HomeSidebar
+									currentNoteID={currentNoteID}
+									refresh={refreshNoteList}
+									openNote={openNote}
+									openShareNote={openShareNote}
+								/>
+							}
 						/>
 					</div>
 					<div className="min-h-screen w-full md:px-4 bg-gray-200 relative z-40">

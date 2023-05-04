@@ -1,15 +1,17 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { NEW_NOTE_EP, NOTE_EP } from "config";
-import { ResponseType } from "types/query";
-import { SlateDocumentType } from "utils/ExampleDocument";
+import { handleApiError } from "services/handle_error";
+import { NoteType } from "types/api";
+import { ApiError, ResponseType } from "types/query";
+import ExampleDocument, { SlateDocumentType } from "utils/ExampleDocument";
 
 // read a note
 // create a note
 export function createNote(
 	token: string,
-	title: string,
-	content: SlateDocumentType
-): Promise<ResponseType> {
+	title: string = "Untitled",
+	content: SlateDocumentType = ExampleDocument
+): Promise<ResponseType<NoteType | ApiError>> {
 	return axios
 		.post(
 			NEW_NOTE_EP,
@@ -24,18 +26,10 @@ export function createNote(
 		.then(function (response) {
 			return {
 				success: true,
-				res: response.data,
+				res: response.data as NoteType,
 			};
 		})
-		.catch(function (error) {
-			return {
-				success: false,
-				res:
-					error.response && error.response.data
-						? error.response.data.message[0]
-						: error.response?.statusText || "Unable to reach server.",
-			};
-		});
+		.catch(handleApiError);
 }
 
 // update a note
@@ -44,7 +38,7 @@ export function updateNoteContent(
 	note: string,
 	title: string,
 	content: SlateDocumentType
-): Promise<ResponseType> {
+): Promise<ResponseType<NoteType | ApiError>> {
 	return axios
 		.put(
 			NOTE_EP(note),
@@ -62,15 +56,7 @@ export function updateNoteContent(
 				res: response.data,
 			};
 		})
-		.catch(function (error) {
-			return {
-				success: false,
-				res:
-					error.response && error.response.data
-						? error.response.data.message[0]
-						: error.response?.statusText || "Unable to reach server.",
-			};
-		});
+		.catch(handleApiError);
 }
 // rename note title
 // get list of user's notes

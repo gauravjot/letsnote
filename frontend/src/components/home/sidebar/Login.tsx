@@ -3,8 +3,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { setUser, logoutUser } from "redux/actions";
 import { userLogout, userLogin } from "services/user/log_in_out";
 import { RootState } from "App";
+import { ApiUserType } from "types/api";
+import { ApiError } from "types/query";
+import { Link } from "react-router-dom";
 
-export default function Login() {
+export default function Login({ showLinkToHome = false }: { showLinkToHome?: boolean }) {
 	let formRef = React.useRef<HTMLDivElement>(null);
 	const user = useSelector((state: RootState) => state.user);
 	const dispatch = useDispatch();
@@ -28,11 +31,13 @@ export default function Login() {
 		// Make login request
 		const req = await userLogin(email, password);
 		if (req.success) {
-			dispatch(setUser(req.res));
+			let response = req.res as ApiUserType;
+			dispatch(setUser(response));
 			setAPIResponse(null);
 		} else {
 			formRef.current?.removeAttribute("disabled");
-			setAPIResponse(req.res);
+			let response = req.res as ApiError;
+			setAPIResponse(response.message);
 		}
 	};
 
@@ -142,6 +147,16 @@ export default function Login() {
 						{user.user.id}
 					</div>
 				</>
+			)}
+			{showLinkToHome && (
+				<div className="mt-4">
+					<Link
+						to={"/"}
+						className="text-sm hover:underline hover:underline-offset-4"
+					>
+						&#8592; Go back to Letsnote
+					</Link>
+				</div>
 			)}
 		</div>
 	);

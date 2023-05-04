@@ -244,10 +244,11 @@ code {
 	transform-origin: top right;
 }
 
-.sidebar-note-menu[aria-expanded="true"] {
-	@apply scale-100;
+/* note list - note item menu button - three dots */
+.sidebar-note-menu[aria-hidden="false"] {
+	@apply scale-100 z-20;
 }
-.sidebar-note-menu[aria-expanded="false"] {
+.sidebar-note-menu[aria-hidden="true"] {
 	@apply scale-0;
 }
 

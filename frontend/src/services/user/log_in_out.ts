@@ -1,8 +1,13 @@
 import axios from "axios";
 import { LOGIN_EP, LOGOUT_EP } from "config";
-import { ResponseType } from "types/query";
+import { handleApiError } from "services/handle_error";
+import { ApiError, ResponseType } from "types/query";
+import { ApiUserType, UserType } from "types/api";
 
-export function userLogin(email: string, password: string): Promise<ResponseType> {
+export function userLogin(
+	email: string,
+	password: string
+): Promise<ResponseType<ApiUserType | ApiError>> {
 	return axios
 		.post(LOGIN_EP, JSON.stringify({ email: email, password: password }), {
 			headers: {
@@ -12,15 +17,7 @@ export function userLogin(email: string, password: string): Promise<ResponseType
 		.then(function (response) {
 			return { success: true, res: response.data };
 		})
-		.catch(function (error) {
-			return {
-				success: false,
-				res:
-					error.response && error.response.data
-						? error.response.data.message[0]
-						: error.response?.statusText || "Unable to reach server.",
-			};
-		});
+		.catch(handleApiError);
 }
 
 export function userLogout(token: string) {
@@ -34,7 +31,5 @@ export function userLogout(token: string) {
 		.then(() => {
 			return true;
 		})
-		.catch((err) => {
-			return false;
-		});
+		.catch(handleApiError);
 }
