@@ -1,7 +1,7 @@
-export const BACKEND_SERVER_DOMAIN: string = "http://localhost:8000";
-export const DEPLOY_DOMAIN: string = "http://localhost:3000";
-// export const BACKEND_SERVER_DOMAIN: string = "https://letsnote.io";
-// export const DEPLOY_DOMAIN: string = "https://letsnote.io";
+// export const BACKEND_SERVER_DOMAIN: string = "http://localhost:8000";
+// export const DEPLOY_DOMAIN: string = "http://localhost:3000";
+export const BACKEND_SERVER_DOMAIN: string = "https://api.letsnote.io";
+export const DEPLOY_DOMAIN: string = "https://letsnote.io";
 
 // Endpoints
 export const LOGIN_EP: string = BACKEND_SERVER_DOMAIN + "/api/user/login/";
