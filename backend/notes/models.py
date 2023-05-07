@@ -1,26 +1,28 @@
 from django.db import models
+from users.models import User
 
-# Create your models here.
+
 class Note(models.Model):
     id = models.UUIDField(primary_key=True)
-    user = models.CharField(max_length=48)
-    title = models.CharField(max_length=100,default="Untitled")
-    content = models.JSONField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=100, default="Untitled")
     created = models.DateTimeField()
     updated = models.DateTimeField()
+    content = models.JSONField()
 
     def __str__(self):
-        return f"id:{self.pk}, {self.user}, {self.title}, {self.created}"
-    
+        return f"id:{self.id}, {self.user}, {self.title}, {self.created}"
+
+
 class ShareExternal(models.Model):
     id = models.UUIDField(primary_key=True)
-    title = models.CharField(max_length=48,default="Link Share")
-    key = models.CharField(max_length=72)
-    noteid = models.CharField(max_length=48)
-    expire = models.IntegerField(default=0)
-    created = models.DateTimeField()
-    creator = models.CharField(max_length=48)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    note = models.ForeignKey(Note, on_delete=models.CASCADE)
+    passkey = models.CharField(max_length=72)
+    title = models.CharField(max_length=48, default="Note Share")
     anonymous = models.BooleanField(default=True)
-    
+    active = models.BooleanField(default=True)
+    created = models.DateTimeField()
+
     def __str__(self):
-        return f"id:{self.pk}, {self.creator}, {self.noteid}, {self.created}, {self.expire}"
+        return f"id:{self.id}, {self.user}, {self.note}, {self.created}, {self.active}"

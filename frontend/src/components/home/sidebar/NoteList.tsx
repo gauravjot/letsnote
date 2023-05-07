@@ -7,6 +7,7 @@ import NoteItem from "./NoteItem";
 import { monthYear } from "utils/TimeSince";
 import { NoteType } from "types/api";
 import { RootState } from "App";
+import Spinner from "components/Spinner";
 
 interface Props {
 	refresh: boolean;
@@ -34,7 +35,7 @@ export default function NoteList({ openNote, shareNote, currentNote, refresh }: 
 			axios
 				.get(BACKEND_SERVER_DOMAIN + "/api/note/all", config)
 				.then(function (response) {
-					setNotes(response.data.reverse());
+					setNotes(response.data.data.reverse());
 					setIsLoading(false);
 				})
 				.catch(function (error) {
@@ -105,11 +106,13 @@ export default function NoteList({ openNote, shareNote, currentNote, refresh }: 
 					})}
 				</div>
 			) : isLoading ? (
-				<div className="px-4 py-4 text-xl text-gray-400 font-thin user-select-none">
+				<>
+					<Spinner />
+				</>
+			) : (
+				<div className="px-6 py-4 text-xl text-gray-400 font-thin user-select-none">
 					It's so empty here. Make a note in editor!
 				</div>
-			) : (
-				<></>
 			)}
 		</div>
 	) : (

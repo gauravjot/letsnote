@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { NEW_NOTE_EP, NOTE_EP } from "config";
 import { handleApiError } from "services/handle_error";
 import { NoteType } from "types/api";
@@ -13,20 +13,16 @@ export function createNote(
 	content: SlateDocumentType = ExampleDocument
 ): Promise<ResponseType<NoteType | ApiError>> {
 	return axios
-		.post(
-			NEW_NOTE_EP,
-			JSON.stringify({ title: title, content: JSON.stringify(content) }),
-			{
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: token,
-				},
-			}
-		)
+		.post(NEW_NOTE_EP, JSON.stringify({ title: title, content: content }), {
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: token,
+			},
+		})
 		.then(function (response) {
 			return {
 				success: true,
-				res: response.data as NoteType,
+				res: response.data.data as NoteType,
 			};
 		})
 		.catch(handleApiError);
@@ -40,20 +36,16 @@ export function updateNoteContent(
 	content: SlateDocumentType
 ): Promise<ResponseType<NoteType | ApiError>> {
 	return axios
-		.put(
-			NOTE_EP(note),
-			JSON.stringify({ title: title, content: JSON.stringify(content) }),
-			{
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: token,
-				},
-			}
-		)
+		.put(NOTE_EP(note), JSON.stringify({ title: title, content: content }), {
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: token,
+			},
+		})
 		.then(function (response) {
 			return {
 				success: true,
-				res: response.data,
+				res: response.data.data,
 			};
 		})
 		.catch(handleApiError);
