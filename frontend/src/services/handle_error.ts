@@ -10,9 +10,7 @@ export function handleApiError(err: Error | AxiosError) {
 					err.response?.status.toString() ??
 					"Unknown",
 				message:
-					(err.response?.data?.message && err.response?.data?.message[0]) ??
-					err.response?.statusText ??
-					"Unknown",
+					err.response?.data?.message ?? err.response?.statusText ?? "Unknown",
 			},
 		};
 	} else {

@@ -140,7 +140,7 @@ export default function Login({ showLinkToHome = false }: { showLinkToHome?: boo
 					<div className="whitespace-nowrap max-w-14 overflow-hidden text-ellipsis">
 						<span className="ic ic-person ic-black align-middle mr-2"></span>
 						<span className="align-middle text-gray-800 text-[0.92rem] leading-5 font-medium">
-							{user.user.full_name}
+							{user.user.name}
 						</span>
 					</div>
 					<div className="ml-6 text-[0.75rem] whitespace-nowrap overflow-hidden text-gray-500">

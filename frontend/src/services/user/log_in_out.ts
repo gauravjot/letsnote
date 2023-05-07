@@ -2,7 +2,7 @@ import axios from "axios";
 import { LOGIN_EP, LOGOUT_EP } from "config";
 import { handleApiError } from "services/handle_error";
 import { ApiError, ResponseType } from "types/query";
-import { ApiUserType, UserType } from "types/api";
+import { ApiUserType } from "types/api";
 
 export function userLogin(
 	email: string,
@@ -15,7 +15,10 @@ export function userLogin(
 			},
 		})
 		.then(function (response) {
-			return { success: true, res: response.data };
+			return {
+				success: response.data.success,
+				res: response.data.data,
+			} as ResponseType<ApiUserType>;
 		})
 		.catch(handleApiError);
 }

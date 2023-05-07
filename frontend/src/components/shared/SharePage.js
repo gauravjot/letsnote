@@ -34,13 +34,13 @@ export default function Shared() {
 				config
 			)
 			.then(function (response) {
-				setDocument(JSON.parse(response.data.noteContent));
-				setResponse(response.data);
+				setDocument(JSON.parse(response.data.data.noteContent));
+				setResponse(response.data.data);
 			})
 			.catch(function (error) {
 				setError(error.response.data);
 			});
-	}, []);
+	}, [nui, shareid]);
 	return (
 		<>
 			<Helmet>
@@ -48,13 +48,6 @@ export default function Shared() {
 			</Helmet>
 			<div className="App min-h-screen">
 				<div className="mx-auto lg:flex w-full">
-					{error ? (
-						<>
-							<ErrorPage error={error} />
-						</>
-					) : (
-						<></>
-					)}
 					<div id="sidebar" aria-hidden="false" className="sidebar-hide-able">
 						<Sidebar
 							component={
@@ -134,8 +127,12 @@ export default function Shared() {
 										</div>
 									</div>
 								</Slate>
+							) : error ? (
+								<>
+									<ErrorPage error={error} />
+								</>
 							) : (
-								""
+								<></>
 							)}
 						</div>
 					</div>

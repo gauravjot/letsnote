@@ -41,18 +41,6 @@ export default function Home() {
 		message: "Saving...",
 	};
 
-	useEffect(() => {
-		if (!user) {
-			setNote(null);
-			setDocument(ExampleDocument);
-		} else {
-			// Check if url has note id and no note is open
-			if (noteid && !note) {
-				openNote(noteid);
-			}
-		}
-	}, [user, note]);
-
 	const saveNote = (content: SlateDocumentType, note: NoteType | null) => {
 		setStatus(savingStatus);
 		window.onbeforeunload = function () {
@@ -132,36 +120,39 @@ export default function Home() {
 		[note]
 	);
 
-	const openNote = (n_id: NoteType["id"]) => {
-		if (user) {
-			console.log("hello");
-			setIsNoteLoading(true);
-			setCurrentNoteID(n_id);
-			let config = {
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: user.token,
-				},
-			};
-			axios
-				.get(BACKEND_SERVER_DOMAIN + "/api/note/" + n_id + "/", config)
-				.then(function (response) {
-					setNote(response.data);
-					setDocument(JSON.parse(response.data.content));
-					setIsNoteLoading(false);
-					navigate("/note/" + n_id);
-				})
-				.catch(function (error) {
-					setIsNoteLoading(false);
-					if (error.response.data.code === "N0404") {
-						// Note not found
-						navigate("/");
-					}
-				});
-		} else {
-			navigate("/");
-		}
-	};
+	const openNote = useCallback(
+		(n_id: NoteType["id"]) => {
+			if (user) {
+				console.log("hello");
+				setIsNoteLoading(true);
+				setCurrentNoteID(n_id);
+				let config = {
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: user.token,
+					},
+				};
+				axios
+					.get(BACKEND_SERVER_DOMAIN + "/api/note/" + n_id + "/", config)
+					.then(function (response) {
+						setNote(response.data.data);
+						setDocument(JSON.parse(response.data.data.content));
+						setIsNoteLoading(false);
+						navigate("/note/" + n_id);
+					})
+					.catch(function (error) {
+						setIsNoteLoading(false);
+						if (error.response.data.code === "N0404") {
+							// Note not found
+							navigate("/");
+						}
+					});
+			} else {
+				navigate("/");
+			}
+		},
+		[navigate, user]
+	);
 
 	const closeSharePopup = () => {
 		setSharePopupNote(false);
@@ -187,6 +178,18 @@ export default function Home() {
 			);
 		}
 	};
+
+	useEffect(() => {
+		if (!user) {
+			setNote(null);
+			setDocument(ExampleDocument);
+		} else {
+			// Check if url has note id and no note is open
+			if (noteid && !note) {
+				openNote(noteid);
+			}
+		}
+	}, [user, note, noteid, openNote]);
 
 	return (
 		<>

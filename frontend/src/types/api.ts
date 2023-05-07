@@ -12,13 +12,14 @@ export interface ShareNote {
 	title: string;
 	created: string;
 	anonymous: boolean;
+	active: boolean;
 }
 
 export interface UserType {
 	id: string;
-	full_name: string;
+	name: string;
 	email: string;
-	email_verified: boolean;
+	verified: boolean;
 }
 
 export interface UserToken {

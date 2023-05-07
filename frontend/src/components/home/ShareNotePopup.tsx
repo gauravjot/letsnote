@@ -11,6 +11,7 @@ interface Link {
 	urlkey: string;
 	expire: string;
 	anon: boolean;
+	active: boolean;
 }
 
 interface Props {
@@ -49,7 +50,7 @@ export default function ShareNotePopup({ closePopup, note, open }: Props) {
 				)
 				.then(function (response) {
 					if (!ignore) {
-						setShareLinkList(response.data);
+						setShareLinkList(response.data.data);
 						setIsCallingGetLinksAPI(false);
 					}
 				})
@@ -63,7 +64,7 @@ export default function ShareNotePopup({ closePopup, note, open }: Props) {
 		return () => {
 			ignore = true;
 		};
-	}, [user, note]);
+	}, [user, note.id]);
 
 	const createLink = () => {
 		if (user) {
@@ -77,24 +78,26 @@ export default function ShareNotePopup({ closePopup, note, open }: Props) {
 			axios
 				.post(
 					BACKEND_SERVER_DOMAIN + "/api/note/share/" + note.id + "/",
-					JSON.stringify({ title: title, anonymous: anon, expire: 0 }),
+					JSON.stringify({ title: title, anonymous: anon, active: true }),
 					config
 				)
 				.then(function (response) {
 					setShareLinkList([
 						{
-							title: response.data.title,
-							id: response.data.id,
-							created: response.data.created,
-							anonymous: response.data.anonymous,
+							title: response.data.data.title,
+							id: response.data.data.id,
+							created: response.data.data.created,
+							anonymous: response.data.data.anonymous,
+							active: response.data.data.active,
 						},
 						...shareLinkList,
 					]);
 					setLink({
-						title: response.data.title,
-						urlkey: response.data.urlkey,
-						expire: response.data.expire,
-						anon: response.data.anonymous,
+						title: response.data.data.title,
+						urlkey: response.data.data.urlkey,
+						expire: response.data.data.expire,
+						anon: response.data.data.anonymous,
+						active: response.data.data.active,
 					});
 					setIsCallingAPI(false);
 				})
