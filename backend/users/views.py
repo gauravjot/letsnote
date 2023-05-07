@@ -1,6 +1,5 @@
 import pytz, json, uuid
 from datetime import datetime
-from django.shortcuts import render
 # Security
 import bcrypt
 from secrets import token_hex
@@ -24,21 +23,21 @@ def register(request):
 
     userSerializer = UserSerializer(data=dict(
         id = uuid.uuid4(),
-        full_name = request.data['full_name'],
+        name = str(request.data['name']),
         email = str(request.data['email']).lower(),
-        password = hashPwd(request.data['password']),
+        password = hashPwd(str(request.data['password'])),
         created = dateStamp,
         updated = dateStamp
     ))
-    
+
     # -- check if data is without bad actors
     if userSerializer.is_valid():
         userSerializer.save()
-        
+
         # Generate and send email verification token
         emailSent = False
         verifyToken = token_hex(24)
-        
+
         verifySerializer = VerifySerializer(data=dict(
             user = userSerializer.data['id'],
             token = hashThis(verifyToken),
@@ -49,17 +48,17 @@ def register(request):
             emailSent = sendEmailVerification(userSerializer.data['id'], userSerializer.data['email'], verifyToken)
         # send token to user
         token = issueToken(userSerializer.data['id'], request)
-        return Response(data={"verifyEmailSent":emailSent,"user":userSerializer.data,**tokenResponse(token)},status=status.HTTP_201_CREATED)
+        return Response(data=successResponse({"verifyEmailSent":emailSent,"user":userSerializer.data,**tokenResponse(token)}),status=status.HTTP_201_CREATED)
     else:
-        return Response(data=userSerializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        return Response(data=errorResponse(userSerializer.errors),status=status.HTTP_400_BAD_REQUEST)
 
 # Log In function, requires email and password
 # -----------------------------------------------
 @api_view(['POST'])
 def login(request):
     email = str(request.data['email']).lower()
-    password = request.data['password']
-    
+    password = str(request.data['password'])
+
     # Check if credentials are correct
     try:
         user = User.objects.get(email=email)
@@ -69,7 +68,7 @@ def login(request):
         return Response(data=errorResponse("Error: A0004. Credentials are invalid.", "A0004"),status=status.HTTP_401_UNAUTHORIZED)
     # send token to user
     token = issueToken(user.id, request)
-    return Response(data={"user":UserSerializer(user).data, **tokenResponse(token)},status=status.HTTP_202_ACCEPTED)
+    return Response(data=successResponse({"user":UserSerializer(user).data, **tokenResponse(token)}),status=status.HTTP_202_ACCEPTED)
 
 # Log Out function, requires token
 # -----------------------------------------------
@@ -82,14 +81,14 @@ def logout(request):
 # Verify Email, requires email verification token
 # -----------------------------------------------
 @api_view(['PUT'])
-def verifyEmail(request, emailtoken):    
+def verifyEmail(request, emailtoken):
     try:
         verify = Verify.objects.get(token=hashThis(emailtoken))
         if not verify.consumed:
             user = User.objects.get(uuid=verify.user)
-            user.email_verified = True
+            user.verified = True
             user.save()
-            
+
             verify.consumed = True
             verify.save()
 

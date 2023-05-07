@@ -1,38 +1,32 @@
 import React from "react";
-import { dateTimePretty } from "../utils/TimeSince";
+import { dateTimePretty } from "utils/TimeSince";
 import axios from "axios";
-import { BACKEND_SERVER_DOMAIN } from "../config";
+import { BACKEND_SERVER_DOMAIN } from "config";
 import { useSelector } from "react-redux";
+import { NoteType } from "types/api";
+import { RootState } from "App";
 
-export default function NoteItem({
-	note,
-	openNote,
-	currentNote,
-	shareNote,
-	refreshNotes,
-}) {
-	const optionsRef = React.useRef();
-	const user = useSelector((state) => state.user);
+interface Props {
+	note: NoteType;
+	openNote: (nid: NoteType["id"]) => void;
+	shareNote: (note: NoteType) => void;
+	isActive: boolean;
+}
+
+export default function NoteItem({ note, isActive, openNote, shareNote }: Props) {
+	const optionsRef = React.useRef<HTMLDivElement>(null);
+	const user = useSelector((state: RootState) => state.user);
 	const [menuOpen, setMenuOpen] = React.useState(false);
 
-	const closeOpenMenus = (e) => {
-		if (optionsRef.current && !optionsRef.current.contains(e.target)) {
-			window.removeEventListener("mousedown", closeOpenMenus);
+	const closeMenu = (e: MouseEvent) => {
+		if (
+			!document
+				.getElementById(note.id + "-option-box")
+				?.contains(e.target as Node) &&
+			!document.getElementById(note.id + "-option-btn")?.contains(e.target as Node)
+		) {
 			setMenuOpen(false);
 		}
-	};
-
-	const openMenu = () => {
-		setMenuOpen((val) => {
-			if (val === true) {
-				console.log("Y");
-				window.removeEventListener("mousedown", closeOpenMenus);
-			} else {
-				console.log("X");
-				window.addEventListener("mousedown", closeOpenMenus);
-			}
-			return !val;
-		});
 	};
 
 	const deleteNote = () => {
@@ -52,10 +46,7 @@ export default function NoteItem({
 				},
 			};
 			axios
-				.delete(
-					BACKEND_SERVER_DOMAIN + "/api/note/" + note.id + "/",
-					config
-				)
+				.delete(BACKEND_SERVER_DOMAIN + "/api/note/" + note.id + "/", config)
 				.then(function (response) {
 					// if (response.data.action) {
 					//   refreshNotes();
@@ -71,14 +62,11 @@ export default function NoteItem({
 	const renameNote = () => {};
 
 	return (
-		<div
-			className="sidebar-notelist-item"
-			aria-current={note.id === currentNote}
-		>
+		<div className="sidebar-notelist-item" aria-current={isActive}>
 			<div
 				className="flex-grow pr-2 py-2 cursor-pointer"
 				onClick={() => {
-					openNote(note);
+					openNote(note.id);
 				}}
 			>
 				<div className="text-gray-900 max-w-12 text-ellipsis font-medium line-height-125 whitespace-nowrap overflow-hidden">
@@ -92,18 +80,30 @@ export default function NoteItem({
 			<div className="h-fit self-center relative">
 				<button
 					className="line-height-0 p-1 ml-2 cursor-pointer hover:rotate-90 focus:rotate-90 focus-within:rotate-90 transition-all rounded-md"
-					onClick={() => openMenu()}
+					id={note.id + "-option-btn"}
+					aria-expanded={menuOpen}
+					onClick={() => {
+						setMenuOpen((val) => {
+							if (val) {
+								// menu will go away
+								window.removeEventListener("click", closeMenu);
+							} else {
+								// menu will appear
+								window.addEventListener("click", closeMenu);
+							}
+							return !val;
+						});
+					}}
 				>
 					<span
-						className={
-							"ic ic-md ic-gray-50 align-middle ic-options-vertical"
-						}
+						className={"ic ic-md ic-gray-50 align-middle ic-options-vertical"}
 					></span>
 				</button>
 				<div
 					ref={optionsRef}
-					aria-expanded={menuOpen}
-					className="transition-all scale-0 origin-bottom-right absolute right-8 -bottom-2 bg-gray-600 border border-gray-700 border-solid text-white rounded-md shadow-md z-20 sidebar-note-menu"
+					aria-hidden={!menuOpen}
+					id={note.id + "-option-box"}
+					className="transition-all origin-bottom-right absolute right-8 -bottom-2 bg-gray-600 border border-gray-700 border-solid text-white rounded-md shadow-md z-20 sidebar-note-menu"
 				>
 					<button
 						className="text-sm font-medium border-b border-gray-700 px-4 py-2 w-full text-left rounded-t-md hover:bg-gray-800 hover:text-white"
@@ -118,10 +118,7 @@ export default function NoteItem({
 						onClick={() => {
 							shareNote(note);
 							setMenuOpen(false);
-							document.removeEventListener(
-								"mousedown",
-								closeOpenMenus
-							);
+							document.removeEventListener("mousedown", closeMenu);
 						}}
 					>
 						Share

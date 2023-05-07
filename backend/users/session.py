@@ -23,7 +23,7 @@ def getUserID(request):
         return Response(errorResponse("Unauthorized.","A1001"),status=status.HTTP_401_UNAUTHORIZED)
     # Check if token is present in database and is valid
     try:
-        session = Session.objects.get(token=hashThis(token))
+        session = Session.objects.select_related('user').get(token=hashThis(token))
         # Check if session is expired
         isSessionExpired = False
         gap = datetime.now(tz=pytz.utc) - session.created
@@ -31,7 +31,7 @@ def getUserID(request):
             isSessionExpired = True
         # Return valid token
         if session.valid and not isSessionExpired:
-            return session.user
+            return session.user.id
         else:
             if session.valid:
                 session.valid = False
@@ -46,7 +46,7 @@ def issueToken(uid, request):
     newToken = token_hex(24)
     sessionSerializer = SessionSerializer(data=dict(
         token=hashThis(newToken),
-        user=str(uid),
+        user=uid,
         created=datetime.now(pytz.utc),
         ip=_getClientIP(request),
         ua=_getUserAgent(request)
