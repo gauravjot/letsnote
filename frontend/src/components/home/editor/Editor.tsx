@@ -2,23 +2,23 @@ import { useCallback, useRef, useState } from "react";
 import { Editable, Slate, withReact } from "slate-react";
 import { createEditor } from "slate";
 import { withHistory } from "slate-history";
-import "assets/css/editor.css";
+import "@/assets/css/editor.css";
 
-import { identifyLinksInTextIfAny, isLinkNodeAtSelection } from "utils/EditorUtils";
-import useEditorConfig from "hooks/useEditorConfig";
-import useSelection from "hooks/useSelection";
+import useEditorConfig from "@/hooks/useEditorConfig";
 
 import LinkEditor from "./LinkEditor";
 import Toolbar from "./Toolbar";
-import ExampleDocument from "utils/ExampleDocument";
+import ExampleDocument from "@/utils/ExampleDocument";
+import { identifyLinksInTextIfAny, isLinkNodeAtSelection } from "@/utils/EditorUtils";
+import useSelection from "@/hooks/useSelection";
 
-export default function Editor({ document, onChange, note }) {
+export default function Editor({ document, onChange, note }: any) {
 	const [editor] = useState(() => withReact(withHistory(createEditor())));
-	const editorRef = useRef(null);
+	const editorRef = useRef<HTMLDivElement>(null);
 	const { renderLeaf, renderElement, KeyBindings } = useEditorConfig(editor);
 
 	const onKeyDown = useCallback(
-		(event) => KeyBindings.onKeyDown(editor, event),
+		(event: any) => KeyBindings.onKeyDown(editor, event),
 		[KeyBindings, editor]
 	);
 
@@ -26,7 +26,7 @@ export default function Editor({ document, onChange, note }) {
 
 	// we update selection here because Slate fires an onChange even on pure selection change.
 	const onChangeLocal = useCallback(
-		(doc) => {
+		(doc: any) => {
 			onChange(doc);
 			setSelection(editor.selection);
 			identifyLinksInTextIfAny(editor);

@@ -6,12 +6,11 @@ import {
 	toggleBlockType,
 	toggleLinkAtSelection,
 	toggleStyle,
-} from "utils/EditorUtils";
+} from "@/utils/EditorUtils";
 
 import { useCallback } from "react";
 import { useSlateStatic } from "slate-react";
-import useImageUploadHandler from "hooks/useImageUploadHandler";
-import { dateTimePretty } from "utils/TimeSince";
+import { dateTimePretty } from "@/utils/TimeSince";
 
 const PARAGRAPH_STYLES = ["h1", "h2", "h3", "h4", "codeblock", "quote", "ul", "ol"];
 const CHARACTER_STYLES = [
@@ -26,11 +25,11 @@ const CHARACTER_STYLES = [
 ];
 const TEXT_ALIGN = ["left", "center", "right", "justify"];
 
-export default function Toolbar({ selection, previousSelection, note }) {
+export default function Toolbar({ selection, previousSelection, note }: any) {
 	const editor = useSlateStatic();
 
 	const onBlockTypeChange = useCallback(
-		(targetType) => {
+		(targetType: string) => {
 			if (targetType === "multiple") {
 				return;
 			}
@@ -38,8 +37,6 @@ export default function Toolbar({ selection, previousSelection, note }) {
 		},
 		[editor]
 	);
-
-	const onImageSelected = useImageUploadHandler(editor, previousSelection);
 
 	const blockType = getTextBlockStyle(editor);
 
@@ -79,7 +76,7 @@ export default function Toolbar({ selection, previousSelection, note }) {
 									characterstyle={style}
 									label={style}
 									isActive={getActiveStyles(editor).has(style)}
-									onMouseDown={(event) => {
+									onMouseDown={(event: any) => {
 										event.preventDefault();
 										toggleStyle(editor, style);
 									}}
@@ -132,7 +129,7 @@ export default function Toolbar({ selection, previousSelection, note }) {
 }
 
 // Text Formatting
-function ToolBarButton(props) {
+function ToolBarButton(props: any) {
 	const { label, isActive, ...otherProps } = props;
 	return (
 		<button
@@ -159,7 +156,7 @@ function ToolBarButton(props) {
 	);
 }
 
-function getIconForButton(style) {
+function getIconForButton(style: string) {
 	switch (style) {
 		case "bold":
 			return "ic-b";
@@ -182,12 +179,11 @@ function getIconForButton(style) {
 		case "link":
 			return "ic-link";
 		default:
-			console.log(style.props.children);
 			return "ic";
 	}
 }
 
-function getTitleForTool(tool) {
+function getTitleForTool(tool: string) {
 	switch (tool) {
 		case "bold":
 			return "Bold";
@@ -215,7 +211,7 @@ function getTitleForTool(tool) {
 }
 // Element Select
 
-function getLabelForBlockStyle(style) {
+function getLabelForBlockStyle(style: string) {
 	switch (style) {
 		case "h1":
 			return "Heading 1";
@@ -250,10 +246,9 @@ function getLabelForBlockStyle(style) {
 	}
 }
 
-function Element({ element, title, onSelect }) {
+function Element({ element, title, onSelect }: any) {
 	return (
 		<button
-			variant=""
 			className={
 				(title === getLabelForBlockStyle(element) ||
 				element.align === getLabelForBlockStyle(element)
@@ -280,11 +275,11 @@ function Element({ element, title, onSelect }) {
 	);
 }
 
-function ElementSelect(props) {
+function ElementSelect(props: any) {
 	const { elements, title, onSelect } = props;
 	return (
 		<div className="inline-block">
-			{elements.map((element, index) => (
+			{elements.map((element: any, index: number) => (
 				<span key={index}>
 					<Element element={element} title={title} onSelect={onSelect} />
 				</span>

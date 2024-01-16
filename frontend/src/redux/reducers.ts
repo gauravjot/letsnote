@@ -1,12 +1,12 @@
-import { SET_USER, LOGOUT_USER } from "./actions";
-import { ApiUserType } from "../types/api";
-import { AnyAction, Reducer } from "redux";
+import {SET_USER, LOGOUT_USER} from "./actions";
+import {AnyAction, Reducer} from "redux";
+import {UserReduxType} from "@/services/user/log_in_out";
 
-const userReducer: Reducer<ApiUserType, AnyAction> = (
-	state: ApiUserType | null = null,
+const userReducer: Reducer<UserReduxType, AnyAction> = (
+	state: UserReduxType | null = null,
 	action: any
 ) => {
-	const { type, payload } = action;
+	const {type, payload} = action;
 	switch (type) {
 		case LOGOUT_USER:
 			return (state = null);

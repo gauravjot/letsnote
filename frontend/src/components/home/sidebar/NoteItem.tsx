@@ -1,10 +1,10 @@
 import React from "react";
-import { dateTimePretty } from "utils/TimeSince";
+import { dateTimePretty } from "@/utils/TimeSince";
 import axios from "axios";
-import { BACKEND_SERVER_DOMAIN } from "config";
+import { BACKEND_SERVER_DOMAIN } from "@/config";
 import { useSelector } from "react-redux";
-import { NoteType } from "types/api";
-import { RootState } from "App";
+import { NoteType } from "@/types/api";
+import { RootState } from "@/App";
 
 interface Props {
 	note: NoteType;

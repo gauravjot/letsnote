@@ -1,18 +1,18 @@
 import Editor from "./editor/Editor";
-import { useState, useCallback, useEffect, useRef } from "react";
+import {useState, useCallback, useEffect, useRef} from "react";
 import ShareNotePopup from "./ShareNotePopup";
 import axios from "axios";
-import { BACKEND_SERVER_DOMAIN } from "config";
-import { useSelector } from "react-redux";
+import {BACKEND_SERVER_DOMAIN} from "@/config";
+import {useSelector} from "react-redux";
 import _ from "lodash";
-import ExampleDocument, { SlateDocumentType } from "utils/ExampleDocument";
-import { Helmet } from "react-helmet";
-import { useParams, useNavigate } from "react-router-dom";
-import { createNote, updateNoteContent } from "services/note/note";
-import { RootState } from "App";
-import { NoteType } from "types/api";
+import ExampleDocument, {SlateDocumentType} from "@/utils/ExampleDocument";
+import {Helmet} from "react-helmet";
+import {useParams, useNavigate} from "react-router-dom";
+import {createNote, updateNoteContent} from "@/services/note/note";
+import {RootState} from "@/App";
+import {NoteType} from "@/types/api";
 import HomeSidebar from "./sidebar/HomeSidebar";
-import Sidebar from "components/Sidebar";
+import Sidebar from "@/components/Sidebar";
 
 interface SavingState {
 	icon: "ic-cloud" | "ic-cloud-done" | "ic-cloud-fail";
@@ -21,7 +21,7 @@ interface SavingState {
 }
 
 export default function Home() {
-	let { noteid } = useParams(); /* from url: '/note/{noteid}' */
+	let {noteid} = useParams(); /* from url: '/note/{noteid}' */
 	let sidebarRef = useRef<HTMLDivElement>(null);
 	let sidebarCtrlBtnRef = useRef<HTMLButtonElement>(null);
 	const navigate = useNavigate();
@@ -123,7 +123,6 @@ export default function Home() {
 	const openNote = useCallback(
 		(n_id: NoteType["id"]) => {
 			if (user) {
-				console.log("hello");
 				setIsNoteLoading(true);
 				setCurrentNoteID(n_id);
 				let config = {
@@ -165,17 +164,10 @@ export default function Home() {
 
 	const toggleSidebar = () => {
 		if (sidebarRef.current && sidebarCtrlBtnRef.current) {
-			let isSidebarOpen =
-				sidebarRef.current.getAttribute("aria-hidden") === "false";
+			let isSidebarOpen = sidebarRef.current.getAttribute("aria-hidden") === "false";
 			// Toggle the aria labels
-			sidebarRef.current.setAttribute(
-				"aria-hidden",
-				isSidebarOpen ? "true" : "false"
-			);
-			sidebarCtrlBtnRef.current.setAttribute(
-				"aria-expanded",
-				isSidebarOpen ? "false" : "true"
-			);
+			sidebarRef.current.setAttribute("aria-hidden", isSidebarOpen ? "true" : "false");
+			sidebarCtrlBtnRef.current.setAttribute("aria-expanded", isSidebarOpen ? "false" : "true");
 		}
 	};
 
@@ -198,12 +190,7 @@ export default function Home() {
 			</Helmet>
 			<div className="App min-h-screen">
 				<div className="mx-auto lg:flex w-full">
-					<div
-						ref={sidebarRef}
-						id="sidebar"
-						aria-hidden="false"
-						className="sidebar-hide-able"
-					>
+					<div ref={sidebarRef} id="sidebar" aria-hidden="false" className="sidebar-hide-able">
 						<Sidebar
 							component={
 								<HomeSidebar
@@ -264,9 +251,7 @@ export default function Home() {
 											status.color
 										}
 									>
-										<span
-											className={"ic align-middle " + status.icon}
-										></span>
+										<span className={"ic align-middle " + status.icon}></span>
 										&nbsp; {status.message}
 									</div>
 								)
@@ -291,17 +276,9 @@ export default function Home() {
 				 * Note sharing component
 				 */}
 				{shareNote !== null ? (
-					<ShareNotePopup
-						note={shareNote}
-						closePopup={closeSharePopup}
-						open={sharePopupNote}
-					/>
+					<ShareNotePopup note={shareNote} closePopup={closeSharePopup} open={sharePopupNote} />
 				) : note !== null ? (
-					<ShareNotePopup
-						note={note}
-						closePopup={closeSharePopup}
-						open={sharePopupNote}
-					/>
+					<ShareNotePopup note={note} closePopup={closeSharePopup} open={sharePopupNote} />
 				) : (
 					<></>
 				)}

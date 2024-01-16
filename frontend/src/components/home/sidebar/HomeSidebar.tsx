@@ -1,6 +1,6 @@
-import Login from "components/home/sidebar/Login";
-import NoteList from "components/home/sidebar/NoteList";
-import { NoteType } from "types/api";
+import NoteList from "@/components/home/sidebar/NoteList";
+import {NoteType} from "@/types/api";
+import LoginRegister from "./LoginRegister";
 
 interface ISidebarProps {
 	currentNoteID: NoteType["id"] | null;
@@ -12,13 +12,11 @@ interface ISidebarProps {
 export default function HomeSidebar(props: ISidebarProps) {
 	return (
 		<>
-			<Login />
+			<LoginRegister />
 			<NoteList
 				openNote={props.openNote}
 				shareNote={props.openShareNote}
-				currentNote={
-					props.currentNoteID !== undefined ? props.currentNoteID : null
-				}
+				currentNote={props.currentNoteID !== undefined ? props.currentNoteID : null}
 				refresh={props.refresh}
 			/>
 		</>

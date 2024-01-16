@@ -1,9 +1,9 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { NoteType } from "types/api";
-import { RootState } from "App";
-import { createNote } from "services/note/note";
-import { ApiError, ResponseType } from "../../../types/query";
+import { NoteType } from "@/types/api";
+import { RootState } from "@/App";
+import { createNote } from "@/services/note/note";
+import { ApiError } from "../../../types/query";
 
 export default function CreateNote({
 	onNewNoteCreated,

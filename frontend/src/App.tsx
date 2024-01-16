@@ -8,8 +8,8 @@ import userReducer from "./redux/reducers";
 import { CookiesProvider } from "react-cookie";
 import { useCookies } from "react-cookie";
 /* Components */
-import Home from "components/home/Home";
-import Shared from "components/shared/SharePage";
+import Home from "@/components/home/Home";
+import Shared from "@/components/shared/SharePage";
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof _store.getState>;

@@ -1,22 +1,23 @@
-import { DefaultElement } from "slate-react";
-import Image from "components/home/editor/Image";
-import Link from "components/home/editor/Link";
-import LinkEditor from "components/home/editor/LinkEditor";
+import { DefaultElement, ReactEditor } from "slate-react";
+import Image from "@/components/home/editor/Image";
+import Link from "@/components/home/editor/Link";
+import LinkEditor from "@/components/home/editor/LinkEditor";
 import isHotkey from "is-hotkey";
-import { toggleStyle, insertContent, toggleBlockType } from "../utils/EditorUtils";
+import { toggleStyle, insertContent, toggleBlockType } from "@/utils/EditorUtils";
+import { BaseEditor } from "slate";
 
-export default function useEditorConfig(editor) {
+export default function useEditorConfig(editor: BaseEditor & ReactEditor) {
 	const { isVoid } = editor;
-	editor.isVoid = (element) => {
+	editor.isVoid = (element: any) => {
 		return ["image"].includes(element.type) || isVoid(element);
 	};
 
-	editor.isInline = (element) => ["link"].includes(element.type);
+	editor.isInline = (element: any) => ["link"].includes(element.type);
 
 	return { renderElement, renderLeaf, KeyBindings };
 }
 
-function renderElement(props) {
+function renderElement(props: any) {
 	const { element, children, attributes } = props;
 	const style = { textAlign: element.align };
 	switch (element.type) {
@@ -100,12 +101,12 @@ function renderElement(props) {
 	}
 }
 
-function renderLeaf(props) {
+function renderLeaf(props: any) {
 	return <StyledText {...props} />;
 }
 
 const KeyBindings = {
-	onKeyDown: (editor, event) => {
+	onKeyDown: (editor: any, event: any) => {
 		if (isHotkey("mod+b", event)) {
 			event.preventDefault();
 			toggleStyle(editor, "bold");
@@ -164,7 +165,7 @@ const KeyBindings = {
 	},
 };
 
-function StyledText({ attributes, children, leaf }) {
+function StyledText({ attributes, children, leaf }: any) {
 	if (leaf.bold) {
 		children = <strong {...attributes}>{children}</strong>;
 	}

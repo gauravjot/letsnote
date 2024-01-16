@@ -1,26 +1,37 @@
 import axios from "axios";
-import { LOGIN_EP, LOGOUT_EP } from "config";
-import { handleApiError } from "services/handle_error";
-import { ApiError, ResponseType } from "types/query";
-import { ApiUserType } from "types/api";
+import {LOGIN_EP, LOGOUT_EP} from "@/config";
+import {handleApiError} from "@/services/handle_error";
 
-export function userLogin(
-	email: string,
-	password: string
-): Promise<ResponseType<ApiUserType | ApiError>> {
-	return axios
-		.post(LOGIN_EP, JSON.stringify({ email: email, password: password }), {
+export interface UserLoginInfo {
+	email: string;
+	password: string;
+}
+
+export interface UserReduxType {
+	user: {
+		id: string;
+		name: string;
+		email: string;
+		verified: boolean;
+	};
+	token: string;
+}
+
+export interface UserLoginResponse {
+	success: boolean;
+	data: UserReduxType;
+}
+
+export async function userLogin(info: UserLoginInfo) {
+	return await axios
+		.post(LOGIN_EP, JSON.stringify(info), {
 			headers: {
 				"Content-Type": "application/json",
 			},
 		})
 		.then(function (response) {
-			return {
-				success: response.data.success,
-				res: response.data.data,
-			} as ResponseType<ApiUserType>;
-		})
-		.catch(handleApiError);
+			return response.data;
+		});
 }
 
 export function userLogout(token: string) {

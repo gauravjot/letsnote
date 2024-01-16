@@ -437,3 +437,79 @@ code {
 .shadow-smb {
 	box-shadow: 0px 2px 5px -2px rgb(0 0 0 / 20%);
 }
+
+/*
+ * Spinner
+ */
+.spinner {
+	--loader-size: 35px;
+	--loader-border-size: 3px;
+	--loader-border-color: white;
+	width: var(--loader-size);
+	height: var(--loader-size);
+	border: var(--loader-border-size) solid var(--loader-border-color);
+	border-top-color: transparent;
+	border-right-color: transparent;
+	border-bottom-color: transparent;
+	background-color: transparent;
+	border-radius: 50%;
+	position: relative;
+	animation: rotateX 1s infinite linear;
+	display: inline-block;
+}
+
+.spinner::before {
+	content: "";
+	border: var(--loader-border-size) solid var(--loader-border-color);
+	border-top-color: transparent;
+	border-left-color: transparent;
+	border-bottom-color: transparent;
+	background-color: transparent;
+	border-radius: 50%;
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	right: 2px;
+	bottom: 2px;
+	animation: rotateX 0.5s infinite linear reverse;
+}
+.spinner-xl {
+	--loader-size: 80px;
+	--loader-border-size: 6px;
+}
+.spinner-sm {
+	--loader-size: 25px;
+	--loader-border-size: 2px;
+}
+.spinner-md {
+	--loader-size: 50px;
+	--loader-border-size: 4px;
+}
+.spinner-lg {
+	--loader-size: 60px;
+	--loader-border-size: 5px;
+}
+.spinner-primary {
+	--loader-border-color: #1457e1;
+}
+.spinner-danger {
+	--loader-border-color: #e53e3e;
+}
+.spinner-white {
+	--loader-border-color: white;
+}
+.spinner-black {
+	--loader-border-color: black;
+}
+.spinner-gray {
+	--loader-border-color: rgb(103, 103, 103);
+}
+
+@keyframes rotateX {
+	from {
+		transform: rotateZ(0deg);
+	}
+	to {
+		transform: rotateZ(360deg);
+	}
+}

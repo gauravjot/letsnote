@@ -1,10 +1,10 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
-import { BACKEND_SERVER_DOMAIN, DEPLOY_DOMAIN } from "config";
-import { timeSince, dateTimePretty } from "utils/TimeSince";
-import { ShareNote, NoteType } from "types/api";
-import { RootState } from "App";
+import { BACKEND_SERVER_DOMAIN, DEPLOY_DOMAIN } from "@/config";
+import { timeSince, dateTimePretty } from "@/utils/TimeSince";
+import { ShareNote, NoteType } from "@/types/api";
+import { RootState } from "@/App";
 
 interface Link {
 	title: string;

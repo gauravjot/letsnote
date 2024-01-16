@@ -1,9 +1,9 @@
 import axios from "axios";
-import { NEW_NOTE_EP, NOTE_EP } from "config";
-import { handleApiError } from "services/handle_error";
-import { NoteType } from "types/api";
-import { ApiError, ResponseType } from "types/query";
-import ExampleDocument, { SlateDocumentType } from "utils/ExampleDocument";
+import { NEW_NOTE_EP, NOTE_EP } from "@/config";
+import { handleApiError } from "@/services/handle_error";
+import { NoteType } from "@/types/api";
+import { ApiError, ResponseType } from "@/types/query";
+import ExampleDocument, { SlateDocumentType } from "@/utils/ExampleDocument";
 
 // read a note
 // create a note

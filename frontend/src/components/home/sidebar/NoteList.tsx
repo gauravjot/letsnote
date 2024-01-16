@@ -1,13 +1,13 @@
 import React from "react";
 import axios from "axios";
-import { BACKEND_SERVER_DOMAIN } from "config";
-import { useSelector } from "react-redux";
+import {BACKEND_SERVER_DOMAIN} from "@/config";
+import {useSelector} from "react-redux";
 import CreateNote from "./CreateNote";
 import NoteItem from "./NoteItem";
-import { monthYear } from "utils/TimeSince";
-import { NoteType } from "types/api";
-import { RootState } from "App";
-import Spinner from "components/Spinner";
+import {monthYear} from "@/utils/TimeSince";
+import {NoteType} from "@/types/api";
+import {RootState} from "@/App";
+import Spinner from "@/components/ui/spinner/Spinner";
 
 interface Props {
 	refresh: boolean;
@@ -16,7 +16,7 @@ interface Props {
 	shareNote: (note: NoteType) => void;
 }
 
-export default function NoteList({ openNote, shareNote, currentNote, refresh }: Props) {
+export default function NoteList({openNote, shareNote, currentNote, refresh}: Props) {
 	const user = useSelector((state: RootState) => state.user);
 	const [notes, setNotes] = React.useState<NoteType[]>([]);
 	const [isLoading, setIsLoading] = React.useState(false);
@@ -106,9 +106,9 @@ export default function NoteList({ openNote, shareNote, currentNote, refresh }: 
 					})}
 				</div>
 			) : isLoading ? (
-				<>
-					<Spinner />
-				</>
+				<div className="flex justify-center">
+					<Spinner color="primary" size="md" />
+				</div>
 			) : (
 				<div className="px-6 py-4 text-xl text-gray-400 font-thin user-select-none">
 					It's so empty here. Make a note in editor!
