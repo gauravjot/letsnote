@@ -13,17 +13,16 @@
 		"react": "^18.2.0",
 		"react-cookie": "^4.1.1",
 		"react-dom": "^18.2.0",
-		"react-hook-form": "^7.46.1",
 		"react-editor-js": "^2.1.0",
 		"react-helmet": "^6.1.0",
+		"react-hook-form": "^7.46.1",
 		"react-query": "^3.39.3",
 		"react-redux": "^8.0.4",
 		"react-router-dom": "^6.4.2",
 		"redux": "^4.2.0",
 		"slate": "^0.84.0",
 		"slate-history": "^0.85.0",
-		"slate-react": "^0.83.2",
-		"typescript": "^4.9.5"
+		"slate-react": "^0.83.2"
 	},
 	"scripts": {
 		"dev": "vite",
@@ -52,6 +51,7 @@
 		]
 	},
 	"devDependencies": {
+		"@reduxjs/toolkit": "^1.9.1",
 		"@storybook/addon-essentials": "^7.4.6",
 		"@storybook/addon-interactions": "^7.4.6",
 		"@storybook/addon-links": "^7.4.6",
@@ -60,25 +60,26 @@
 		"@storybook/react": "^7.4.6",
 		"@storybook/react-vite": "^7.4.6",
 		"@storybook/testing-library": "^0.2.2",
-		"@reduxjs/toolkit": "^1.9.1",
 		"@types/deep-equal": "^1.0.4",
 		"@types/is-url": "^1.2.32",
 		"@types/jest": "^29.5.1",
 		"@types/node": "^18.16.3",
 		"@types/react": "^18.2.0",
 		"@types/react-dom": "^18.2.1",
+		"@types/react-helmet": "^6.1.6",
 		"@types/uuid": "^9.0.7",
 		"@vitejs/plugin-react": "^4.2.1",
-		"@types/react-helmet": "^6.1.6",
+		"autoprefixer": "^10.4.12",
 		"eslint": "^8.38.0",
 		"eslint-plugin-react-hooks": "^4.6.0",
 		"eslint-plugin-react-refresh": "^0.3.4",
 		"eslint-plugin-storybook": "^0.6.15",
-		"storybook": "^7.4.6",
-		"autoprefixer": "^10.4.12",
 		"postcss": "^8.4.18",
+		"storybook": "^7.4.6",
 		"tailwindcss": "^3.2.0",
+		"typescript": "^4.9.5",
 		"vite": "^5.0.11",
+		"vite-plugin-svgr": "^4.2.0",
 		"vite-tsconfig-paths": "^4.2.3"
 	}
 }

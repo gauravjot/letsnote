@@ -10,13 +10,13 @@ import {
 } from "@/services/user/log_in_out";
 import {RootState} from "@/App";
 import {Link} from "react-router-dom";
-import {useMutation} from "react-query";
 import {useForm} from "react-hook-form";
 import {AxiosError} from "axios";
 import {handleAxiosError} from "@/utils/HandleAxiosError";
 import InputField from "@/components/ui/input/Input";
 import Button from "@/components/ui/button/Button";
 import {UserRegisterInfo, UserRegisterResponse, userRegister} from "@/services/user/register";
+import {useMutation} from "react-query";
 
 export default function LoginRegister({showLinkToHome = false}: {showLinkToHome?: boolean}) {
 	const user = useSelector((state: RootState) => state.user);

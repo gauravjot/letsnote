@@ -1,12 +1,12 @@
-import { Route, Navigate, Routes, BrowserRouter as Router } from "react-router-dom";
+import {Route, Navigate, Routes, BrowserRouter as Router} from "react-router-dom";
 /* Redux */
-import { Provider } from "react-redux";
-import { compose } from "redux";
-import { configureStore } from "@reduxjs/toolkit";
+import {Provider} from "react-redux";
+import {compose} from "redux";
+import {configureStore} from "@reduxjs/toolkit";
 import userReducer from "./redux/reducers";
 /* Cookies */
-import { CookiesProvider } from "react-cookie";
-import { useCookies } from "react-cookie";
+import {CookiesProvider} from "react-cookie";
+import {useCookies} from "react-cookie";
 /* Components */
 import Home from "@/components/home/Home";
 import Shared from "@/components/shared/SharePage";
@@ -23,8 +23,7 @@ const _store = configureStore({
 });
 // Redux browser extension support
 const composeEnhancers =
-	((window as any)["__REDUX_DEVTOOLS_EXTENSION_COMPOSE__"] as typeof compose) ||
-	compose;
+	((window as any)["__REDUX_DEVTOOLS_EXTENSION_COMPOSE__"] as typeof compose) || compose;
 
 export default function App() {
 	// Using cookies to for user session
@@ -68,17 +67,12 @@ export default function App() {
 		<CookiesProvider>
 			<Provider store={store}>
 				<Router>
-					<div>
-						<Routes>
-							<Route path="/" element={<Home />} />
-							<Route
-								path="/note/shared/:nui/:shareid"
-								element={<Shared />}
-							/>
-							<Route path="/note/:noteid" element={<Home />} />
-							<Route path="*" element={<Navigate to="/" replace />} />
-						</Routes>
-					</div>
+					<Routes>
+						<Route path="/" element={<Home />} />
+						<Route path="/note/shared/:nui/:shareid" element={<Shared />} />
+						<Route path="/note/:noteid" element={<Home />} />
+						<Route path="*" element={<Navigate to="/" replace />} />
+					</Routes>
 				</Router>
 			</Provider>
 		</CookiesProvider>
