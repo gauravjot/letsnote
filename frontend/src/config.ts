@@ -1,5 +1,5 @@
-export const BACKEND_SERVER_DOMAIN: string = "http://localhost:8000";
-export const DEPLOY_DOMAIN: string = "http://localhost:5173";
+export const BACKEND_SERVER_DOMAIN: string = import.meta.env.VITE_BACKEND_BASE_URL;
+export const DEPLOY_DOMAIN: string = import.meta.env.VITE_FRONTEND_BASE_URL;
 
 // Endpoints
 export const LOGIN_EP: string = BACKEND_SERVER_DOMAIN + "/api/user/login/";

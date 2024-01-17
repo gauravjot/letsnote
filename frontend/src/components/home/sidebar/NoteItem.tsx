@@ -1,10 +1,10 @@
 import React from "react";
-import { dateTimePretty } from "@/utils/TimeSince";
+import {dateTimePretty} from "@/utils/TimeSince";
 import axios from "axios";
-import { BACKEND_SERVER_DOMAIN } from "@/config";
-import { useSelector } from "react-redux";
-import { NoteType } from "@/types/api";
-import { RootState } from "@/App";
+import {BACKEND_SERVER_DOMAIN} from "@/config";
+import {useSelector} from "react-redux";
+import {NoteType} from "@/types/api";
+import {RootState} from "@/App";
 
 interface Props {
 	note: NoteType;
@@ -13,16 +13,14 @@ interface Props {
 	isActive: boolean;
 }
 
-export default function NoteItem({ note, isActive, openNote, shareNote }: Props) {
+export default function NoteItem({note, isActive, openNote, shareNote}: Props) {
 	const optionsRef = React.useRef<HTMLDivElement>(null);
 	const user = useSelector((state: RootState) => state.user);
 	const [menuOpen, setMenuOpen] = React.useState(false);
 
 	const closeMenu = (e: MouseEvent) => {
 		if (
-			!document
-				.getElementById(note.id + "-option-box")
-				?.contains(e.target as Node) &&
+			!document.getElementById(note.id + "-option-box")?.contains(e.target as Node) &&
 			!document.getElementById(note.id + "-option-btn")?.contains(e.target as Node)
 		) {
 			setMenuOpen(false);
@@ -47,7 +45,7 @@ export default function NoteItem({ note, isActive, openNote, shareNote }: Props)
 			};
 			axios
 				.delete(BACKEND_SERVER_DOMAIN + "/api/note/" + note.id + "/", config)
-				.then(function (response) {
+				.then(() => {
 					// if (response.data.action) {
 					//   refreshNotes();
 					// }
@@ -95,9 +93,7 @@ export default function NoteItem({ note, isActive, openNote, shareNote }: Props)
 						});
 					}}
 				>
-					<span
-						className={"ic ic-md ic-gray-50 align-middle ic-options-vertical"}
-					></span>
+					<span className={"ic ic-md ic-gray-50 align-middle ic-options-vertical"}></span>
 				</button>
 				<div
 					ref={optionsRef}

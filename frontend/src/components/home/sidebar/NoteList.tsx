@@ -38,7 +38,7 @@ export default function NoteList({openNote, shareNote, currentNote, refresh}: Pr
 					setNotes(response.data.data.reverse());
 					setIsLoading(false);
 				})
-				.catch(function (error) {
+				.catch(() => {
 					setIsLoading(false);
 				});
 		}

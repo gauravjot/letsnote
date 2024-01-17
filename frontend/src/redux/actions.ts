@@ -1,4 +1,4 @@
-import { ApiUserType } from "types/api";
+import {ApiUserType} from "@/types/api";
 
 // User Reducer
 export const SET_USER = "SET_USER";

@@ -8,9 +8,9 @@ import {
 	toggleStyle,
 } from "@/utils/EditorUtils";
 
-import { useCallback } from "react";
-import { useSlateStatic } from "slate-react";
-import { dateTimePretty } from "@/utils/TimeSince";
+import {useCallback} from "react";
+import {useSlateStatic} from "slate-react";
+import {dateTimePretty} from "@/utils/TimeSince";
 
 const PARAGRAPH_STYLES = ["h1", "h2", "h3", "h4", "codeblock", "quote", "ul", "ol"];
 const CHARACTER_STYLES = [
@@ -25,7 +25,7 @@ const CHARACTER_STYLES = [
 ];
 const TEXT_ALIGN = ["left", "center", "right", "justify"];
 
-export default function Toolbar({ selection, previousSelection, note }: any) {
+export default function Toolbar({note}: any) {
 	const editor = useSlateStatic();
 
 	const onBlockTypeChange = useCallback(
@@ -44,9 +44,7 @@ export default function Toolbar({ selection, previousSelection, note }: any) {
 		<div className="top-0 z-30 sticky" id="toolbar">
 			<div className="bg-gray-50 px-1 mt-1 shadow-md rounded ab-toolbar">
 				<div className="px-3 pt-2 mb-1 ml-1">
-					<span className="text-lg font-serif font-medium">
-						{note ? note.title : "Untitled"}
-					</span>
+					<span className="text-lg font-serif font-medium">{note ? note.title : "Untitled"}</span>
 					<button
 						className="line-height-0 h-fit ml-1 align-top p-1 py-1 cursor-pointer rounded-md hover:bg-gray-300"
 						onClick={() => {}}
@@ -115,9 +113,7 @@ export default function Toolbar({ selection, previousSelection, note }: any) {
 					{/* Options for text Alignment */}
 					<div className="pr-3 inline-block">
 						<ElementSelect
-							title={getLabelForBlockStyle(
-								getTextAlignStyle(editor) ?? "paragraph"
-							)}
+							title={getLabelForBlockStyle(getTextAlignStyle(editor) ?? "paragraph")}
 							elements={TEXT_ALIGN}
 							onSelect={onBlockTypeChange}
 						/>
@@ -130,14 +126,13 @@ export default function Toolbar({ selection, previousSelection, note }: any) {
 
 // Text Formatting
 function ToolBarButton(props: any) {
-	const { label, isActive, ...otherProps } = props;
+	const {label, isActive, ...otherProps} = props;
 	return (
 		<button
 			variant=""
 			className={
-				(isActive
-					? "bg-gray-300 hover:outline outline-1 outline-gray-400 "
-					: "hover:bg-gray-300") + " infotrig ml-3 p-1 text-xs aspect-square"
+				(isActive ? "bg-gray-300 hover:outline outline-1 outline-gray-400 " : "hover:bg-gray-300") +
+				" infotrig ml-3 p-1 text-xs aspect-square"
 			}
 			active={isActive ? "true" : "false"}
 			{...otherProps}
@@ -149,9 +144,7 @@ function ToolBarButton(props: any) {
 					getIconForButton(label)
 				}
 			></span>
-			<div className="infomsg mt-3 z-30 whitespace-nowrap">
-				{getTitleForTool(label)}
-			</div>
+			<div className="infomsg mt-3 z-30 whitespace-nowrap">{getTitleForTool(label)}</div>
 		</button>
 	);
 }
@@ -246,7 +239,7 @@ function getLabelForBlockStyle(style: string) {
 	}
 }
 
-function Element({ element, title, onSelect }: any) {
+function Element({element, title, onSelect}: any) {
 	return (
 		<button
 			className={
@@ -261,22 +254,18 @@ function Element({ element, title, onSelect }: any) {
 		>
 			<span
 				className={
-					(title === getLabelForBlockStyle(element)
-						? "ic-black "
-						: "ic-gray-50 ") +
+					(title === getLabelForBlockStyle(element) ? "ic-black " : "ic-gray-50 ") +
 					"ic ic-md align-middle ic-" +
 					element
 				}
 			></span>
-			<div className="infomsg mt-3 z-30 whitespace-nowrap">
-				{getTitleForTool(element)}
-			</div>
+			<div className="infomsg mt-3 z-30 whitespace-nowrap">{getTitleForTool(element)}</div>
 		</button>
 	);
 }
 
 function ElementSelect(props: any) {
-	const { elements, title, onSelect } = props;
+	const {elements, title, onSelect} = props;
 	return (
 		<div className="inline-block">
 			{elements.map((element: any, index: number) => (

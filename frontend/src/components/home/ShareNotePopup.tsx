@@ -1,10 +1,10 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import {useSelector} from "react-redux";
 import axios from "axios";
-import { BACKEND_SERVER_DOMAIN, DEPLOY_DOMAIN } from "@/config";
-import { timeSince, dateTimePretty } from "@/utils/TimeSince";
-import { ShareNote, NoteType } from "@/types/api";
-import { RootState } from "@/App";
+import {BACKEND_SERVER_DOMAIN, DEPLOY_DOMAIN} from "@/config";
+import {timeSince, dateTimePretty} from "@/utils/TimeSince";
+import {ShareNote, NoteType} from "@/types/api";
+import {RootState} from "@/App";
 
 interface Link {
 	title: string;
@@ -20,7 +20,7 @@ interface Props {
 	open: boolean;
 }
 
-export default function ShareNotePopup({ closePopup, note, open }: Props) {
+export default function ShareNotePopup({closePopup, note, open}: Props) {
 	const user = useSelector((state: RootState) => state.user);
 	let sidebarRef = React.useRef<HTMLDivElement>(null);
 	const [link, setLink] = React.useState<Link | null>(null);
@@ -44,10 +44,7 @@ export default function ShareNotePopup({ closePopup, note, open }: Props) {
 				},
 			};
 			axios
-				.get(
-					BACKEND_SERVER_DOMAIN + "/api/note/share/links/" + note.id + "/",
-					config
-				)
+				.get(BACKEND_SERVER_DOMAIN + "/api/note/share/links/" + note.id + "/", config)
 				.then(function (response) {
 					if (!ignore) {
 						setShareLinkList(response.data.data);
@@ -78,7 +75,7 @@ export default function ShareNotePopup({ closePopup, note, open }: Props) {
 			axios
 				.post(
 					BACKEND_SERVER_DOMAIN + "/api/note/share/" + note.id + "/",
-					JSON.stringify({ title: title, anonymous: anon, active: true }),
+					JSON.stringify({title: title, anonymous: anon, active: true}),
 					config
 				)
 				.then(function (response) {
@@ -101,7 +98,7 @@ export default function ShareNotePopup({ closePopup, note, open }: Props) {
 					});
 					setIsCallingAPI(false);
 				})
-				.catch(function (error) {
+				.catch(() => {
 					window.onbeforeunload = null;
 					setIsCallingAPI(false);
 				});
@@ -113,10 +110,7 @@ export default function ShareNotePopup({ closePopup, note, open }: Props) {
 			aria-expanded={open}
 			className="share-sidebar fixed top-0 left-0 w-full h-full bg-black bg-opacity-50"
 		>
-			<div
-				ref={sidebarRef}
-				className="absolute h-full ml-8 mr-auto bg-white right-0 shadow-md p-4"
-			>
+			<div ref={sidebarRef} className="absolute h-full ml-8 mr-auto bg-white right-0 shadow-md p-4">
 				<button
 					className="ab-btn-secondary mt-4 px-2 text-sm font-medium py-1 rounded shadow"
 					onClick={() => {
@@ -140,11 +134,7 @@ export default function ShareNotePopup({ closePopup, note, open }: Props) {
 										className="text-sky-600 text-xs ml-2 border border-gray-200 px-2 rounded hover:bg-gray-200"
 										onClick={(self) => {
 											navigator.clipboard.writeText(
-												DEPLOY_DOMAIN +
-													"/note/shared/" +
-													note.id.split("-")[0] +
-													"/" +
-													link.urlkey
+												DEPLOY_DOMAIN + "/note/shared/" + note.id.split("-")[0] + "/" + link.urlkey
 											);
 											self.currentTarget.innerHTML = "Copied!";
 										}}
@@ -153,31 +143,22 @@ export default function ShareNotePopup({ closePopup, note, open }: Props) {
 									</button>
 								</div>
 								<div className="mt-2 mb-2 text-sm text-yellow-700">
-									This is the only time you will see this link. Save it
-									somewhere safe. You can make more in future.
+									This is the only time you will see this link. Save it somewhere safe. You can make
+									more in future.
 								</div>
 								<input
 									type="text"
 									className="w-full border border-gray-300 rounded py-1 px-2 bg-sky-100 text-sm"
 									value={
-										DEPLOY_DOMAIN +
-										"/note/shared/" +
-										note.id.split("-")[0] +
-										"/" +
-										link.urlkey
+										DEPLOY_DOMAIN + "/note/shared/" + note.id.split("-")[0] + "/" + link.urlkey
 									}
 									readOnly
 								/>
-								<div className="text-sm my-1 mt-2">
-									Anonymous: {link.anon ? "Yes" : "No"}
-								</div>
+								<div className="text-sm my-1 mt-2">Anonymous: {link.anon ? "Yes" : "No"}</div>
 							</>
 						) : (
 							<div>
-								<label
-									className="user-select-none text-gray-600 pl-0.5 text-sm"
-									htmlFor="title"
-								>
+								<label className="user-select-none text-gray-600 pl-0.5 text-sm" htmlFor="title">
 									Group name
 								</label>
 								<input
