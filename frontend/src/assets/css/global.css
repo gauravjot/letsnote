@@ -206,13 +206,18 @@ code {
 .sidebar-hide-able {
 	transition-property: width, opacity;
 	transition: 0.5s ease-out;
-	@apply relative z-20;
+	@apply fixed left-0 top-0 bottom-0 right-10;
+	@apply lg:relative;
 }
 .sidebar-hide-able[aria-hidden="false"] {
-	@apply opacity-100 w-full lg:w-[28rem];
+	@apply opacity-100 w-[90%] lg:w-[28rem] z-50;
+}
+.sidebar-hide-able[aria-hidden="false"]:after {
+	content: "";
+	@apply fixed bg-black/20 inset-0 -z-10 lg:hidden;
 }
 .sidebar-hide-able[aria-hidden="true"] {
-	@apply w-0 opacity-0;
+	@apply w-0 opacity-0 z-0;
 }
 .sidebar-expand-btn {
 	@apply hover:bg-gray-500 transition-all pl-0.5 pr-1.5 py-1 pt-2 shadow-md border-t border-r border-b rounded-tr-md rounded-br-md border-solid border-gray-300;
@@ -315,7 +320,7 @@ code {
 	transition: opacity 0.2s ease;
 }
 .share-sidebar[aria-expanded="true"] {
-	@apply opacity-100 z-40;
+	@apply opacity-100 z-50 fixed inset-0;
 }
 .share-sidebar[aria-expanded="false"] {
 	@apply opacity-0 z-0;
@@ -479,6 +484,10 @@ code {
 }
 .spinner-sm {
 	--loader-size: 25px;
+	--loader-border-size: 2px;
+}
+.spinner-xs {
+	--loader-size: 14px;
 	--loader-border-size: 2px;
 }
 .spinner-md {

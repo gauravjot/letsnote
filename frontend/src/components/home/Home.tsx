@@ -13,12 +13,7 @@ import {RootState} from "@/App";
 import {NoteType} from "@/types/api";
 import HomeSidebar from "./sidebar/HomeSidebar";
 import Sidebar from "@/components/Sidebar";
-
-interface SavingState {
-	icon: "ic-cloud" | "ic-cloud-done" | "ic-cloud-fail";
-	color: "bg-slate-800" | "bg-green-800" | "bg-sky-600" | "bg-orange-700";
-	message: string;
-}
+import NoteStatus, {NOTE_STATUS, SavingState} from "./NoteStatus";
 
 export default function Home() {
 	let {noteid} = useParams(); /* from url: '/note/{noteid}' */
@@ -26,8 +21,8 @@ export default function Home() {
 	let sidebarCtrlBtnRef = useRef<HTMLButtonElement>(null);
 	const navigate = useNavigate();
 	const user = useSelector((state: RootState) => state.user);
-	const [note, setNote] = useState<NoteType | null>(null);
 	const [status, setStatus] = useState<SavingState | null>(null);
+	const [note, setNote] = useState<NoteType | null>(null);
 	const [document, setDocument] = useState<SlateDocumentType>(ExampleDocument);
 	const [refreshNoteList, setRefreshNoteList] = useState(false);
 	const [isNoteLoading, setIsNoteLoading] = useState(false);
@@ -35,14 +30,10 @@ export default function Home() {
 	const [sharePopupNote, setSharePopupNote] = useState(false);
 	const [shareNote, setShareNote] = useState<NoteType | null>(null);
 
-	const savingStatus: SavingState = {
-		icon: "ic-cloud",
-		color: "bg-slate-800",
-		message: "Saving...",
-	};
+	const isMobile = window.innerWidth < 768;
 
 	const saveNote = (content: SlateDocumentType, note: NoteType | null) => {
-		setStatus(savingStatus);
+		setStatus(NOTE_STATUS.saving);
 		window.onbeforeunload = function () {
 			alert("Note is not yet saved. Please wait!");
 			return true;
@@ -54,21 +45,13 @@ export default function Home() {
 		const req = await updateNoteContent(user.token, nid, title, content);
 		if (req.success) {
 			let response = req.res as NoteType;
-			setStatus({
-				icon: "ic-cloud-done",
-				color: "bg-green-800",
-				message: "Synced",
-			});
+			setStatus(NOTE_STATUS.saved);
 			if (note?.id === response.id) {
 				setNote(req.res as NoteType);
 			}
 			window.onbeforeunload = null;
 		} else {
-			setStatus({
-				icon: "ic-cloud-fail",
-				color: "bg-orange-700",
-				message: "Sync failed",
-			});
+			setStatus(NOTE_STATUS.failed);
 		}
 	}
 
@@ -76,22 +59,14 @@ export default function Home() {
 		const req = await createNote(user.token, title, content);
 		if (req.success) {
 			let response = req.res as NoteType;
-			setStatus({
-				icon: "ic-cloud-done",
-				color: "bg-sky-600",
-				message: "Created",
-			});
+			setStatus(NOTE_STATUS.created);
 			setCurrentNoteID(response.id);
 			setNote(response);
 			setRefreshNoteList(!refreshNoteList);
 			window.onbeforeunload = null;
 			navigate("/note/" + response.id);
 		} else {
-			setStatus({
-				icon: "ic-cloud-fail",
-				color: "bg-orange-700",
-				message: `Sync fail: ${JSON.stringify(req.res)}`,
-			});
+			setStatus(NOTE_STATUS.failed);
 		}
 	}
 
@@ -110,11 +85,7 @@ export default function Home() {
 					createNewNote(title, content);
 				}
 			} else {
-				setStatus({
-					icon: "ic-cloud-fail",
-					color: "bg-orange-700",
-					message: "Saving failed",
-				});
+				setStatus(NOTE_STATUS.failed);
 			}
 		}, 2000),
 		[note]
@@ -134,8 +105,22 @@ export default function Home() {
 				axios
 					.get(BACKEND_SERVER_DOMAIN + "/api/note/" + n_id + "/", config)
 					.then(function (response) {
+						// Close the sidebar on mobile if open
+						if (
+							isMobile &&
+							sidebarRef.current &&
+							sidebarCtrlBtnRef.current &&
+							sidebarRef.current.getAttribute("aria-hidden") === "false"
+						) {
+							toggleSidebar();
+						}
 						setNote(response.data.data);
-						setDocument(JSON.parse(response.data.data.content));
+						try {
+							setDocument(JSON.parse(response.data.data.content));
+						} catch (e) {
+							// TODO: Let user know that the note is corrupted
+							setDocument(ExampleDocument);
+						}
 						setIsNoteLoading(false);
 						navigate("/note/" + n_id);
 					})
@@ -202,12 +187,12 @@ export default function Home() {
 							}
 						/>
 					</div>
-					<div className="min-h-screen w-full md:px-4 bg-gray-200 relative z-40">
+					<div className="min-h-screen w-full md:px-4 bg-gray-200 relative">
 						{/*
 						 * Toggle to close the sidebar
 						 */}
 						{user && (
-							<div className="hidden lg:block sticky top-2 z-40 -ml-4 left-0 h-0">
+							<div className="fixed top-0 left-0 lg:block lg:sticky lg:top-2 z-50 lg:-ml-4 lg:left-0 lg:h-0">
 								<button
 									className="sidebar-expand-btn"
 									ref={sidebarCtrlBtnRef}
@@ -216,7 +201,7 @@ export default function Home() {
 									onClick={toggleSidebar}
 									title="Toggle Sidebar"
 								>
-									<span className="ic ic-double-arrow align-text-top"></span>
+									<span className="ic ic-white ic-double-arrow align-text-top"></span>
 								</button>
 							</div>
 						)}
@@ -242,25 +227,7 @@ export default function Home() {
 								key={note !== null ? note.id : ""}
 								note={note}
 							/>
-							{user ? (
-								status && (
-									<div
-										className={
-											"fixed bottom-0 right-0 shadow rounded-md px-2" +
-											" py-1 font-medium text-sm text-white z-30 m-6 " +
-											status.color
-										}
-									>
-										<span className={"ic align-middle " + status.icon}></span>
-										&nbsp; {status.message}
-									</div>
-								)
-							) : (
-								<div className="fixed bottom-0 right-0 bg-red-900 shadow rounded-md px-2 py-1 font-medium text-sm text-white z-30 m-6">
-									<span className="ic align-middle ic-cloud-fail"></span>
-									&nbsp; Sign-in to auto-save
-								</div>
-							)}
+							<NoteStatus status={status} isLoggedIn={user.token ? true : false} />
 						</div>
 						{isNoteLoading && (
 							<div className="absolute z-30 top-0 left-0 h-full w-full text-center">

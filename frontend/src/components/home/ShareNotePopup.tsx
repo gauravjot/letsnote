@@ -22,7 +22,6 @@ interface Props {
 
 export default function ShareNotePopup({closePopup, note, open}: Props) {
 	const user = useSelector((state: RootState) => state.user);
-	let sidebarRef = React.useRef<HTMLDivElement>(null);
 	const [link, setLink] = React.useState<Link | null>(null);
 	const [shareLinkList, setShareLinkList] = React.useState<ShareNote[]>([]);
 	const [title, setTitle] = React.useState("");
@@ -106,11 +105,9 @@ export default function ShareNotePopup({closePopup, note, open}: Props) {
 	};
 
 	return (
-		<div
-			aria-expanded={open}
-			className="share-sidebar fixed top-0 left-0 w-full h-full bg-black bg-opacity-50"
-		>
-			<div ref={sidebarRef} className="absolute h-full ml-8 mr-auto bg-white right-0 shadow-md p-4">
+		<div aria-expanded={open} className="share-sidebar">
+			{open && <div className="bg-black/30 inset-0 fixed z-0"></div>}
+			<div className="fixed right-0 z-10 bg-white shadow-md p-4 h-full w-full">
 				<button
 					className="ab-btn-secondary mt-4 px-2 text-sm font-medium py-1 rounded shadow"
 					onClick={() => {

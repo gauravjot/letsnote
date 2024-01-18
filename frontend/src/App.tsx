@@ -49,7 +49,6 @@ export default function App() {
 			if (serializedState === null) return undefined;
 			return JSON.parse(decodeURIComponent(serializedState));
 		} catch (e) {
-			console.log(e);
 			return undefined;
 		}
 	}

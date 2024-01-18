@@ -1,11 +1,11 @@
 interface Props {
-	size: "sm" | "md" | "lg" | "xl";
+	size: "xs" | "sm" | "md" | "lg" | "xl";
 	color: "white" | "black" | "gray" | "primary" | "danger";
 }
 
 /**
  * @description Spinner component
- * @param {"sm" | "md" | "lg" | "xl"} size
+ * @param {"xs" | "sm" | "md" | "lg" | "xl"} size
  * @param {"white" | "black" | "gray" | "primary"} color
  */
 export default function Spinner(props: Props) {
