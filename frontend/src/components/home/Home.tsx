@@ -16,9 +16,9 @@ import Sidebar from "@/components/Sidebar";
 import NoteStatus, {NOTE_STATUS, SavingState} from "./NoteStatus";
 
 export default function Home() {
-	let {noteid} = useParams(); /* from url: '/note/{noteid}' */
-	let sidebarRef = useRef<HTMLDivElement>(null);
-	let sidebarCtrlBtnRef = useRef<HTMLButtonElement>(null);
+	const {noteid} = useParams(); /* from url: '/note/{noteid}' */
+	const sidebarRef = useRef<HTMLDivElement>(null);
+	const sidebarCtrlBtnRef = useRef<HTMLButtonElement>(null);
 	const navigate = useNavigate();
 	const user = useSelector((state: RootState) => state.user);
 	const [status, setStatus] = useState<SavingState | null>(null);
@@ -42,10 +42,10 @@ export default function Home() {
 	async function updateNote(nid: string, title: string, content: SlateDocumentType) {
 		const req = await updateNoteContent(user.token, nid, title, content);
 		if (req.success) {
-			let response = req.res as NoteType;
+			const response = req.res as NoteType;
 			setStatus(NOTE_STATUS.saved);
 			if (note?.id === response.id) {
-				setNote(req.res as NoteType);
+				setNote(response);
 			}
 			window.onbeforeunload = null;
 		} else {
@@ -56,7 +56,7 @@ export default function Home() {
 	async function createNewNote(title: string, content: SlateDocumentType) {
 		const req = await createNote(user.token, title, content);
 		if (req.success) {
-			let response = req.res as NoteType;
+			const response = req.res as NoteType;
 			setStatus(NOTE_STATUS.created);
 			setCurrentNoteID(response.id);
 			setNote(response);
@@ -73,7 +73,7 @@ export default function Home() {
 			/* debouce keeps the old variables data, it creates
         a snapshot. To use variables at runtime add as
         parameters. */
-			let title = note ? note.title : "Untitled";
+			const title = note ? note.title : "Untitled";
 			if (user) {
 				if (note) {
 					// Update note
@@ -94,7 +94,7 @@ export default function Home() {
 			if (user) {
 				setIsNoteLoading(true);
 				setCurrentNoteID(n_id);
-				let config = {
+				const config = {
 					headers: {
 						"Content-Type": "application/json",
 						Authorization: user.token,
@@ -105,7 +105,7 @@ export default function Home() {
 					.then(function (response) {
 						// Close the sidebar on mobile if open
 						if (
-							window.innerWidth < 768 &&
+							window.innerWidth < 1024 &&
 							sidebarRef.current &&
 							sidebarCtrlBtnRef.current &&
 							sidebarRef.current.getAttribute("aria-hidden") === "false"
@@ -150,7 +150,7 @@ export default function Home() {
 
 	const toggleSidebar = () => {
 		if (sidebarRef.current && sidebarCtrlBtnRef.current) {
-			let isSidebarOpen = sidebarRef.current.getAttribute("aria-hidden") === "false";
+			const isSidebarOpen = sidebarRef.current.getAttribute("aria-hidden") === "false";
 			// Toggle the aria labels
 			sidebarRef.current.setAttribute("aria-hidden", isSidebarOpen ? "true" : "false");
 			sidebarCtrlBtnRef.current.setAttribute("aria-expanded", isSidebarOpen ? "false" : "true");

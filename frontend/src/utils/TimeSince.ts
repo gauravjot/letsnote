@@ -1,8 +1,7 @@
 export function timeSince(timestamp: string) {
-	console.log(timestamp);
-	let diff = Date.now() - Date.parse(timestamp);
+	const diff = Date.now() - Date.parse(timestamp);
 
-	let seconds = diff / 1000;
+	const seconds = diff / 1000;
 
 	let interval = seconds / 31536000;
 
@@ -44,10 +43,10 @@ export function dateTimePretty(dt: string) {
 	// 	"Nov",
 	// 	"Dec",
 	// ];
-	var x = new Date(dt);
-	var dd = x.getDate();
-	// var mm = monthNames[x.getMonth()];
-	var yy = x.getFullYear();
+	const x = new Date(dt);
+	const dd = x.getDate();
+	// let mm = monthNames[x.getMonth()];
+	const yy = x.getFullYear();
 	return (
 		yy +
 		"/" +
@@ -79,9 +78,9 @@ export function monthYear(dt: string) {
 		"November",
 		"December",
 	];
-	var x = new Date(dt);
-	// var dd = x.getDate();
-	var mm = monthNames[x.getMonth()];
-	var yy = x.getFullYear();
+	const x = new Date(dt);
+	// let dd = x.getDate();
+	const mm = monthNames[x.getMonth()];
+	const yy = x.getFullYear();
 	return mm + " " + yy;
 }

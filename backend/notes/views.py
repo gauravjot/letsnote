@@ -123,7 +123,7 @@ def createNoteShareExternal(request, noteid):
     # try:
     note = Note.objects.select_related('user').get(id=noteid)
     note_owner = note.user
-    if user == note_owner.id:
+    if user == note_owner:
         rid = uuid.uuid4()
         active = request.data['active'] if type(
             request.data['active']) is bool else True
@@ -169,7 +169,7 @@ def readNoteShareExternal(request, nui, permkey):
         # We keep person who externally shared the note anonymous
         response = dict(
             noteTitle=query.note.title,
-            noteContent=query.note.content,
+            noteContent=decrypt_note(query.note.content),
             noteCreated=query.note.created,
             noteUpdated=query.note.updated,
             noteSharedOn=query.created,

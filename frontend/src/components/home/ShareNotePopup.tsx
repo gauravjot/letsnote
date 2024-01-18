@@ -36,7 +36,7 @@ export default function ShareNotePopup({closePopup, note, open}: Props) {
 			setIsCallingGetLinksAPI(true);
 
 			setShareLinkList([]);
-			let config = {
+			const config = {
 				headers: {
 					"Content-Type": "application/json",
 					Authorization: user.token,
@@ -65,7 +65,7 @@ export default function ShareNotePopup({closePopup, note, open}: Props) {
 	const createLink = () => {
 		if (user) {
 			setIsCallingAPI(true);
-			let config = {
+			const config = {
 				headers: {
 					"Content-Type": "application/json",
 					Authorization: user.token,
@@ -104,10 +104,18 @@ export default function ShareNotePopup({closePopup, note, open}: Props) {
 		}
 	};
 
+	React.useEffect(() => {
+		if (open) {
+			setLink(null);
+			setTitle("");
+			setAnon(true);
+		}
+	}, [open]);
+
 	return (
 		<div aria-expanded={open} className="share-sidebar">
-			{open && <div className="bg-black/30 inset-0 fixed z-0"></div>}
-			<div className="share-sidebar-content fixed right-0 z-10 bg-white shadow-md h-full w-full">
+			{open && <div className="bg-black/30 inset-0 fixed z-0" onClick={closePopup}></div>}
+			<div className="share-sidebar-content">
 				<div className="p-4">
 					<button
 						className="ab-btn-secondary mt-4 px-2 text-sm font-medium py-1 rounded shadow"
@@ -117,8 +125,8 @@ export default function ShareNotePopup({closePopup, note, open}: Props) {
 					>
 						Close
 					</button>
-					<div className="text-gray-600 mt-8 text-sm">{note.title}</div>
-					<div className="mb-1 mt-2 text-2xl font-bold text-gray-900 font-sans align-middle whitespace-nowrap overflow-hidden">
+					<div className="text-gray-600 mt-8 text-sm truncate">{note.title}</div>
+					<div className="mb-1 mt-2 text-2xl font-bold text-gray-900 font-sans align-middle">
 						Share Note
 					</div>
 					<div>
@@ -160,10 +168,7 @@ export default function ShareNotePopup({closePopup, note, open}: Props) {
 								</>
 							) : (
 								<div>
-									<label
-										className="user-select-none text-gray-600 pl-0.5 text-sm whitespace-nowrap overflow-hidden"
-										htmlFor="title"
-									>
+									<label className="user-select-none text-gray-600 pl-0.5 text-sm" htmlFor="title">
 										Group name
 									</label>
 									<input
@@ -177,24 +182,22 @@ export default function ShareNotePopup({closePopup, note, open}: Props) {
 										className="mb-2 mt-1 rounded bg-gray-200 font-medium w-full px-3 py-1.5 text-sm text-gray-700 focus-visible:outline-gray-400"
 										disabled={isCallingAPI}
 									/>
-									<div className="whitespace-nowrap overflow-hidden">
-										<label
-											className="user-select-none text-sm text-gray-700 pl-0.5 pr-2 whitespace-nowrap overflow-hidden"
-											htmlFor="anon"
-										>
-											Share as anonymous
-										</label>
-										<input
-											id="anon"
-											type="checkbox"
-											onChange={(e) => {
-												setAnon(e.target.checked);
-											}}
-											checked={anon}
-										/>
-									</div>
+									<label
+										className="user-select-none text-sm text-gray-700 pl-0.5 pr-2"
+										htmlFor="anon"
+									>
+										Share as anonymous
+									</label>
+									<input
+										id="anon"
+										type="checkbox"
+										onChange={(e) => {
+											setAnon(e.target.checked);
+										}}
+										checked={anon}
+									/>
 									<button
-										className="block mt-3 ab-btn ab-btn-sm whitespace-nowrap overflow-hidden"
+										className="block mt-3 ab-btn ab-btn-sm"
 										onClick={() => createLink()}
 										disabled={isCallingAPI}
 									>
@@ -242,10 +245,7 @@ export default function ShareNotePopup({closePopup, note, open}: Props) {
 												{link.anonymous === true ? "Anonymous" : ""}
 											</div>
 											<div className="ab-link-share-delete px-2 lg:absolute mr-3 right-0 top-0 bottom-0 bg-gradient-to-r from-transparent lg:to-gray-200 lg:pl-64 lg:hidden">
-												<button
-													className="bg-red-600 hover:bg-red-900 text-white px-2 py-1 rounded font-medium text-xs align-sub"
-													onClick={() => {}}
-												>
+												<button className="bg-red-600 hover:bg-red-900 text-white px-2 py-1 rounded font-medium text-xs align-sub">
 													Delete
 												</button>
 											</div>

@@ -31,6 +31,7 @@ export default function Shared() {
 	const [response, setResponse] = React.useState<ShareNoteApiResponseType | null>(null);
 	const [editor] = React.useState(() => withReact(createEditor()));
 	const {renderLeaf, renderElement} = useEditorConfig(editor);
+	const sidebarRef = React.useRef<HTMLDivElement>(null);
 
 	React.useEffect(() => {
 		let config = {
@@ -47,7 +48,20 @@ export default function Shared() {
 			.catch(function (error) {
 				setError(error.response.data);
 			});
+		// if mobile toggle sidebar off
+		if (window.innerWidth < 1024) {
+			sidebarRef.current?.setAttribute("aria-hidden", "true");
+		}
 	}, [nui, shareid]);
+
+	const toggleSidebar = () => {
+		if (sidebarRef.current) {
+			let isSidebarOpen = sidebarRef.current.getAttribute("aria-hidden") === "false";
+			// Toggle the aria labels
+			sidebarRef.current.setAttribute("aria-hidden", isSidebarOpen ? "true" : "false");
+		}
+	};
+
 	return (
 		<>
 			<Helmet>
@@ -55,7 +69,7 @@ export default function Shared() {
 			</Helmet>
 			<div className="App min-h-screen">
 				<div className="mx-auto lg:flex w-full">
-					<div id="sidebar" aria-hidden="false" className="sidebar-hide-able">
+					<div ref={sidebarRef} id="sidebar" aria-hidden="false" className="sidebar-hide-able">
 						<Sidebar
 							component={
 								<div>
@@ -102,7 +116,31 @@ export default function Shared() {
 							}
 						/>
 					</div>
-					<div className="min-h-screen w-full md:px-4 bg-gray-200 relative z-40">
+					{/*
+					 * Toggle to close the sidebar
+					 */}
+					{user && (
+						<div className="fixed top-0 right-0 lg:right-auto lg:hidden lg:sticky lg:top-2 z-50 lg:-ml-4 lg:left-0 lg:h-0">
+							<button
+								className="sidebar-expand-btn"
+								aria-expanded="true"
+								aria-controls="sidebar"
+								onClick={(e) => {
+									e.currentTarget.classList.toggle("active");
+									toggleSidebar();
+								}}
+								title="Toggle Sidebar"
+							>
+								<span className="ic ic-white ic-double-arrow align-text-top !hidden lg:!inline-block"></span>
+								<div className="menu-icon-wrapper">
+									<div className="menu-icon-line half first"></div>
+									<div className="menu-icon-line"></div>
+									<div className="menu-icon-line half last"></div>
+								</div>
+							</button>
+						</div>
+					)}
+					<div className="min-h-screen w-full md:px-4 relative z-40">
 						<div className="z-40">
 							{document ? (
 								<Slate editor={editor} value={document}>

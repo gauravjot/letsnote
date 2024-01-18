@@ -207,14 +207,14 @@ code {
 	transition-property: width, opacity;
 	transition: 0.5s ease-out;
 	@apply fixed left-0 top-0 bottom-0 right-10 z-50;
-	@apply lg:relative;
+	@apply lg:relative w-[90%] max-w-[32rem] lg:w-[28rem];
 }
 .sidebar-hide-able[aria-hidden="false"] {
-	@apply opacity-100 w-[90%] lg:w-[28rem];
+	@apply opacity-100;
 }
 .sidebar-hide-able[aria-hidden="false"]:after {
 	content: "";
-	@apply fixed bg-black/20 inset-0 -z-10 lg:hidden;
+	@apply fixed bg-black/30 inset-0 -z-10 lg:hidden;
 }
 .sidebar-hide-able[aria-hidden="true"] {
 	@apply w-0 opacity-0;
@@ -367,16 +367,16 @@ code {
 	@apply opacity-70;
 }
 .share-sidebar > .share-sidebar-content {
+	@apply fixed right-0 z-10 bg-white shadow-md h-full w-full;
 	@apply transition-all duration-500;
-}
-.share-sidebar > .share-sidebar-content {
-	@apply max-w-[80%];
-}
-.share-sidebar[aria-expanded="true"] > .share-sidebar-content {
+	@apply max-w-[34rem] w-[80%];
 	@apply 2xl:w-[34rem] lg:w-[28rem];
 }
+.share-sidebar[aria-expanded="true"] > .share-sidebar-content {
+	@apply right-0;
+}
 .share-sidebar[aria-expanded="false"] > .share-sidebar-content {
-	@apply w-0 transition-all duration-500;
+	@apply -right-[80%] 2xl:-right-[34rem] lg:-right-[28rem] transition-all duration-500;
 }
 
 /*
