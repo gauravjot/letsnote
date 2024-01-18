@@ -112,6 +112,9 @@ export default function Home() {
 						) {
 							toggleSidebar();
 						}
+						// smooth scroll to top
+						window.scrollTo({top: 0, behavior: "smooth"});
+						// set note
 						setNote(response.data.data);
 						try {
 							setDocument(JSON.parse(response.data.data.content));
@@ -190,16 +193,24 @@ export default function Home() {
 						 * Toggle to close the sidebar
 						 */}
 						{user && (
-							<div className="fixed top-0 left-0 lg:block lg:sticky lg:top-2 z-50 lg:-ml-4 lg:left-0 lg:h-0">
+							<div className="fixed top-0 right-0 lg:right-auto lg:block lg:sticky lg:top-2 z-50 lg:-ml-4 lg:left-0 lg:h-0">
 								<button
 									className="sidebar-expand-btn"
 									ref={sidebarCtrlBtnRef}
 									aria-expanded="true"
 									aria-controls="sidebar"
-									onClick={toggleSidebar}
+									onClick={(e) => {
+										e.currentTarget.classList.toggle("active");
+										toggleSidebar();
+									}}
 									title="Toggle Sidebar"
 								>
-									<span className="ic ic-white ic-double-arrow align-text-top"></span>
+									<span className="ic ic-white ic-double-arrow align-text-top !hidden lg:!inline-block"></span>
+									<div className="menu-icon-wrapper">
+										<div className="menu-icon-line half first"></div>
+										<div className="menu-icon-line"></div>
+										<div className="menu-icon-line half last"></div>
+									</div>
 								</button>
 							</div>
 						)}
