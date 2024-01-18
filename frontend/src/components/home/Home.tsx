@@ -30,8 +30,6 @@ export default function Home() {
 	const [sharePopupNote, setSharePopupNote] = useState(false);
 	const [shareNote, setShareNote] = useState<NoteType | null>(null);
 
-	const isMobile = window.innerWidth < 768;
-
 	const saveNote = (content: SlateDocumentType, note: NoteType | null) => {
 		setStatus(NOTE_STATUS.saving);
 		window.onbeforeunload = function () {
@@ -107,7 +105,7 @@ export default function Home() {
 					.then(function (response) {
 						// Close the sidebar on mobile if open
 						if (
-							isMobile &&
+							window.innerWidth < 768 &&
 							sidebarRef.current &&
 							sidebarCtrlBtnRef.current &&
 							sidebarRef.current.getAttribute("aria-hidden") === "false"
@@ -227,7 +225,7 @@ export default function Home() {
 								key={note !== null ? note.id : ""}
 								note={note}
 							/>
-							<NoteStatus status={status} isLoggedIn={user.token ? true : false} />
+							<NoteStatus status={status} isLoggedIn={user ? true : false} />
 						</div>
 						{isNoteLoading && (
 							<div className="absolute z-30 top-0 left-0 h-full w-full text-center">
