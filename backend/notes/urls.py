@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import createNote, myNotes, noteOps, createNoteShareExternal, readNoteShareExternal, readAllLinksNoteShareExt
+from .views import createNote, myNotes, noteOps, createNoteShareExternal, readNoteShareExternal, readAllLinksNoteShareExt, editNoteTitle
 
 urlpatterns = [
     path('api/note/all/', myNotes),
@@ -8,4 +8,5 @@ urlpatterns = [
     path('api/note/share/<noteid>/', createNoteShareExternal),
     path('api/note/share/links/<noteid>/', readAllLinksNoteShareExt),
     path('api/note/shared/<nui>/<permkey>/', readNoteShareExternal),
+    path('api/note/<noteid>/edit/title/', editNoteTitle),
 ]

@@ -8,9 +8,13 @@ import {
 	toggleStyle,
 } from "@/utils/EditorUtils";
 
-import {useCallback} from "react";
+import {useCallback, useState} from "react";
 import {useSlateStatic} from "slate-react";
 import {dateTimePretty} from "@/utils/TimeSince";
+import {EditNoteNameDialog} from "../sidebar/EditNameDialog";
+import {useSelector} from "react-redux";
+import {RootState} from "@/App";
+import Button from "@/components/ui/button/Button";
 
 const PARAGRAPH_STYLES = ["h1", "h2", "h3", "h4", "codeblock", "quote", "ul", "ol"];
 const CHARACTER_STYLES = [
@@ -27,6 +31,8 @@ const TEXT_ALIGN = ["left", "center", "right", "justify"];
 
 export default function Toolbar({note}: any) {
 	const editor = useSlateStatic();
+	const [editNameDialogOpen, setEditNameDialogOpen] = useState(false);
+	const userToken = useSelector((state: RootState) => state.user)?.token;
 
 	const onBlockTypeChange = useCallback(
 		(targetType: string) => {
@@ -40,57 +46,73 @@ export default function Toolbar({note}: any) {
 
 	const blockType = getTextBlockStyle(editor);
 
-	return (
-		<div className="top-0 z-30 sticky" id="toolbar">
-			<div className="bg-gray-50 px-1 mt-1 shadow-md rounded ab-toolbar">
-				<div className="px-3 pt-2 mb-1 ml-1">
-					<span className="text-lg font-serif font-medium">{note ? note.title : "Untitled"}</span>
-					<button
-						className="line-height-0 h-fit ml-1 align-top p-1 py-1 cursor-pointer rounded-md hover:bg-gray-300"
-						onClick={() => {}}
-					>
-						<span className={"ic ic-gray-50 align-middle ic-edit"}></span>
-					</button>{" "}
-					<span className="text-xs text-gray-500 align-middle">
-						(created {note ? dateTimePretty(note.created) : "not yet"})
-					</span>
-				</div>
-				<div className="pb-2 line-height-150 space-y-1">
-					{/* Dropdown for paragraph styles */}
-					<div className="border-r-2 border-gray-300 pr-3 inline-block">
-						<ElementSelect
-							title={getLabelForBlockStyle(blockType ?? "paragraph")}
-							elements={PARAGRAPH_STYLES}
-							onSelect={onBlockTypeChange}
-						/>
-					</div>
+	const closeEditNameDialog = () => {
+		setEditNameDialogOpen(false);
+	};
 
-					{/* Buttons for character styles */}
-					<div className="inline-block">
-						<div className="inline-block">
-							{CHARACTER_STYLES.map((style) => (
-								<ToolBarButton
-									key={style}
-									characterstyle={style}
-									label={style}
-									isActive={getActiveStyles(editor).has(style)}
-									onMouseDown={(event: any) => {
-										event.preventDefault();
-										toggleStyle(editor, style);
-									}}
-								/>
-							))}
-						</div>
-						{/* Link Button */}
-						<div className="border-r-2 border-gray-300 inline-block pr-3">
-							<ToolBarButton
-								isActive={hasActiveLinkAtSelection(editor)}
-								label={"link"}
-								onMouseDown={() => toggleLinkAtSelection(editor)}
+	return (
+		<>
+			{editNameDialogOpen && note && userToken && (
+				<EditNoteNameDialog note={note} closeFn={closeEditNameDialog} userToken={userToken} />
+			)}
+			<div className="top-0 z-30 sticky" id="toolbar">
+				<div className="bg-gray-50 px-1 mt-1 shadow-md rounded ab-toolbar">
+					<div className="px-3 ml-1 flex gap-2 place-items-center">
+						<span className="text-lg font-serif font-medium">{note ? note.title : "Untitled"}</span>
+						{note && (
+							<Button
+								elementChildren="Rename"
+								elementIcon="edit"
+								elementIconOnly={true}
+								elementType="button"
+								elementState="default"
+								elementStyle="white_no_border"
+								elementSize="xsmall"
+								onClick={() => {
+									setEditNameDialogOpen(true);
+								}}
+							/>
+						)}
+						<span className="text-xs text-gray-500 align-middle">
+							(created {note ? dateTimePretty(note.created) : "not yet"})
+						</span>
+					</div>
+					<div className="pb-2 line-height-150 space-y-1">
+						{/* Dropdown for paragraph styles */}
+						<div className="border-r-2 border-gray-300 pr-3 inline-block">
+							<ElementSelect
+								title={getLabelForBlockStyle(blockType ?? "paragraph")}
+								elements={PARAGRAPH_STYLES}
+								onSelect={onBlockTypeChange}
 							/>
 						</div>
 
-						{/* Image Upload Button
+						{/* Buttons for character styles */}
+						<div className="inline-block">
+							<div className="inline-block">
+								{CHARACTER_STYLES.map((style) => (
+									<ToolBarButton
+										key={style}
+										characterstyle={style}
+										label={style}
+										isActive={getActiveStyles(editor).has(style)}
+										onMouseDown={(event: any) => {
+											event.preventDefault();
+											toggleStyle(editor, style);
+										}}
+									/>
+								))}
+							</div>
+							{/* Link Button */}
+							<div className="border-r-2 border-gray-300 inline-block pr-3">
+								<ToolBarButton
+									isActive={hasActiveLinkAtSelection(editor)}
+									label={"link"}
+									onMouseDown={() => toggleLinkAtSelection(editor)}
+								/>
+							</div>
+
+							{/* Image Upload Button
           <label
             className="ml-3 p-1 text-xs rounded aspect-square cursor-pointer"
             htmlFor="image-upload"
@@ -109,18 +131,19 @@ export default function Toolbar({note}: any) {
             onChange={onImageSelected}
           />
           */}
-					</div>
-					{/* Options for text Alignment */}
-					<div className="pr-3 inline-block">
-						<ElementSelect
-							title={getLabelForBlockStyle(getTextAlignStyle(editor) ?? "paragraph")}
-							elements={TEXT_ALIGN}
-							onSelect={onBlockTypeChange}
-						/>
+						</div>
+						{/* Options for text Alignment */}
+						<div className="pr-3 inline-block">
+							<ElementSelect
+								title={getLabelForBlockStyle(getTextAlignStyle(editor) ?? "paragraph")}
+								elements={TEXT_ALIGN}
+								onSelect={onBlockTypeChange}
+							/>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
+		</>
 	);
 }
 

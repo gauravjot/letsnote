@@ -1,19 +1,19 @@
 import axios from "axios";
-import { NEW_NOTE_EP, NOTE_EP } from "@/config";
-import { handleApiError } from "@/services/handle_error";
-import { NoteType } from "@/types/api";
-import { ApiError, ResponseType } from "@/types/query";
-import ExampleDocument, { SlateDocumentType } from "@/utils/ExampleDocument";
+import {NEW_NOTE_EP, NOTE_EP} from "@/config";
+import {handleApiError} from "@/services/handle_error";
+import {NoteType} from "@/types/api";
+import {ApiError, ResponseType} from "@/types/query";
+import ExampleDocument, {SlateDocumentType} from "@/utils/ExampleDocument";
 
 // read a note
 // create a note
 export function createNote(
 	token: string,
-	title: string = "Untitled",
+	title = "Untitled",
 	content: SlateDocumentType = ExampleDocument
 ): Promise<ResponseType<NoteType | ApiError>> {
 	return axios
-		.post(NEW_NOTE_EP, JSON.stringify({ title: title, content: content }), {
+		.post(NEW_NOTE_EP, JSON.stringify({title: title, content: content}), {
 			headers: {
 				"Content-Type": "application/json",
 				Authorization: token,
@@ -36,7 +36,7 @@ export function updateNoteContent(
 	content: SlateDocumentType
 ): Promise<ResponseType<NoteType | ApiError>> {
 	return axios
-		.put(NOTE_EP(note), JSON.stringify({ title: title, content: content }), {
+		.put(NOTE_EP(note), JSON.stringify({title: title, content: content}), {
 			headers: {
 				"Content-Type": "application/json",
 				Authorization: token,

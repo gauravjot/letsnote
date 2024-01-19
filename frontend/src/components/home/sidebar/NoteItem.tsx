@@ -5,11 +5,13 @@ import {BACKEND_SERVER_DOMAIN} from "@/config";
 import {useSelector} from "react-redux";
 import {NoteType} from "@/types/api";
 import {RootState} from "@/App";
+import {EditNoteNameDialog} from "./EditNameDialog";
+import {NoteListItemType} from "@/types/note";
 
 interface Props {
-	note: NoteType;
+	note: NoteListItemType;
 	openNote: (nid: NoteType["id"]) => void;
-	shareNote: (note: NoteType) => void;
+	shareNote: (note: NoteListItemType) => void;
 	isActive: boolean;
 }
 
@@ -17,6 +19,7 @@ export default function NoteItem({note, isActive, openNote, shareNote}: Props) {
 	const optionsRef = React.useRef<HTMLDivElement>(null);
 	const user = useSelector((state: RootState) => state.user);
 	const [menuOpen, setMenuOpen] = React.useState(false);
+	const [editNameDialogOpen, setEditNameDialogOpen] = React.useState(false);
 
 	const closeMenu = (e: MouseEvent) => {
 		if (
@@ -37,7 +40,7 @@ export default function NoteItem({note, isActive, openNote, shareNote}: Props) {
 					"\n"
 			)
 		) {
-			let config = {
+			const config = {
 				headers: {
 					"Content-Type": "application/json",
 					Authorization: user.token,
@@ -57,10 +60,19 @@ export default function NoteItem({note, isActive, openNote, shareNote}: Props) {
 		}
 	};
 
-	const renameNote = () => {};
+	const closeEditNameDialog = () => {
+		setEditNameDialogOpen(false);
+	};
+
+	const renameNote = () => {
+		setEditNameDialogOpen(true);
+	};
 
 	return (
 		<div className="sidebar-notelist-item" aria-current={isActive}>
+			{editNameDialogOpen && user && (
+				<EditNoteNameDialog note={note} closeFn={closeEditNameDialog} userToken={user.token} />
+			)}
 			<div
 				className="flex-grow pr-2 py-2 cursor-pointer"
 				onClick={() => {

@@ -23,6 +23,8 @@ interface Props {
 	elementState: "default" | "loading" | "done";
 	elementType: "button" | "submit" | "reset";
 	elementSize?: "xsmall" | "small" | "base" | "large";
+	elementIconSize?: "xs" | "sm" | "md" | "base" | "lg";
+	elementIconOnly?: boolean;
 	elementInvert?: boolean;
 	elementDisabled?: boolean;
 	elementWidth?: "auto" | "full";
@@ -30,7 +32,7 @@ interface Props {
 }
 
 const buttonBaseStyle =
-	"my-3 leading-[1] shadow font-bold rounded-md pointer hover:outline focus:outline focus:outline-4 hover:outline-4 disabled:outline-0 disabled:opacity-50";
+	"my-1 leading-[1] shadow font-bold rounded-md pointer hover:outline focus:outline focus:outline-4 hover:outline-4 disabled:outline-0 disabled:opacity-50";
 
 /**
  * @description Returns a JSX button component
@@ -81,22 +83,29 @@ export default function Button(props: Props) {
 		<button
 			onClick={props.onClick}
 			className={
-				buttonBaseStyle + " " + style[props.elementStyle] + " " + buttonSizing + " " + buttonWidth
+				buttonBaseStyle +
+				" " +
+				style[props.elementStyle] +
+				" " +
+				buttonSizing +
+				" " +
+				buttonWidth +
+				(props.elementIconOnly ? " aspect-square" : "")
 			}
 			disabled={props.elementDisabled}
 		>
 			{props.elementState === "default" ? (
-				<span className="py-[0.36rem] flex gap-1.5 place-items-center justify-center">
+				<span className="h-7 flex gap-1.5 place-items-center justify-center">
 					{props.elementIcon && (
 						<>
 							<span
-								className={`ic ic-${props.elementIcon.replace("ic-", "")} ${
-									"ic-" + iconColor
-								} align-bottom`}
+								className={` ic ${
+									props.elementIconSize ? "ic-" + props.elementIconSize : ""
+								} ic-${props.elementIcon.replace("ic-", "")} ${"ic-" + iconColor} align-bottom`}
 							></span>
 						</>
 					)}
-					{props.elementChildren}
+					{props.elementIconOnly ? <></> : props.elementChildren}
 				</span>
 			) : props.elementState === "loading" ? (
 				<Spinner size="sm" color={iconColor} />

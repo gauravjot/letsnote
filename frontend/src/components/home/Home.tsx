@@ -11,9 +11,12 @@ import {useParams, useNavigate} from "react-router-dom";
 import {createNote, updateNoteContent} from "@/services/note/note";
 import {RootState} from "@/App";
 import {NoteType} from "@/types/api";
-import HomeSidebar from "./sidebar/HomeSidebar";
+import HomeSidebar from "./sidebar/Sidebar";
 import Sidebar from "@/components/Sidebar";
-import NoteStatus, {NOTE_STATUS, SavingState} from "./NoteStatus";
+import NoteStatus from "./NoteStatus";
+import {NOTE_STATUS, NoteListItemType, SavingState} from "@/types/note";
+import {QueryClient} from "react-query";
+import {SIDEBAR_NOTES_QUERY} from "@/services/queries";
 
 export default function Home() {
 	const {noteid} = useParams(); /* from url: '/note/{noteid}' */
@@ -24,11 +27,10 @@ export default function Home() {
 	const [status, setStatus] = useState<SavingState | null>(null);
 	const [note, setNote] = useState<NoteType | null>(null);
 	const [document, setDocument] = useState<SlateDocumentType>(ExampleDocument);
-	const [refreshNoteList, setRefreshNoteList] = useState(false);
 	const [isNoteLoading, setIsNoteLoading] = useState(false);
-	const [currentNoteID, setCurrentNoteID] = useState<string | null>(null);
 	const [sharePopupNote, setSharePopupNote] = useState(false);
-	const [shareNote, setShareNote] = useState<NoteType | null>(null);
+	const [shareNote, setShareNote] = useState<NoteListItemType | null>(null);
+	const queryClient = new QueryClient();
 
 	const saveNote = (content: SlateDocumentType, note: NoteType | null) => {
 		setStatus(NOTE_STATUS.saving);
@@ -58,11 +60,10 @@ export default function Home() {
 		if (req.success) {
 			const response = req.res as NoteType;
 			setStatus(NOTE_STATUS.created);
-			setCurrentNoteID(response.id);
 			setNote(response);
-			setRefreshNoteList(!refreshNoteList);
 			window.onbeforeunload = null;
 			navigate("/note/" + response.id);
+			queryClient.invalidateQueries(SIDEBAR_NOTES_QUERY);
 		} else {
 			setStatus(NOTE_STATUS.failed);
 		}
@@ -93,7 +94,6 @@ export default function Home() {
 		(n_id: NoteType["id"]) => {
 			if (user) {
 				setIsNoteLoading(true);
-				setCurrentNoteID(n_id);
 				const config = {
 					headers: {
 						"Content-Type": "application/json",
@@ -143,7 +143,7 @@ export default function Home() {
 		setSharePopupNote(false);
 	};
 
-	const openShareNote = (note: NoteType) => {
+	const openShareNote = (note: NoteListItemType) => {
 		setShareNote(note);
 		setSharePopupNote(true);
 	};
@@ -180,8 +180,7 @@ export default function Home() {
 						<Sidebar
 							component={
 								<HomeSidebar
-									currentNoteID={currentNoteID}
-									refresh={refreshNoteList}
+									currentNoteID={note !== null ? note.id : null}
 									openNote={openNote}
 									openShareNote={openShareNote}
 								/>
@@ -193,7 +192,7 @@ export default function Home() {
 						 * Toggle to close the sidebar
 						 */}
 						{user && (
-							<div className="fixed top-0 right-0 lg:right-auto lg:block lg:sticky lg:top-2 z-50 lg:-ml-4 lg:left-0 lg:h-0">
+							<div className="fixed top-0 right-0 lg:right-auto lg:block lg:sticky lg:top-2 z-[49] lg:-ml-4 lg:left-0 lg:h-0">
 								<button
 									className="sidebar-expand-btn"
 									ref={sidebarCtrlBtnRef}
