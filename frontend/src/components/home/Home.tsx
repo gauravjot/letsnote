@@ -8,27 +8,72 @@ import _ from "lodash";
 import ExampleDocument, {SlateDocumentType} from "@/utils/ExampleDocument";
 import {Helmet} from "react-helmet";
 import {useParams, useNavigate} from "react-router-dom";
-import {createNote, updateNoteContent} from "@/services/note/note";
 import {RootState} from "@/App";
 import {NoteType} from "@/types/api";
-import HomeSidebar from "./sidebar/HomeSidebar";
+import HomeSidebar from "./sidebar/Sidebar";
 import Sidebar from "@/components/Sidebar";
-import NoteStatus, {NOTE_STATUS, SavingState} from "./NoteStatus";
+import NoteStatus, {SavingState} from "./NoteStatus";
+import {NoteListItemType} from "@/types/note";
+import {QueryClient, useMutation} from "react-query";
+import {SIDEBAR_NOTES_QUERY} from "@/services/queries";
+import {updateNoteContent} from "@/services/note/update_note_content";
+import {createNote} from "@/services/note/create_note";
+import {NOTE_STATUS} from "./NoteStatusOptions";
 
 export default function Home() {
 	const {noteid} = useParams(); /* from url: '/note/{noteid}' */
 	const sidebarRef = useRef<HTMLDivElement>(null);
-	const sidebarCtrlBtnRef = useRef<HTMLButtonElement>(null);
 	const navigate = useNavigate();
 	const user = useSelector((state: RootState) => state.user);
 	const [status, setStatus] = useState<SavingState | null>(null);
 	const [note, setNote] = useState<NoteType | null>(null);
 	const [document, setDocument] = useState<SlateDocumentType>(ExampleDocument);
-	const [refreshNoteList, setRefreshNoteList] = useState(false);
 	const [isNoteLoading, setIsNoteLoading] = useState(false);
-	const [currentNoteID, setCurrentNoteID] = useState<string | null>(null);
 	const [sharePopupNote, setSharePopupNote] = useState(false);
-	const [shareNote, setShareNote] = useState<NoteType | null>(null);
+	const [shareNote, setShareNote] = useState<NoteListItemType | null>(null);
+	const queryClient = new QueryClient();
+
+	const updateNoteMutation = useMutation({
+		mutationFn: (payload: {title: string; content: SlateDocumentType}) => {
+			return note
+				? updateNoteContent(user.token, note.id, payload)
+				: Promise.reject("Note not found");
+		},
+		onSuccess: (res) => {
+			const response = res as NoteType;
+			console.log(note?.id);
+			console.log(response);
+			if (note?.id === response.id) {
+				setNote(response);
+				console.log("Note updated");
+			}
+			setTimeout(() => {
+				setStatus(null);
+			}, 1500);
+			window.onbeforeunload = null;
+		},
+		onError: () => {
+			setStatus(NOTE_STATUS.failed);
+		},
+	});
+
+	const createNoteMutation = useMutation({
+		mutationFn: (payload: {title: string; content: SlateDocumentType}) => {
+			return createNote(user.token, payload);
+		},
+		onSuccess: (res) => {
+			setStatus(null);
+			if (note?.id === res.id) {
+				setNote(res);
+			}
+			navigate("/note/" + res.id);
+			window.onbeforeunload = null;
+			queryClient.invalidateQueries(SIDEBAR_NOTES_QUERY);
+		},
+		onError: () => {
+			setStatus(NOTE_STATUS.failed);
+		},
+	});
 
 	const saveNote = (content: SlateDocumentType, note: NoteType | null) => {
 		setStatus(NOTE_STATUS.saving);
@@ -36,64 +81,24 @@ export default function Home() {
 			alert("Note is not yet saved. Please wait!");
 			return true;
 		};
-		_sendReq(content, note);
-	};
-
-	async function updateNote(nid: string, title: string, content: SlateDocumentType) {
-		const req = await updateNoteContent(user.token, nid, title, content);
-		if (req.success) {
-			const response = req.res as NoteType;
-			setStatus(NOTE_STATUS.saved);
-			if (note?.id === response.id) {
-				setNote(response);
-			}
-			window.onbeforeunload = null;
-		} else {
-			setStatus(NOTE_STATUS.failed);
-		}
-	}
-
-	async function createNewNote(title: string, content: SlateDocumentType) {
-		const req = await createNote(user.token, title, content);
-		if (req.success) {
-			const response = req.res as NoteType;
-			setStatus(NOTE_STATUS.created);
-			setCurrentNoteID(response.id);
-			setNote(response);
-			setRefreshNoteList(!refreshNoteList);
-			window.onbeforeunload = null;
-			navigate("/note/" + response.id);
-		} else {
-			setStatus(NOTE_STATUS.failed);
-		}
-	}
-
-	const _sendReq = useCallback(
-		_.debounce((content: SlateDocumentType, note: NoteType | null) => {
-			/* debouce keeps the old variables data, it creates
-        a snapshot. To use variables at runtime add as
-        parameters. */
-			const title = note ? note.title : "Untitled";
-			if (user) {
-				if (note) {
-					// Update note
-					updateNote(note.id, title, content);
-				} else {
-					// Create note
-					createNewNote(title, content);
-				}
+		const title = note ? note.title : "Untitled";
+		if (user) {
+			if (note) {
+				// Update note
+				updateNoteMutation.mutate({title, content});
 			} else {
-				setStatus(NOTE_STATUS.failed);
+				// Create note
+				createNoteMutation.mutate({title, content});
 			}
-		}, 2000),
-		[note]
-	);
+		} else {
+			setStatus(NOTE_STATUS.failed);
+		}
+	};
 
 	const openNote = useCallback(
 		(n_id: NoteType["id"]) => {
 			if (user) {
 				setIsNoteLoading(true);
-				setCurrentNoteID(n_id);
 				const config = {
 					headers: {
 						"Content-Type": "application/json",
@@ -104,13 +109,8 @@ export default function Home() {
 					.get(BACKEND_SERVER_DOMAIN + "/api/note/" + n_id + "/", config)
 					.then(function (response) {
 						// Close the sidebar on mobile if open
-						if (
-							window.innerWidth < 1024 &&
-							sidebarRef.current &&
-							sidebarCtrlBtnRef.current &&
-							sidebarRef.current.getAttribute("aria-hidden") === "false"
-						) {
-							toggleSidebar();
+						if (window.innerWidth < 1024) {
+							sidebarRef.current?.setAttribute("aria-hidden", "true");
 						}
 						// smooth scroll to top
 						window.scrollTo({top: 0, behavior: "smooth"});
@@ -139,22 +139,36 @@ export default function Home() {
 		[navigate, user]
 	);
 
+	const editorDebounced = useCallback(
+		_.debounce(
+			(value: SlateDocumentType) => {
+				if (user) {
+					// If user is logged in then
+					// save the note
+					saveNote(value, note);
+				} else {
+					setStatus(null);
+				}
+			},
+			2000,
+			{leading: false, trailing: true, maxWait: 60000}
+		),
+		[note, user]
+	);
+	const handleEditorChange = useCallback(
+		(value: SlateDocumentType) => {
+			editorDebounced(value);
+		},
+		[editorDebounced]
+	);
+
 	const closeSharePopup = () => {
 		setSharePopupNote(false);
 	};
 
-	const openShareNote = (note: NoteType) => {
+	const openShareNote = (note: NoteListItemType) => {
 		setShareNote(note);
 		setSharePopupNote(true);
-	};
-
-	const toggleSidebar = () => {
-		if (sidebarRef.current && sidebarCtrlBtnRef.current) {
-			const isSidebarOpen = sidebarRef.current.getAttribute("aria-hidden") === "false";
-			// Toggle the aria labels
-			sidebarRef.current.setAttribute("aria-hidden", isSidebarOpen ? "true" : "false");
-			sidebarCtrlBtnRef.current.setAttribute("aria-expanded", isSidebarOpen ? "false" : "true");
-		}
 	};
 
 	useEffect(() => {
@@ -169,6 +183,10 @@ export default function Home() {
 		}
 	}, [user, note, noteid, openNote]);
 
+	function isSidebarOpen() {
+		return sidebarRef.current?.getAttribute("aria-hidden") === "false";
+	}
+
 	return (
 		<>
 			<Helmet>
@@ -180,8 +198,7 @@ export default function Home() {
 						<Sidebar
 							component={
 								<HomeSidebar
-									currentNoteID={currentNoteID}
-									refresh={refreshNoteList}
+									currentNoteID={note !== null ? note.id : null}
 									openNote={openNote}
 									openShareNote={openShareNote}
 								/>
@@ -193,46 +210,57 @@ export default function Home() {
 						 * Toggle to close the sidebar
 						 */}
 						{user && (
-							<div className="fixed top-0 right-0 lg:right-auto lg:block lg:sticky lg:top-2 z-50 lg:-ml-4 lg:left-0 lg:h-0">
-								<button
-									className="sidebar-expand-btn"
-									ref={sidebarCtrlBtnRef}
-									aria-expanded="true"
-									aria-controls="sidebar"
-									onClick={(e) => {
-										e.currentTarget.classList.toggle("active");
-										toggleSidebar();
-									}}
-									title="Toggle Sidebar"
-								>
-									<span className="ic ic-white ic-double-arrow align-text-top !hidden lg:!inline-block"></span>
-									<div className="menu-icon-wrapper">
-										<div className="menu-icon-line half first"></div>
-										<div className="menu-icon-line"></div>
-										<div className="menu-icon-line half last"></div>
-									</div>
-								</button>
-							</div>
+							<>
+								{/* arrow toggle on desktop */}
+								<div className="hidden lg:block sticky top-2 right-auto z-50 -ml-4 left-0 h-0">
+									<button
+										className="sidebar-expand-btn"
+										aria-expanded={
+											sidebarRef.current?.getAttribute("aria-hidden") === "true" ? "false" : "true"
+										}
+										aria-controls="sidebar"
+										onClick={(e) => {
+											const isOpen = isSidebarOpen();
+											sidebarRef.current?.setAttribute("aria-hidden", isOpen ? "true" : "false");
+											e.currentTarget.setAttribute("aria-expanded", isOpen ? "false" : "true");
+										}}
+										title="Toggle Sidebar"
+									>
+										<span className="ic ic-white ic-double-arrow align-text-top"></span>
+									</button>
+								</div>
+								{/* hambuger menu for mobile */}
+								<div className="fixed top-0 right-0 lg:hidden z-50">
+									<button
+										className="mobile-sidebar-toggle"
+										aria-expanded={
+											sidebarRef.current?.getAttribute("aria-hidden") === "true" ? "false" : "true"
+										}
+										aria-controls="sidebar"
+										onClick={(e) => {
+											const isOpen = isSidebarOpen();
+											sidebarRef.current?.setAttribute("aria-hidden", isOpen ? "true" : "false");
+											e.currentTarget.setAttribute("aria-expanded", isOpen ? "false" : "true");
+										}}
+										title="Toggle Mobile Sidebar"
+									>
+										<div className="hamburger-wrapper">
+											<div className="hamburger-line half first"></div>
+											<div className="hamburger-line"></div>
+											<div className="hamburger-line half last"></div>
+										</div>
+									</button>
+								</div>
+							</>
 						)}
+
 						{/*
 						 * Editor area
 						 */}
 						<div className={isNoteLoading ? "blur-sm z-40" : "z-40"}>
 							<Editor
 								document={document}
-								onChange={(value: SlateDocumentType) => {
-									// Check if a change is made to document
-									if (!_.isEqual(document, value)) {
-										setDocument(value);
-										if (user) {
-											// If user is logged in then
-											// save the note
-											saveNote(value, note);
-										} else {
-											setStatus(null);
-										}
-									}
-								}}
+								onChange={handleEditorChange}
 								key={note !== null ? note.id : ""}
 								note={note}
 							/>

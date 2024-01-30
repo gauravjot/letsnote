@@ -107,9 +107,26 @@ def updateNote(request, noteid):
         note.updated = datetime.now(pytz.utc)
         note.save()
 
-        return Response(data=successResponse(), status=status.HTTP_200_OK)
+        data = NoteListSerializer(note).data
+        data['content'] = request.data['content']
+
+        return Response(data=successResponse(data), status=status.HTTP_200_OK)
     except Note.DoesNotExist:
         return Response(data=errorResponse("This note does not exist.", "N0403"), status=status.HTTP_400_BAD_REQUEST)
+
+
+# Update
+@api_view(['PUT'])
+def editNoteTitle(request, noteid):
+    user = getUserID(request)
+    try:
+        note = Note.objects.get(id=noteid, user=user)
+        note.title = request.data['title']
+        note.save()
+
+        return Response(data=successResponse(), status=status.HTTP_200_OK)
+    except Note.DoesNotExist:
+        return Response(data=errorResponse("This note does not exist.", "N0405"), status=status.HTTP_400_BAD_REQUEST)
 
 
 # Share a note via unique URL

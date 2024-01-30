@@ -24,7 +24,10 @@ export function timeSince(timestamp: string) {
 	if (interval > 1) {
 		return Math.floor(interval) + " min" + (Math.floor(interval) > 1 ? "s" : "") + " ago";
 	}
-	return Math.floor(seconds) + " secs ago";
+	if (Math.floor(seconds) === 0) {
+		return "just now";
+	}
+	return Math.floor(seconds) + " sec" + (Math.floor(seconds) > 1 ? "s" : "") + " ago";
 }
 
 export function dateTimePretty(dt: string) {

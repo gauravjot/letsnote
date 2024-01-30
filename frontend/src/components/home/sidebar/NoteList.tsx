@@ -1,6 +1,4 @@
 import React from "react";
-import axios from "axios";
-import {BACKEND_SERVER_DOMAIN} from "@/config";
 import {useSelector} from "react-redux";
 import CreateNote from "./CreateNote";
 import NoteItem from "./NoteItem";
@@ -8,45 +6,25 @@ import {monthYear} from "@/utils/TimeSince";
 import {NoteType} from "@/types/api";
 import {RootState} from "@/App";
 import Spinner from "@/components/ui/spinner/Spinner";
+import {useQuery} from "react-query";
+import {getAllNotes} from "@/services/note/get_note_list";
+import {NoteListItemType} from "@/types/note";
+import {SIDEBAR_NOTES_QUERY} from "@/services/queries";
 
 interface Props {
-	refresh: boolean;
 	currentNote: NoteType["id"] | null;
 	openNote: (nid: NoteType["id"]) => void;
-	shareNote: (note: NoteType) => void;
+	shareNote: (note: NoteListItemType) => void;
 }
 
-export default function NoteList({openNote, shareNote, currentNote, refresh}: Props) {
+export default function NoteList({openNote, shareNote, currentNote}: Props) {
 	const user = useSelector((state: RootState) => state.user);
-	const [notes, setNotes] = React.useState<NoteType[]>([]);
-	const [isLoading, setIsLoading] = React.useState(false);
 	const [showCreateBox, setShowCreateBox] = React.useState(false);
-
-	// If user changes or refresh is trigger we need to fetch data
-	React.useEffect(() => {
-		setIsLoading(true);
-		if (user) {
-			let config = {
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: user.token,
-				},
-			};
-			axios
-				.get(BACKEND_SERVER_DOMAIN + "/api/note/all", config)
-				.then(function (response) {
-					setNotes(response.data.data.reverse());
-					setIsLoading(false);
-				})
-				.catch(() => {
-					setIsLoading(false);
-				});
-		}
-	}, [user, refresh]);
+	const notes = useQuery([SIDEBAR_NOTES_QUERY, user], () => getAllNotes(user.token));
 
 	const newNoteCreated = (note: NoteType) => {
 		setShowCreateBox(false);
-		setNotes([note, ...notes]);
+		notes.refetch();
 		openNote(note.id);
 	};
 
@@ -69,23 +47,23 @@ export default function NoteList({openNote, shareNote, currentNote, refresh}: Pr
 						className="infotrig sidebar-make-note-popup cursor-pointer"
 					>
 						<span className="ic-close inline-block align-baseline h-4 w-4 p-1 invert"></span>
-						<div className="infomsg mt-2 bottom-7 right-0 whitespace-nowrap">
+						<div className="infomsg bottom-1.5 right-10 whitespace-nowrap">
 							{showCreateBox ? "Close" : "Make new note"}
 						</div>
 					</div>
 				</div>
 				<div
 					className={
-						(showCreateBox ? "max-h-40" : "max-h-0") +
+						(showCreateBox ? "max-h-44" : "max-h-0") +
 						" basis-full transition-all duration-200 ease-linear overflow-hidden"
 					}
 				>
 					<CreateNote onNewNoteCreated={newNoteCreated} />
 				</div>
 			</div>
-			{notes.length > 0 ? (
+			{notes.isSuccess && notes.data.length > 0 ? (
 				<div className="block relative notelist h-full overflow-y-auto overflow-x-hidden min-h-[24rem]">
-					{notes.map((note) => {
+					{notes.data.map((note) => {
 						return (
 							<div key={note.id}>
 								{monthYear(note.updated) !== count ? (
@@ -105,14 +83,20 @@ export default function NoteList({openNote, shareNote, currentNote, refresh}: Pr
 						);
 					})}
 				</div>
-			) : isLoading ? (
-				<div className="flex justify-center">
-					<Spinner color="primary" size="md" />
-				</div>
-			) : (
+			) : notes.isSuccess && notes.data.length === 0 ? (
 				<div className="px-6 py-4 text-xl text-gray-400 font-thin user-select-none">
 					It's so empty here. Make a note in editor!
 				</div>
+			) : notes.isLoading ? (
+				<div className="flex justify-center">
+					<Spinner color="primary" size="md" />
+				</div>
+			) : notes.isError ? (
+				<div className="px-6 py-4 text-xl text-gray-400 font-thin user-select-none">
+					Unable to fetch notes. Please reload page try again.
+				</div>
+			) : (
+				<></>
 			)}
 		</div>
 	) : (

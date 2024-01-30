@@ -1,15 +1,17 @@
 import React from "react";
-import {dateTimePretty} from "@/utils/TimeSince";
+import {dateTimePretty, timeSince} from "@/utils/TimeSince";
 import axios from "axios";
 import {BACKEND_SERVER_DOMAIN} from "@/config";
 import {useSelector} from "react-redux";
 import {NoteType} from "@/types/api";
 import {RootState} from "@/App";
+import TitleUpdateDialog from "./TitleUpdateDialog";
+import {NoteListItemType} from "@/types/note";
 
 interface Props {
-	note: NoteType;
+	note: NoteListItemType;
 	openNote: (nid: NoteType["id"]) => void;
-	shareNote: (note: NoteType) => void;
+	shareNote: (note: NoteListItemType) => void;
 	isActive: boolean;
 }
 
@@ -17,6 +19,7 @@ export default function NoteItem({note, isActive, openNote, shareNote}: Props) {
 	const optionsRef = React.useRef<HTMLDivElement>(null);
 	const user = useSelector((state: RootState) => state.user);
 	const [menuOpen, setMenuOpen] = React.useState(false);
+	const editNameDialogRef = React.useRef<HTMLDivElement>(null);
 
 	const closeMenu = (e: MouseEvent) => {
 		if (
@@ -37,7 +40,7 @@ export default function NoteItem({note, isActive, openNote, shareNote}: Props) {
 					"\n"
 			)
 		) {
-			let config = {
+			const config = {
 				headers: {
 					"Content-Type": "application/json",
 					Authorization: user.token,
@@ -57,10 +60,32 @@ export default function NoteItem({note, isActive, openNote, shareNote}: Props) {
 		}
 	};
 
-	const renameNote = () => {};
+	const closeEditNameDialog = () => {
+		if (editNameDialogRef.current) {
+			editNameDialogRef.current.setAttribute("aria-hidden", "true");
+			editNameDialogRef.current.classList.remove("active");
+		}
+	};
+
+	const renameNote = () => {
+		if (editNameDialogRef.current) {
+			editNameDialogRef.current.setAttribute("aria-hidden", "false");
+			editNameDialogRef.current.classList.add("active");
+		}
+	};
 
 	return (
 		<div className="sidebar-notelist-item" aria-current={isActive}>
+			<div
+				aria-hidden="true"
+				className="aria-hidden:scale-0 group scale-100 fixed inset-0 z-50"
+				ref={editNameDialogRef}
+			>
+				<div className="fixed inset-0 bg-black/30 z-0" onClick={closeEditNameDialog}></div>
+				<div className="group-[.active]:scale-100 group-[.active]:opacity-100 opacity-0 scale-90 fixed inset-0 flex place-items-center justify-center z-[60] transition-transform duration-75 ease-in">
+					<TitleUpdateDialog note={note} closeFn={closeEditNameDialog} userToken={user.token} />
+				</div>
+			</div>
 			<div
 				className="flex-grow pr-2 py-2 cursor-pointer"
 				onClick={() => {
@@ -68,16 +93,16 @@ export default function NoteItem({note, isActive, openNote, shareNote}: Props) {
 				}}
 			>
 				<div className="text-gray-900 max-w-12 text-ellipsis font-medium line-height-125 whitespace-nowrap overflow-hidden">
-					<span className="active-badge">Active</span>
 					{note.title}
 				</div>
 				<div className="text-xs mt-1 whitespace-nowrap overflow-hidden">
-					{dateTimePretty(note.updated)}
+					<span className="active-badge">Active</span>
+					<span title={`Modified ${timeSince(note.updated)}`}>{dateTimePretty(note.updated)}</span>
 				</div>
 			</div>
 			<div className="h-fit self-center relative">
 				<button
-					className="line-height-0 p-1 ml-2 cursor-pointer hover:rotate-90 focus:rotate-90 focus-within:rotate-90 transition-all rounded-md"
+					className="line-height-0 p-1 ml-2 cursor-pointer group hover:rotate-90 focus:rotate-90 focus:scale-150 focus-within:rotate-90 transition-all rounded-md"
 					id={note.id + "-option-btn"}
 					aria-expanded={menuOpen}
 					onClick={() => {
@@ -93,39 +118,63 @@ export default function NoteItem({note, isActive, openNote, shareNote}: Props) {
 						});
 					}}
 				>
-					<span className={"ic ic-md ic-gray-50 align-middle ic-options-vertical"}></span>
+					<span
+						className={
+							"ic ic-md ic-gray-50 group-hover:invert-0 group-focus:invert-0 align-middle ic-options-vertical"
+						}
+					></span>
 				</button>
 				<div
 					ref={optionsRef}
 					aria-hidden={!menuOpen}
 					id={note.id + "-option-box"}
-					className="transition-all origin-bottom-right absolute right-8 -bottom-2 bg-gray-600 border border-gray-700 border-solid text-white rounded-md shadow-md z-20 sidebar-note-menu"
+					className={
+						"transition-transform origin-bottom-right absolute right-8 -bottom-2" +
+						" bg-white border border-gray-300 shadow-md border-solid" +
+						" rounded-lg shadow-lg z-20 sidebar-note-menu p-2 flex flex-col gap-1"
+					}
 				>
 					<button
-						className="text-sm font-medium border-b border-gray-700 px-4 py-2 w-full text-left rounded-t-md hover:bg-gray-800 hover:text-white"
+						className={
+							"min-w-28 text-sm font-medium pr-3 pl-2 py-1 w-full text-left rounded" +
+							" hover:outline hover:outline-2 hover:outline-primary-500 focus-within:bg-primary-100" +
+							" text-gray-600 hover:text-gray-800 flex place-items-center gap-2.5"
+						}
 						onClick={() => {
+							setMenuOpen(false);
 							renameNote();
 						}}
 					>
-						Rename&nbsp;&nbsp;&nbsp;
+						<span className="ic ic-edit"></span>
+						<span>Rename</span>
 					</button>
 					<button
-						className="text-sm font-medium border-b border-gray-700 px-4 py-2 w-full text-left hover:bg-gray-800 hover:text-white"
+						className={
+							"text-sm font-medium pr-3 pl-2 py-1 w-full text-left rounded" +
+							" hover:outline hover:outline-2 hover:outline-primary-500 focus-within:bg-primary-100" +
+							" text-gray-600 hover:text-gray-800 flex place-items-center gap-2.5"
+						}
 						onClick={() => {
 							shareNote(note);
 							setMenuOpen(false);
 							document.removeEventListener("mousedown", closeMenu);
 						}}
 					>
-						Share
+						<span className="ic ic-share"></span>
+						<span>Share</span>
 					</button>
 					<button
-						className="text-sm font-medium px-4 py-2 w-full text-left rounded-b-md hover:bg-gray-800 hover:text-white"
+						className={
+							"text-sm font-medium pr-3 pl-2 py-1 w-full text-left rounded" +
+							" hover:outline hover:outline-2 hover:outline-primary-500 focus-within:bg-primary-100" +
+							" text-gray-600 hover:text-gray-800 flex place-items-center gap-2.5"
+						}
 						onClick={() => {
 							deleteNote();
 						}}
 					>
-						Delete
+						<span className="ic ic-delete"></span>
+						<span>Delete</span>
 					</button>
 				</div>
 			</div>

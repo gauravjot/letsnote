@@ -3,8 +3,9 @@ import {useSelector} from "react-redux";
 import axios from "axios";
 import {BACKEND_SERVER_DOMAIN, DEPLOY_DOMAIN} from "@/config";
 import {timeSince, dateTimePretty} from "@/utils/TimeSince";
-import {ShareNote, NoteType} from "@/types/api";
+import {ShareNote} from "@/types/api";
 import {RootState} from "@/App";
+import {NoteListItemType} from "@/types/note";
 
 interface Link {
 	title: string;
@@ -15,7 +16,7 @@ interface Link {
 }
 
 interface Props {
-	note: NoteType;
+	note: NoteListItemType;
 	closePopup: () => void;
 	open: boolean;
 }
