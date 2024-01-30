@@ -16,7 +16,7 @@ export interface IEditNoteNameDialogProps {
 	userToken: string;
 }
 
-export function EditNoteNameDialog(props: IEditNoteNameDialogProps) {
+export default function TitleUpdateDialog(props: IEditNoteNameDialogProps) {
 	const [error, setError] = useState<string | null>(null);
 	const {
 		register,
@@ -40,6 +40,11 @@ export function EditNoteNameDialog(props: IEditNoteNameDialogProps) {
 		},
 	});
 
+	function closeDialog() {
+		mutation.reset();
+		props.closeFn();
+	}
+
 	return (
 		<>
 			<div className="max-w-[350px] py-4 px-5 w-4/5 bg-white rounded-2xl shadow-md relative z-10">
@@ -53,7 +58,7 @@ export function EditNoteNameDialog(props: IEditNoteNameDialogProps) {
 						elementStyle="white_border"
 						elementSize="xsmall"
 						elementIconOnly={true}
-						onClick={props.closeFn}
+						onClick={closeDialog}
 					/>
 				</div>
 				<p className="text-sm font-medium text-gray-800 mb-px select-none">Selected Note</p>
@@ -83,6 +88,7 @@ export function EditNoteNameDialog(props: IEditNoteNameDialogProps) {
 								elementInputType="text"
 								elementHookFormRegister={register}
 								elementHookFormErrors={errors}
+								defaultValue={props.note.title}
 							/>
 
 							<Button
@@ -105,7 +111,7 @@ export function EditNoteNameDialog(props: IEditNoteNameDialogProps) {
 							elementStyle="white_border"
 							elementType="button"
 							elementWidth="full"
-							onClick={props.closeFn}
+							onClick={closeDialog}
 						/>
 					</div>
 				)}

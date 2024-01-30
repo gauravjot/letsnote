@@ -1,21 +1,30 @@
-import { useCallback, useRef, useState } from "react";
-import { Editable, Slate, withReact } from "slate-react";
-import { createEditor } from "slate";
-import { withHistory } from "slate-history";
+import {useCallback, useRef, useState} from "react";
+import {Editable, Slate, withReact} from "slate-react";
+import {createEditor} from "slate";
+import {withHistory} from "slate-history";
 import "@/assets/css/editor.css";
 
 import useEditorConfig from "@/hooks/useEditorConfig";
 
 import LinkEditor from "./LinkEditor";
-import Toolbar from "./Toolbar";
-import ExampleDocument from "@/utils/ExampleDocument";
-import { identifyLinksInTextIfAny, isLinkNodeAtSelection } from "@/utils/EditorUtils";
+import ExampleDocument, {SlateDocumentType, SlateNodeType} from "@/utils/ExampleDocument";
+import {identifyLinksInTextIfAny, isLinkNodeAtSelection} from "@/utils/EditorUtils";
 import useSelection from "@/hooks/useSelection";
+import {NoteType} from "@/types/api";
+import {EditorToolbar} from "./Toolbar";
 
-export default function Editor({ document, onChange, note }: any) {
+export default function Editor({
+	document,
+	onChange,
+	note,
+}: {
+	document: SlateDocumentType;
+	onChange: (value: SlateNodeType[]) => void;
+	note: NoteType | null;
+}) {
 	const [editor] = useState(() => withReact(withHistory(createEditor())));
 	const editorRef = useRef<HTMLDivElement>(null);
-	const { renderLeaf, renderElement, KeyBindings } = useEditorConfig(editor);
+	const {renderLeaf, renderElement, KeyBindings} = useEditorConfig(editor);
 
 	const onKeyDown = useCallback(
 		(event: any) => KeyBindings.onKeyDown(editor, event),
@@ -43,11 +52,7 @@ export default function Editor({ document, onChange, note }: any) {
 
 	return (
 		<Slate editor={editor} value={document} onChange={onChangeLocal}>
-			<Toolbar
-				selection={selection}
-				previousSelection={previousSelection}
-				note={note}
-			/>
+			<EditorToolbar note={note} />
 			{document === ExampleDocument ? (
 				<div className="z-10 top-1/2 mx-auto left-0 right-0 text-center font-thin text-2xl text-gray-300 user-select-none absolute">
 					start typing and we'll auto save
@@ -64,10 +69,9 @@ export default function Editor({ document, onChange, note }: any) {
 									editorOffsets={
 										editorRef.current != null
 											? {
-													x: editorRef.current.getBoundingClientRect()
-														.x,
-													y: editorRef.current.getBoundingClientRect()
-														.y,
+													x: editorRef.current.getBoundingClientRect().x,
+													y: editorRef.current.getBoundingClientRect().y,
+													// eslint-disable-next-line no-mixed-spaces-and-tabs
 											  }
 											: null
 									}

@@ -1,5 +1,14 @@
-import {NOTE_STATUS, SavingState} from "@/types/note";
 import Spinner from "../ui/spinner/Spinner";
+import {NOTE_STATUS} from "./NoteStatusOptions";
+
+/*
+	Status toast types
+*/
+export interface SavingState {
+	icon: "ic-cloud" | "ic-cloud-done" | "ic-cloud-fail" | "ic-edit";
+	color: "bg-slate-800" | "bg-green-800" | "bg-sky-600" | "bg-orange-700";
+	message: string;
+}
 
 export interface INoteStatusProps {
 	status: SavingState | null;

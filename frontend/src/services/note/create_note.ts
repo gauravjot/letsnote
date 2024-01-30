@@ -16,7 +16,7 @@ export interface CreateNoteType {
  * @returns {Promise<NoteType>}
  */
 export async function createNote(token: string, payload: CreateNoteType) {
-	return axios
+	return await axios
 		.post(BACKEND_SERVER_DOMAIN + "/api/note/create/", JSON.stringify(payload), {
 			headers: {
 				"Content-Type": "application/json",

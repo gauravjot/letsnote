@@ -97,13 +97,11 @@ export default function Button(props: Props) {
 			{props.elementState === "default" ? (
 				<span className="h-7 flex gap-1.5 place-items-center justify-center">
 					{props.elementIcon && (
-						<>
-							<span
-								className={` ic ${
-									props.elementIconSize ? "ic-" + props.elementIconSize : ""
-								} ic-${props.elementIcon.replace("ic-", "")} ${"ic-" + iconColor} align-bottom`}
-							></span>
-						</>
+						<span
+							className={` ic ${
+								props.elementIconSize ? "ic-" + props.elementIconSize : ""
+							} ic-${props.elementIcon.replace("ic-", "")} ${"ic-" + iconColor} align-bottom`}
+						></span>
 					)}
 					{props.elementIconOnly ? <></> : props.elementChildren}
 				</span>

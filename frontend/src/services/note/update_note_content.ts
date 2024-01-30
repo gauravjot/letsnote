@@ -20,7 +20,7 @@ export async function updateNoteContent(
 	note_id: string,
 	payload: UpdateNoteContentType
 ) {
-	return axios
+	return await axios
 		.put(BACKEND_SERVER_DOMAIN + "/api/note/" + note_id + "/", JSON.stringify(payload), {
 			headers: {
 				"Content-Type": "application/json",

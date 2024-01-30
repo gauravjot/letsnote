@@ -8,13 +8,14 @@ import {
 	toggleStyle,
 } from "@/utils/EditorUtils";
 
-import {useCallback, useState} from "react";
+import React, {useCallback} from "react";
 import {useSlateStatic} from "slate-react";
-import {dateTimePretty} from "@/utils/TimeSince";
-import {EditNoteNameDialog} from "../sidebar/EditNameDialog";
+import {timeSince} from "@/utils/TimeSince";
 import {useSelector} from "react-redux";
 import {RootState} from "@/App";
 import Button from "@/components/ui/button/Button";
+import {NoteType} from "@/types/api";
+import TitleUpdateDialog from "@/components/home/sidebar/TitleUpdateDialog";
 
 const PARAGRAPH_STYLES = ["h1", "h2", "h3", "h4", "codeblock", "quote", "ul", "ol"];
 const CHARACTER_STYLES = [
@@ -29,9 +30,9 @@ const CHARACTER_STYLES = [
 ];
 const TEXT_ALIGN = ["left", "center", "right", "justify"];
 
-export default function Toolbar({note}: any) {
+function Toolbar({note}: {note: NoteType | null}) {
 	const editor = useSlateStatic();
-	const [editNameDialogOpen, setEditNameDialogOpen] = useState(false);
+	const editNameDialogRef = React.useRef<HTMLDivElement>(null);
 	const userToken = useSelector((state: RootState) => state.user)?.token;
 
 	const onBlockTypeChange = useCallback(
@@ -43,17 +44,30 @@ export default function Toolbar({note}: any) {
 		},
 		[editor]
 	);
+	console.log(note);
 
 	const blockType = getTextBlockStyle(editor);
 
 	const closeEditNameDialog = () => {
-		setEditNameDialogOpen(false);
+		if (editNameDialogRef.current) {
+			editNameDialogRef.current.setAttribute("aria-hidden", "true");
+			editNameDialogRef.current.classList.remove("active");
+		}
 	};
 
 	return (
 		<>
-			{editNameDialogOpen && note && userToken && (
-				<EditNoteNameDialog note={note} closeFn={closeEditNameDialog} userToken={userToken} />
+			{note && userToken && (
+				<div
+					aria-hidden="true"
+					className="aria-hidden:scale-0 group scale-100 fixed inset-0 z-50"
+					ref={editNameDialogRef}
+				>
+					<div className="fixed inset-0 bg-black/30 z-0" onClick={closeEditNameDialog}></div>
+					<div className="group-[.active]:scale-100 group-[.active]:opacity-100 opacity-0 scale-90 fixed inset-0 flex place-items-center justify-center z-[60] transition-transform duration-75 ease-in">
+						<TitleUpdateDialog note={note} closeFn={closeEditNameDialog} userToken={userToken} />
+					</div>
+				</div>
 			)}
 			<div className="top-0 z-30 sticky" id="toolbar">
 				<div className="bg-gray-50 px-1 mt-1 shadow-md rounded ab-toolbar">
@@ -69,12 +83,15 @@ export default function Toolbar({note}: any) {
 								elementStyle="white_no_border"
 								elementSize="xsmall"
 								onClick={() => {
-									setEditNameDialogOpen(true);
+									if (editNameDialogRef.current) {
+										editNameDialogRef.current.setAttribute("aria-hidden", "false");
+										editNameDialogRef.current.classList.add("active");
+									}
 								}}
 							/>
 						)}
 						<span className="text-xs text-gray-500 align-middle">
-							(created {note ? dateTimePretty(note.created) : "not yet"})
+							{note ? `(modified ${timeSince(note.updated)})` : "not yet"}
 						</span>
 					</div>
 					<div className="pb-2 line-height-150 space-y-1">
@@ -96,7 +113,7 @@ export default function Toolbar({note}: any) {
 										characterstyle={style}
 										label={style}
 										isActive={getActiveStyles(editor).has(style)}
-										onMouseDown={(event: any) => {
+										onMouseDown={(event: MouseEvent) => {
 											event.preventDefault();
 											toggleStyle(editor, style);
 										}}
@@ -146,6 +163,14 @@ export default function Toolbar({note}: any) {
 		</>
 	);
 }
+
+export const EditorToolbar = React.memo(Toolbar, (prevProps, nextProps) => {
+	return (
+		prevProps.note?.id === nextProps.note?.id &&
+		prevProps.note?.title === nextProps.note?.title &&
+		prevProps.note?.updated === nextProps.note?.updated
+	);
+});
 
 // Text Formatting
 function ToolBarButton(props: any) {

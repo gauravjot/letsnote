@@ -12,12 +12,13 @@ import {RootState} from "@/App";
 import {NoteType} from "@/types/api";
 import HomeSidebar from "./sidebar/Sidebar";
 import Sidebar from "@/components/Sidebar";
-import NoteStatus from "./NoteStatus";
-import {NOTE_STATUS, NoteListItemType, SavingState} from "@/types/note";
+import NoteStatus, {SavingState} from "./NoteStatus";
+import {NoteListItemType} from "@/types/note";
 import {QueryClient, useMutation} from "react-query";
 import {SIDEBAR_NOTES_QUERY} from "@/services/queries";
 import {updateNoteContent} from "@/services/note/update_note_content";
 import {createNote} from "@/services/note/create_note";
+import {NOTE_STATUS} from "./NoteStatusOptions";
 
 export default function Home() {
 	const {noteid} = useParams(); /* from url: '/note/{noteid}' */
@@ -40,10 +41,15 @@ export default function Home() {
 		},
 		onSuccess: (res) => {
 			const response = res as NoteType;
-			setStatus(NOTE_STATUS.saved);
+			console.log(note?.id);
+			console.log(response);
 			if (note?.id === response.id) {
 				setNote(response);
+				console.log("Note updated");
 			}
+			setTimeout(() => {
+				setStatus(null);
+			}, 1500);
 			window.onbeforeunload = null;
 		},
 		onError: () => {
@@ -56,7 +62,7 @@ export default function Home() {
 			return createNote(user.token, payload);
 		},
 		onSuccess: (res) => {
-			setStatus(NOTE_STATUS.saved);
+			setStatus(null);
 			if (note?.id === res.id) {
 				setNote(res);
 			}
@@ -133,11 +139,9 @@ export default function Home() {
 		[navigate, user]
 	);
 
-	const editorOnChange = _.debounce(
-		(value: SlateDocumentType) => {
-			// Check if a change is made to document
-			if (!_.isEqual(document, value)) {
-				setDocument(value);
+	const editorDebounced = useCallback(
+		_.debounce(
+			(value: SlateDocumentType) => {
 				if (user) {
 					// If user is logged in then
 					// save the note
@@ -145,10 +149,17 @@ export default function Home() {
 				} else {
 					setStatus(null);
 				}
-			}
+			},
+			2000,
+			{leading: false, trailing: true, maxWait: 60000}
+		),
+		[note, user]
+	);
+	const handleEditorChange = useCallback(
+		(value: SlateDocumentType) => {
+			editorDebounced(value);
 		},
-		2000,
-		{leading: false, trailing: true, maxWait: 5000}
+		[editorDebounced]
 	);
 
 	const closeSharePopup = () => {
@@ -249,7 +260,7 @@ export default function Home() {
 						<div className={isNoteLoading ? "blur-sm z-40" : "z-40"}>
 							<Editor
 								document={document}
-								onChange={editorOnChange}
+								onChange={handleEditorChange}
 								key={note !== null ? note.id : ""}
 								note={note}
 							/>
