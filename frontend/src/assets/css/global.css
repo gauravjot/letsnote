@@ -239,43 +239,43 @@ code {
 	@apply rotate-0;
 }
 
-.menu-icon-wrapper {
-	border-radius: 2px;
-	width: 20px;
-	height: 20px;
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-	cursor: pointer;
-	transition: transform 330ms ease-out;
-	@apply lg:hidden;
+.mobile-sidebar-toggle {
+	@apply rounded shadow m-1;
+	@apply h-10 w-10 aspect-square flex place-items-center justify-center bg-gray-900;
+	@apply transition-all duration-300;
 }
-.menu-icon-line {
-	background-color: #fff;
-	border-radius: 2px;
-	width: 100%;
-	height: 2px;
-	@apply lg:hidden;
+.mobile-sidebar-toggle[aria-expanded="true"] {
+	@apply h-12 w-12 m-2 rounded-full;
 }
-.menu-icon-line.half {
+.hamburger-wrapper {
+	@apply transition-all ease-out duration-300;
+	@apply rounded-sm w-4 h-4 flex flex-col justify-between cursor-pointer;
+}
+.mobile-sidebar-toggle[aria-expanded="true"] .hamburger-wrapper {
+	@apply w-5 h-5;
+}
+.hamburger-line {
+	@apply bg-white rounded-sm w-full h-0.5;
+}
+.hamburger-line.half {
 	width: 50%;
 }
-.menu-icon-line.first {
+.hamburger-line.first {
 	transition: transform 300ms cubic-bezier(0.52, -0.8, 0.52, 0.52);
 	transform-origin: right;
 }
-.menu-icon-line.last {
+.hamburger-line.last {
 	align-self: flex-end;
 	transition: transform 300ms cubic-bezier(0.52, -0.8, 0.52, 0.52);
 	transform-origin: left;
 }
-.active .menu-icon-wrapper {
+.mobile-sidebar-toggle[aria-expanded="true"] .hamburger-wrapper {
 	transform: rotate(-45deg);
 }
-.active .menu-icon-line.first {
+.mobile-sidebar-toggle[aria-expanded="true"] .hamburger-line.first {
 	transform: rotate(-90deg) translateX(1px);
 }
-.active .menu-icon-line.last {
+.mobile-sidebar-toggle[aria-expanded="true"] .hamburger-line.last {
 	transform: rotate(-90deg) translateX(-1px);
 }
 
@@ -299,17 +299,12 @@ code {
 }
 
 .sidebar-make-note-popup {
-	border-radius: 0.125rem;
-	@apply transition-all duration-300 h-7 w-7 absolute top-0 right-6 border-2 border-solid border-black border-opacity-10 hover:bg-blue-600 hover:border-solid flex items-center justify-center;
+	@apply transition-all duration-300 h-8 w-8 absolute top-0 right-6;
+	@apply hover:bg-primary-600 rounded-md bg-white;
+	@apply hover:border-solid flex items-center justify-center;
 }
 .sidebar-make-note-popup[aria-selected="true"] {
-	border-radius: 50%;
-	background: rgb(197, 46, 46);
-	@apply hover:bg-[rgb(226,56,56)] border-solid border-black border-opacity-20 top-[1.6rem] right-4;
-}
-.sidebar-make-note-popup[aria-selected="false"] {
-	border-radius: 0.125rem;
-	@apply top-0 right-6 bg-transparent border-transparent hover:bg-blue-500;
+	@apply bg-black/30 top-12 right-4 shadow hover:bg-black/80;
 }
 .sidebar-make-note-popup span {
 	filter: invert(1);

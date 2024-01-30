@@ -2,8 +2,6 @@ import {Editor, Node, Transforms} from "slate";
 import {ReactEditor, useSlateStatic} from "slate-react";
 import {useCallback, useEffect, useRef, useState} from "react";
 import Button from "@/components/ui/button/Button";
-import {set} from "lodash";
-
 export default function LinkEditor({editorOffsets, selectionForLink}: any) {
 	const linkEditorRef = useRef<HTMLDivElement>(null);
 	const [saveBtnIcon, setSaveBtnIcon] = useState<"done" | "save">("save");

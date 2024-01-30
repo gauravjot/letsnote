@@ -19,7 +19,7 @@ export default function NoteItem({note, isActive, openNote, shareNote}: Props) {
 	const optionsRef = React.useRef<HTMLDivElement>(null);
 	const user = useSelector((state: RootState) => state.user);
 	const [menuOpen, setMenuOpen] = React.useState(false);
-	const [editNameDialogOpen, setEditNameDialogOpen] = React.useState(false);
+	const editNameDialogRef = React.useRef<HTMLDivElement>(null);
 
 	const closeMenu = (e: MouseEvent) => {
 		if (
@@ -61,18 +61,31 @@ export default function NoteItem({note, isActive, openNote, shareNote}: Props) {
 	};
 
 	const closeEditNameDialog = () => {
-		setEditNameDialogOpen(false);
+		if (editNameDialogRef.current) {
+			editNameDialogRef.current.setAttribute("aria-hidden", "true");
+			editNameDialogRef.current.classList.remove("active");
+		}
 	};
 
 	const renameNote = () => {
-		setEditNameDialogOpen(true);
+		if (editNameDialogRef.current) {
+			editNameDialogRef.current.setAttribute("aria-hidden", "false");
+			editNameDialogRef.current.classList.add("active");
+		}
 	};
 
 	return (
 		<div className="sidebar-notelist-item" aria-current={isActive}>
-			{editNameDialogOpen && user && (
-				<EditNoteNameDialog note={note} closeFn={closeEditNameDialog} userToken={user.token} />
-			)}
+			<div
+				aria-hidden="true"
+				className="aria-hidden:scale-0 group scale-100 fixed inset-0 z-50"
+				ref={editNameDialogRef}
+			>
+				<div className="fixed inset-0 bg-black/30 z-0" onClick={closeEditNameDialog}></div>
+				<div className="group-[.active]:scale-100 group-[.active]:opacity-100 opacity-60 scale-90 fixed inset-0 flex place-items-center justify-center z-[60] transition-transform duration-150 ease-in">
+					<EditNoteNameDialog note={note} closeFn={closeEditNameDialog} userToken={user.token} />
+				</div>
+			</div>
 			<div
 				className="flex-grow pr-2 py-2 cursor-pointer"
 				onClick={() => {
@@ -116,6 +129,7 @@ export default function NoteItem({note, isActive, openNote, shareNote}: Props) {
 					<button
 						className="text-sm font-medium border-b border-gray-700 px-4 py-2 w-full text-left rounded-t-md hover:bg-gray-800 hover:text-white"
 						onClick={() => {
+							setMenuOpen(false);
 							renameNote();
 						}}
 					>

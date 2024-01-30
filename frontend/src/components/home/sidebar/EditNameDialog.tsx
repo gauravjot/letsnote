@@ -8,7 +8,7 @@ import {AxiosError} from "axios";
 import {useState} from "react";
 import {useForm} from "react-hook-form";
 import {QueryClient, useMutation} from "react-query";
-import {dateTimePretty} from "../../../utils/TimeSince";
+import {dateTimePretty} from "@/utils/TimeSince";
 
 export interface IEditNoteNameDialogProps {
 	note: NoteListItemType;
@@ -41,8 +41,7 @@ export function EditNoteNameDialog(props: IEditNoteNameDialogProps) {
 	});
 
 	return (
-		<div className="fixed inset-0 flex place-items-center justify-center z-50">
-			<div className="fixed inset-0 bg-black/30 z-0" onClick={props.closeFn}></div>
+		<>
 			<div className="max-w-[350px] py-4 px-5 w-4/5 bg-white rounded-2xl shadow-md relative z-10">
 				<div className="flex justify-between place-items-center mb-3">
 					<h3 className="text-black select-none">Edit Note Title</h3>
@@ -111,6 +110,6 @@ export function EditNoteNameDialog(props: IEditNoteNameDialogProps) {
 					</div>
 				)}
 			</div>
-		</div>
+		</>
 	);
 }

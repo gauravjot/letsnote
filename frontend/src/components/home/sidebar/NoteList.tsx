@@ -47,14 +47,14 @@ export default function NoteList({openNote, shareNote, currentNote}: Props) {
 						className="infotrig sidebar-make-note-popup cursor-pointer"
 					>
 						<span className="ic-close inline-block align-baseline h-4 w-4 p-1 invert"></span>
-						<div className="infomsg mt-2 bottom-7 right-0 whitespace-nowrap">
+						<div className="infomsg bottom-1.5 right-10 whitespace-nowrap">
 							{showCreateBox ? "Close" : "Make new note"}
 						</div>
 					</div>
 				</div>
 				<div
 					className={
-						(showCreateBox ? "max-h-40" : "max-h-0") +
+						(showCreateBox ? "max-h-44" : "max-h-0") +
 						" basis-full transition-all duration-200 ease-linear overflow-hidden"
 					}
 				>

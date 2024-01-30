@@ -43,8 +43,8 @@ const buttonBaseStyle =
 export default function Button(props: Props) {
 	const style = {
 		primary: props.elementInvert
-			? "border border-primary-600 text-primary-600 outline-primary-100 focus:bg-primary-50"
-			: "bg-primary-600 text-white outline-primary-100 focus:bg-primary-700/90",
+			? "border border-primary-600 text-primary-600 outline-primary-600/20 focus:bg-primary-50"
+			: "bg-primary-600 text-white outline-primary-600/20 focus:bg-primary-700/90",
 		black: props.elementInvert
 			? "border border-gray-600 text-gray-700 outline-gray-200 focus:bg-gray-50"
 			: "bg-gray-900 text-white outline-gray-300 focus:bg-gray-800",
