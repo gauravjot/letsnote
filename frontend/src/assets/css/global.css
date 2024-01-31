@@ -209,10 +209,10 @@ code {
 	@apply fixed left-0 top-0 bottom-0 right-10 z-50;
 	@apply lg:relative w-[90%] max-w-[28rem];
 	@apply lg:w-[18rem] xl:w-[21rem] 2xl:w-[23rem];
-	@apply lg:min-w-[18rem] xl:min-w-[21rem] 2xl:min-w-[23rem];
 }
 .sidebar-hide-able[aria-hidden="false"] {
 	@apply opacity-100;
+	@apply lg:min-w-[18rem] xl:min-w-[21rem] 2xl:min-w-[23rem];
 }
 .sidebar-hide-able[aria-hidden="false"]:after {
 	content: "";
@@ -220,6 +220,7 @@ code {
 }
 .sidebar-hide-able[aria-hidden="true"] {
 	@apply w-0 opacity-0;
+	@apply lg:min-w-0 xl:min-w-0 2xl:min-w-0;
 }
 .sidebar-expand-btn {
 	@apply aspect-square lg:aspect-auto rounded-bl-md lg:rounded-bl-none w-10 h-10 lg:w-auto lg:h-10 flex justify-center place-items-center;
