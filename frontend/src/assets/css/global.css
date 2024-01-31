@@ -206,7 +206,7 @@ code {
 .sidebar-hide-able {
 	transition-property: width, opacity;
 	transition: 0.5s ease-out;
-	@apply fixed left-0 top-0 bottom-0 right-10 z-50;
+	@apply fixed left-0 top-0 bottom-0 right-10 z-[55];
 	@apply lg:relative w-[90%] max-w-[28rem];
 	@apply lg:w-[18rem] xl:w-[21rem] 2xl:w-[23rem];
 }
@@ -354,7 +354,7 @@ code {
 	display: block;
 }
 .share-sidebar {
-	@apply fixed right-0 top-0 bottom-0 z-50 transition-opacity;
+	@apply fixed right-0 top-0 bottom-0 z-[100] transition-opacity;
 }
 .share-sidebar[aria-expanded="true"] {
 	@apply opacity-100;

@@ -119,27 +119,32 @@ export default function Shared() {
 					{/*
 					 * Toggle to close the sidebar
 					 */}
-					{user && (
-						<div className="fixed top-0 right-0 lg:right-auto lg:hidden lg:sticky lg:top-2 z-50 lg:-ml-4 lg:left-0 lg:h-0">
+					{
+						<div className="fixed top-0 right-0 lg:right-auto lg:sticky lg:top-2 z-[55] lg:left-0 lg:h-0">
 							<button
-								className="sidebar-expand-btn"
-								aria-expanded="true"
+								className="sidebar-expand-btn mobile-sidebar-toggle"
+								aria-expanded={
+									sidebarRef?.current?.getAttribute("aria-hidden") === "true" ? "false" : "true"
+								}
 								aria-controls="sidebar"
 								onClick={(e) => {
-									e.currentTarget.classList.toggle("active");
+									e.currentTarget.setAttribute(
+										"aria-expanded",
+										e.currentTarget.getAttribute("aria-expanded") === "true" ? "false" : "true"
+									);
 									toggleSidebar();
 								}}
 								title="Toggle Sidebar"
 							>
 								<span className="ic ic-white ic-double-arrow align-text-top !hidden lg:!inline-block"></span>
-								<div className="hamburger-wrapper">
+								<div className="hamburger-wrapper lg:hidden">
 									<div className="hamburger-line half first"></div>
 									<div className="hamburger-line"></div>
 									<div className="hamburger-line half last"></div>
 								</div>
 							</button>
 						</div>
-					)}
+					}
 					<div className="min-h-screen w-full lg:flex-1 md:px-4 relative z-40">
 						<div className="z-40">
 							{document ? (

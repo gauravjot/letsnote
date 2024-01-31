@@ -125,7 +125,7 @@ export default function NoteItem({note, isActive, openNote, shareNote}: Props) {
 				>
 					<button
 						className={
-							"min-w-28 text-sm font-medium pr-3 pl-2 py-1 w-full text-left rounded" +
+							"min-w-28 text-sm font-medium pr-3 pl-2 py-2 md:py-1.5 lg:py-1 w-full text-left rounded" +
 							" hover:outline hover:outline-2 hover:outline-primary-500 focus-within:bg-primary-100" +
 							" text-gray-600 hover:text-gray-800 flex place-items-center gap-2.5"
 						}
@@ -142,7 +142,7 @@ export default function NoteItem({note, isActive, openNote, shareNote}: Props) {
 					</button>
 					<button
 						className={
-							"text-sm font-medium pr-3 pl-2 py-1 w-full text-left rounded" +
+							"text-sm font-medium pr-3 pl-2 py-2 md:py-1.5 lg:py-1 w-full text-left rounded" +
 							" hover:outline hover:outline-2 hover:outline-primary-500 focus-within:bg-primary-100" +
 							" text-gray-600 hover:text-gray-800 flex place-items-center gap-2.5"
 						}
@@ -157,7 +157,7 @@ export default function NoteItem({note, isActive, openNote, shareNote}: Props) {
 					</button>
 					<button
 						className={
-							"text-sm font-medium pr-3 pl-2 py-1 w-full text-left rounded" +
+							"text-sm font-medium pr-3 pl-2 py-2 md:py-1.5 lg:py-1 w-full text-left rounded" +
 							" hover:outline hover:outline-2 hover:outline-primary-500 focus-within:bg-primary-100" +
 							" text-gray-600 hover:text-gray-800 flex place-items-center gap-2.5"
 						}

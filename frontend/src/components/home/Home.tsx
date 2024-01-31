@@ -223,7 +223,7 @@ export default function Home() {
 									</button>
 								</div>
 								{/* hambuger menu for mobile */}
-								<div className="fixed top-0 right-0 lg:hidden z-50">
+								<div className="fixed top-0 right-0 lg:hidden z-[55]">
 									<button
 										className="mobile-sidebar-toggle"
 										aria-expanded={

@@ -53,7 +53,7 @@ function Toolbar({note}: {note: NoteType | null}) {
 	return (
 		<>
 			{isRenameDialogOpen && note && userToken && (
-				<div className="fixed inset-0 z-50">
+				<div className="fixed inset-0 z-[100]">
 					<div className="fixed inset-0 bg-black/30 z-0" onClick={closeEditNameDialog}></div>
 					<div className="fixed inset-0 flex place-items-center justify-center z-[60]">
 						<TitleUpdateDialog note={note} closeFn={closeEditNameDialog} userToken={userToken} />
