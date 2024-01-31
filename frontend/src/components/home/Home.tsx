@@ -14,7 +14,7 @@ import HomeSidebar from "./sidebar/Sidebar";
 import Sidebar from "@/components/Sidebar";
 import NoteStatus, {SavingState} from "./NoteStatus";
 import {NoteListItemType} from "@/types/note";
-import {QueryClient, useMutation} from "react-query";
+import {useMutation, useQueryClient} from "react-query";
 import {SIDEBAR_NOTES_QUERY} from "@/services/queries";
 import {updateNoteContent} from "@/services/note/update_note_content";
 import {createNote} from "@/services/note/create_note";
@@ -31,7 +31,7 @@ export default function Home() {
 	const [isNoteLoading, setIsNoteLoading] = useState(false);
 	const [sharePopupNote, setSharePopupNote] = useState(false);
 	const [shareNote, setShareNote] = useState<NoteListItemType | null>(null);
-	const queryClient = new QueryClient();
+	const queryClient = useQueryClient();
 
 	const updateNoteMutation = useMutation({
 		mutationFn: (payload: {title: string; content: SlateDocumentType}) => {
@@ -77,10 +77,6 @@ export default function Home() {
 
 	const saveNote = (content: SlateDocumentType, note: NoteType | null) => {
 		setStatus(NOTE_STATUS.saving);
-		window.onbeforeunload = function () {
-			alert("Note is not yet saved. Please wait!");
-			return true;
-		};
 		const title = note ? note.title : "Untitled";
 		if (user) {
 			if (note) {
@@ -139,6 +135,7 @@ export default function Home() {
 		[navigate, user]
 	);
 
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const editorDebounced = useCallback(
 		_.debounce(
 			(value: SlateDocumentType) => {
@@ -157,19 +154,16 @@ export default function Home() {
 	);
 	const handleEditorChange = useCallback(
 		(value: SlateDocumentType) => {
-			editorDebounced(value);
+			if (!_.isEqual(value, document)) {
+				window.onbeforeunload = function () {
+					alert("Note is not yet saved. Please wait!");
+					return true;
+				};
+				editorDebounced(value);
+			}
 		},
-		[editorDebounced]
+		[editorDebounced, document]
 	);
-
-	const closeSharePopup = () => {
-		setSharePopupNote(false);
-	};
-
-	const openShareNote = (note: NoteListItemType) => {
-		setShareNote(note);
-		setSharePopupNote(true);
-	};
 
 	useEffect(() => {
 		if (!user) {
@@ -182,10 +176,6 @@ export default function Home() {
 			}
 		}
 	}, [user, note, noteid, openNote]);
-
-	function isSidebarOpen() {
-		return sidebarRef.current?.getAttribute("aria-hidden") === "false";
-	}
 
 	return (
 		<>
@@ -200,7 +190,10 @@ export default function Home() {
 								<HomeSidebar
 									currentNoteID={note !== null ? note.id : null}
 									openNote={openNote}
-									openShareNote={openShareNote}
+									openShareNote={(note: NoteListItemType) => {
+										setShareNote(note);
+										setSharePopupNote(true);
+									}}
 								/>
 							}
 						/>
@@ -220,7 +213,7 @@ export default function Home() {
 										}
 										aria-controls="sidebar"
 										onClick={(e) => {
-											const isOpen = isSidebarOpen();
+											const isOpen = sidebarRef.current?.getAttribute("aria-hidden") === "false";
 											sidebarRef.current?.setAttribute("aria-hidden", isOpen ? "true" : "false");
 											e.currentTarget.setAttribute("aria-expanded", isOpen ? "false" : "true");
 										}}
@@ -238,7 +231,7 @@ export default function Home() {
 										}
 										aria-controls="sidebar"
 										onClick={(e) => {
-											const isOpen = isSidebarOpen();
+											const isOpen = sidebarRef.current?.getAttribute("aria-hidden") === "false";
 											sidebarRef.current?.setAttribute("aria-hidden", isOpen ? "true" : "false");
 											e.currentTarget.setAttribute("aria-expanded", isOpen ? "false" : "true");
 										}}
@@ -280,9 +273,17 @@ export default function Home() {
 				 * Note sharing component
 				 */}
 				{shareNote !== null ? (
-					<ShareNotePopup note={shareNote} closePopup={closeSharePopup} open={sharePopupNote} />
+					<ShareNotePopup
+						note={shareNote}
+						closePopup={() => setSharePopupNote(false)}
+						open={sharePopupNote}
+					/>
 				) : note !== null ? (
-					<ShareNotePopup note={note} closePopup={closeSharePopup} open={sharePopupNote} />
+					<ShareNotePopup
+						note={note}
+						closePopup={() => setSharePopupNote(false)}
+						open={sharePopupNote}
+					/>
 				) : (
 					<></>
 				)}

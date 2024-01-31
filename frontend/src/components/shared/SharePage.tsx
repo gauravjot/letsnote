@@ -24,7 +24,7 @@ export type ShareNoteApiResponseType = {
 };
 
 export default function Shared() {
-	let {nui, shareid} = useParams();
+	const {nui, shareid} = useParams();
 	const user = useSelector((state: any) => state.user);
 	const [document, setDocument] = React.useState();
 	const [error, setError] = React.useState();
@@ -34,7 +34,7 @@ export default function Shared() {
 	const sidebarRef = React.useRef<HTMLDivElement>(null);
 
 	React.useEffect(() => {
-		let config = {
+		const config = {
 			headers: {
 				"Content-Type": "application/json",
 			},
@@ -56,7 +56,7 @@ export default function Shared() {
 
 	const toggleSidebar = () => {
 		if (sidebarRef.current) {
-			let isSidebarOpen = sidebarRef.current.getAttribute("aria-hidden") === "false";
+			const isSidebarOpen = sidebarRef.current.getAttribute("aria-hidden") === "false";
 			// Toggle the aria labels
 			sidebarRef.current.setAttribute("aria-hidden", isSidebarOpen ? "true" : "false");
 		}
@@ -132,15 +132,15 @@ export default function Shared() {
 								title="Toggle Sidebar"
 							>
 								<span className="ic ic-white ic-double-arrow align-text-top !hidden lg:!inline-block"></span>
-								<div className="menu-icon-wrapper">
-									<div className="menu-icon-line half first"></div>
-									<div className="menu-icon-line"></div>
-									<div className="menu-icon-line half last"></div>
+								<div className="hamburger-wrapper">
+									<div className="hamburger-line half first"></div>
+									<div className="hamburger-line"></div>
+									<div className="hamburger-line half last"></div>
 								</div>
 							</button>
 						</div>
 					)}
-					<div className="min-h-screen w-full md:px-4 relative z-40">
+					<div className="min-h-screen w-full lg:flex-1 md:px-4 relative z-40">
 						<div className="z-40">
 							{document ? (
 								<Slate editor={editor} value={document}>
