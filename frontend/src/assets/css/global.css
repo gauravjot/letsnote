@@ -207,7 +207,9 @@ code {
 	transition-property: width, opacity;
 	transition: 0.5s ease-out;
 	@apply fixed left-0 top-0 bottom-0 right-10 z-50;
-	@apply lg:relative w-[90%] max-w-[32rem] lg:w-[28rem];
+	@apply lg:relative w-[90%] max-w-[28rem];
+	@apply lg:w-[18rem] xl:w-[21rem] 2xl:w-[23rem];
+	@apply lg:min-w-[18rem] xl:min-w-[21rem] 2xl:min-w-[23rem];
 }
 .sidebar-hide-able[aria-hidden="false"] {
 	@apply opacity-100;
@@ -324,12 +326,10 @@ code {
 
 .sidebar-notelist-item {
 	@apply flex relative text-gray-600 px-6 transition-all;
-}
-.sidebar-notelist-item:hover {
-	@apply bg-gray-200;
+	@apply hover:bg-slate-200;
 }
 .sidebar-notelist-item[aria-current="true"] {
-	@apply pl-6 py-2 border-l-8 border-blue-400 bg-blue-100 bg-opacity-70;
+	@apply pl-6 py-2 border-l-8 border-primary-400 bg-primary-100;
 }
 .sidebar-notelist-item[aria-current="false"] {
 	@apply pl-6;
@@ -340,7 +340,7 @@ code {
 	@apply duration-1000 w-0 overflow-hidden inline-block text-[0.7rem] align-middle font-medium;
 }
 .sidebar-notelist-item[aria-current="true"] .active-badge {
-	@apply w-auto mr-2 bg-blue-200 text-blue-900 rounded-md px-1;
+	@apply w-auto mr-2 bg-primary-200 text-primary-900 rounded-md px-1;
 }
 .sidebar-notelist-item[aria-current="false"] .active-badge {
 	@apply w-0;

@@ -5,9 +5,9 @@ import {SIDEBAR_NOTES_QUERY} from "@/services/queries";
 import {NoteListItemType} from "@/types/note";
 import {handleAxiosError} from "@/utils/HandleAxiosError";
 import {AxiosError} from "axios";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
-import {QueryClient, useMutation} from "react-query";
+import {useMutation, useQueryClient} from "react-query";
 import {dateTimePretty} from "@/utils/TimeSince";
 
 export interface IEditNoteNameDialogProps {
@@ -24,7 +24,7 @@ export default function TitleUpdateDialog(props: IEditNoteNameDialogProps) {
 		reset,
 		formState: {errors},
 	} = useForm();
-	const queryClient = new QueryClient();
+	const queryClient = useQueryClient();
 
 	const mutation = useMutation({
 		mutationFn: (payload: {editnotename: string}) => {
@@ -44,6 +44,20 @@ export default function TitleUpdateDialog(props: IEditNoteNameDialogProps) {
 		mutation.reset();
 		props.closeFn();
 	}
+
+	useEffect(() => {
+		window.addEventListener("keydown", handleKeyDown);
+
+		function handleKeyDown(event: KeyboardEvent) {
+			if (event.key === "Escape") {
+				mutation.reset();
+				props.closeFn();
+			}
+		}
+		return () => {
+			window.removeEventListener("keydown", handleKeyDown);
+		};
+	}, [mutation, props]);
 
 	return (
 		<>
@@ -82,7 +96,6 @@ export default function TitleUpdateDialog(props: IEditNoteNameDialogProps) {
 								elementId="editnotename"
 								elementLabel="New Note Title"
 								elementIsRequired={true}
-								elementInputMinLength={3}
 								elementInputMaxLength={100}
 								elementWidth="full"
 								elementInputType="text"

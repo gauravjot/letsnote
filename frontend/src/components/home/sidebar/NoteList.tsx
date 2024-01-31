@@ -41,6 +41,11 @@ export default function NoteList({openNote, shareNote, currentNote}: Props) {
 				<div className="flex-none h-max mr-4">
 					<div
 						onClick={() => {
+							if (!showCreateBox) {
+								setTimeout(() => {
+									document?.getElementById("create_new_note_title")?.focus();
+								}, 150);
+							}
 							setShowCreateBox(!showCreateBox);
 						}}
 						aria-selected={showCreateBox}

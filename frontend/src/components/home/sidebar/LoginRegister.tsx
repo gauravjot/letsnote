@@ -253,7 +253,7 @@ function UserCard({user}: {user: UserReduxType}) {
 	};
 
 	return (
-		<div className="my-3 mt-6 pb-4 px-4 border-b border-gray-300 shadow-smb">
+		<div className="my-3 pb-4 pt-2 px-4 border-b border-gray-300 shadow-smb">
 			<div className="text-xl font-bold user-select-none text-gray-900 mb-2">
 				<div className="flex">
 					<div className="flex-grow">
@@ -270,11 +270,12 @@ function UserCard({user}: {user: UserReduxType}) {
 					</div>
 				</div>
 			</div>
-			<div className="whitespace-nowrap max-w-14 overflow-hidden text-ellipsis">
+			<div className="flex place-items-center">
 				<span className="ic ic-person ic-black align-middle mr-2"></span>
-				<span className="align-middle text-gray-800 text-[0.92rem] leading-5 font-medium">
-					{user.user.name}
-				</span>
+				<div className="infotrig align-middle text-gray-800 text-[0.92rem] leading-5 font-medium">
+					<div className="truncate">{user.user.name}</div>
+					<div className="infomsg mt-3 top-2 left-0 whitespace-nowrap">{user.user.email}</div>
+				</div>
 			</div>
 			<div className="ml-6 text-[0.75rem] whitespace-nowrap overflow-hidden text-gray-500">
 				{user.user.id}

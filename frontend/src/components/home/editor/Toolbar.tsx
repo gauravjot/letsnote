@@ -32,8 +32,8 @@ const TEXT_ALIGN = ["left", "center", "right", "justify"];
 
 function Toolbar({note}: {note: NoteType | null}) {
 	const editor = useSlateStatic();
-	const editNameDialogRef = React.useRef<HTMLDivElement>(null);
 	const userToken = useSelector((state: RootState) => state.user)?.token;
+	const [isRenameDialogOpen, setIsRenameDialogOpen] = React.useState(false);
 
 	const onBlockTypeChange = useCallback(
 		(targetType: string) => {
@@ -48,31 +48,24 @@ function Toolbar({note}: {note: NoteType | null}) {
 
 	const blockType = getTextBlockStyle(editor);
 
-	const closeEditNameDialog = () => {
-		if (editNameDialogRef.current) {
-			editNameDialogRef.current.setAttribute("aria-hidden", "true");
-			editNameDialogRef.current.classList.remove("active");
-		}
-	};
+	const closeEditNameDialog = () => setIsRenameDialogOpen(false);
 
 	return (
 		<>
-			{note && userToken && (
-				<div
-					aria-hidden="true"
-					className="aria-hidden:scale-0 group scale-100 fixed inset-0 z-50"
-					ref={editNameDialogRef}
-				>
+			{isRenameDialogOpen && note && userToken && (
+				<div className="fixed inset-0 z-50">
 					<div className="fixed inset-0 bg-black/30 z-0" onClick={closeEditNameDialog}></div>
-					<div className="group-[.active]:scale-100 group-[.active]:opacity-100 opacity-0 scale-90 fixed inset-0 flex place-items-center justify-center z-[60] transition-transform duration-75 ease-in">
+					<div className="fixed inset-0 flex place-items-center justify-center z-[60]">
 						<TitleUpdateDialog note={note} closeFn={closeEditNameDialog} userToken={userToken} />
 					</div>
 				</div>
 			)}
 			<div className="top-0 z-30 sticky" id="toolbar">
 				<div className="bg-gray-50 px-1 mt-1 shadow-md rounded ab-toolbar">
-					<div className="px-3 ml-1 flex gap-2 place-items-center">
-						<span className="text-lg font-serif font-medium">{note ? note.title : "Untitled"}</span>
+					<div className="px-3 pt-2 ml-1 flex gap-2 place-items-center">
+						<span className="text-lg font-serif font-medium truncate">
+							{note ? note.title : "Untitled"}
+						</span>
 						{note && (
 							<Button
 								elementChildren="Rename"
@@ -83,15 +76,15 @@ function Toolbar({note}: {note: NoteType | null}) {
 								elementStyle="white_no_border"
 								elementSize="xsmall"
 								onClick={() => {
-									if (editNameDialogRef.current) {
-										editNameDialogRef.current.setAttribute("aria-hidden", "false");
-										editNameDialogRef.current.classList.add("active");
-									}
+									setTimeout(() => {
+										document?.getElementById("editnotename")?.focus();
+									}, 100);
+									setIsRenameDialogOpen(true);
 								}}
 							/>
 						)}
-						<span className="text-xs text-gray-500 align-middle">
-							{note ? `(modified ${timeSince(note.updated)})` : "not yet"}
+						<span className="text-xs text-gray-500 align-middle block">
+							{note ? `(modified ${timeSince(note.updated)})` : ""}
 						</span>
 					</div>
 					<div className="pb-2 line-height-150 space-y-1">

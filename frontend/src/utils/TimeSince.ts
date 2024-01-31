@@ -24,31 +24,15 @@ export function timeSince(timestamp: string) {
 	if (interval > 1) {
 		return Math.floor(interval) + " min" + (Math.floor(interval) > 1 ? "s" : "") + " ago";
 	}
-	if (Math.floor(seconds) === 0) {
+	if (Math.floor(seconds) < 2) {
 		return "just now";
 	}
 	return Math.floor(seconds) + " sec" + (Math.floor(seconds) > 1 ? "s" : "") + " ago";
 }
 
 export function dateTimePretty(dt: string) {
-	// 2022-11-02T23:15:14.327407Z
-	// const monthNames = [
-	// 	"Jan",
-	// 	"Feb",
-	// 	"Mar",
-	// 	"Apr",
-	// 	"May",
-	// 	"Jun",
-	// 	"Jul",
-	// 	"Aug",
-	// 	"Sep",
-	// 	"Oct",
-	// 	"Nov",
-	// 	"Dec",
-	// ];
 	const x = new Date(dt);
 	const dd = x.getDate();
-	// let mm = monthNames[x.getMonth()];
 	const yy = x.getFullYear();
 	return (
 		yy +

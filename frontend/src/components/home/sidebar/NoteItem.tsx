@@ -19,7 +19,7 @@ export default function NoteItem({note, isActive, openNote, shareNote}: Props) {
 	const optionsRef = React.useRef<HTMLDivElement>(null);
 	const user = useSelector((state: RootState) => state.user);
 	const [menuOpen, setMenuOpen] = React.useState(false);
-	const editNameDialogRef = React.useRef<HTMLDivElement>(null);
+	const [isRenameDialogOpen, setIsRenameDialogOpen] = React.useState(false);
 
 	const closeMenu = (e: MouseEvent) => {
 		if (
@@ -60,41 +60,30 @@ export default function NoteItem({note, isActive, openNote, shareNote}: Props) {
 		}
 	};
 
-	const closeEditNameDialog = () => {
-		if (editNameDialogRef.current) {
-			editNameDialogRef.current.setAttribute("aria-hidden", "true");
-			editNameDialogRef.current.classList.remove("active");
-		}
-	};
+	const closeEditNameDialog = () => setIsRenameDialogOpen(false);
 
-	const renameNote = () => {
-		if (editNameDialogRef.current) {
-			editNameDialogRef.current.setAttribute("aria-hidden", "false");
-			editNameDialogRef.current.classList.add("active");
-		}
-	};
+	const renameNote = () => setIsRenameDialogOpen(true);
 
 	return (
 		<div className="sidebar-notelist-item" aria-current={isActive}>
-			<div
-				aria-hidden="true"
-				className="aria-hidden:scale-0 group scale-100 fixed inset-0 z-50"
-				ref={editNameDialogRef}
-			>
-				<div className="fixed inset-0 bg-black/30 z-0" onClick={closeEditNameDialog}></div>
-				<div className="group-[.active]:scale-100 group-[.active]:opacity-100 opacity-0 scale-90 fixed inset-0 flex place-items-center justify-center z-[60] transition-transform duration-75 ease-in">
-					<TitleUpdateDialog note={note} closeFn={closeEditNameDialog} userToken={user.token} />
+			{isRenameDialogOpen && (
+				<div className="fixed inset-0 z-50">
+					<div className="fixed inset-0 bg-black/30 z-0" onClick={closeEditNameDialog}></div>
+					<div className="fixed inset-0 flex place-items-center justify-center z-[60]">
+						<TitleUpdateDialog note={note} closeFn={closeEditNameDialog} userToken={user.token} />
+					</div>
 				</div>
-			</div>
+			)}
 			<div
-				className="flex-grow pr-2 py-2 cursor-pointer"
+				className="flex-grow pr-2 py-2 cursor-pointer overflow-hidden"
 				onClick={() => {
 					openNote(note.id);
 				}}
 			>
-				<div className="text-gray-900 max-w-12 text-ellipsis font-medium line-height-125 whitespace-nowrap overflow-hidden">
+				<div className="text-gray-900 font-medium line-height-125 truncate overflow-hidden whitespace-nowrap overflow-ellipsis">
 					{note.title}
 				</div>
+
 				<div className="text-xs mt-1 whitespace-nowrap overflow-hidden">
 					<span className="active-badge">Active</span>
 					<span title={`Modified ${timeSince(note.updated)}`}>{dateTimePretty(note.updated)}</span>
@@ -142,6 +131,9 @@ export default function NoteItem({note, isActive, openNote, shareNote}: Props) {
 						}
 						onClick={() => {
 							setMenuOpen(false);
+							setTimeout(() => {
+								document?.getElementById("editnotename")?.focus();
+							}, 100);
 							renameNote();
 						}}
 					>
