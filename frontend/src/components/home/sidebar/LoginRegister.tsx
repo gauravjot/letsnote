@@ -1,6 +1,4 @@
-import React, {useState} from "react";
-import {useSelector, useDispatch} from "react-redux";
-import {setUser, logoutUser} from "@/redux/user/actions";
+import React, {useContext, useState} from "react";
 import {
 	userLogout,
 	userLogin,
@@ -8,7 +6,7 @@ import {
 	UserLoginInfo,
 	UserReduxType,
 } from "@/services/user/log_in_out";
-import {RootState} from "@/App";
+import {UserContext} from "@/App";
 import {Link} from "react-router-dom";
 import {useForm} from "react-hook-form";
 import {AxiosError} from "axios";
@@ -19,13 +17,13 @@ import {UserRegisterInfo, UserRegisterResponse, userRegister} from "@/services/u
 import {useMutation} from "react-query";
 
 export default function LoginRegister({showLinkToHome = false}: {showLinkToHome?: boolean}) {
-	const user = useSelector((state: RootState) => state.user);
+	const userContext = useContext(UserContext);
 	const [showRegister, setShowRegister] = React.useState(false);
 
 	return (
 		<>
-			{user && user.token.length > 0 ? (
-				<UserCard user={user} />
+			{userContext.user && userContext.user.token.length > 0 ? (
+				<UserCard user={userContext.user} />
 			) : showRegister ? (
 				<RegisterComponent showRegister={setShowRegister} />
 			) : (
@@ -48,7 +46,7 @@ function Login({
 }: {
 	switchToRegister?: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-	const dispatch = useDispatch();
+	const userContext = React.useContext(UserContext);
 
 	const [error, setError] = useState<string | null>(null);
 	const {
@@ -65,7 +63,7 @@ function Login({
 		onSuccess: (data: UserLoginResponse) => {
 			setError(null);
 			reset();
-			dispatch(setUser(data.data));
+			userContext.setUser(data.data);
 		},
 		onError: (error: AxiosError) => {
 			handleAxiosError(error, setError);
@@ -136,7 +134,7 @@ function RegisterComponent({
 }: {
 	showRegister?: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-	const dispatch = useDispatch();
+	const userContext = React.useContext(UserContext);
 
 	const [error, setError] = useState<string | null>(null);
 	const {
@@ -154,8 +152,8 @@ function RegisterComponent({
 		onSuccess: (data: UserRegisterResponse) => {
 			setError(null);
 			reset();
+			userContext.setUser(data.data);
 			showRegister && showRegister(false);
-			dispatch(setUser(data.data));
 		},
 		onError: (error: AxiosError) => {
 			handleAxiosError(error, setError);
@@ -242,18 +240,18 @@ function RegisterComponent({
 }
 
 function UserCard({user}: {user: UserReduxType}) {
-	const dispatch = useDispatch();
+	const userContext = useContext(UserContext);
 
 	const logOut = async () => {
 		if (await userLogout(user.token)) {
-			dispatch(logoutUser());
+			userContext.setUser(null);
 		} else {
 			console.log("Could not terminate session.");
 		}
 	};
 
 	return (
-		<div className="my-3 pb-4 pt-2 px-4 border-b border-gray-300 shadow-smb">
+		<div className="my-3 pb-4 pt-3 px-4 border-b border-gray-300 shadow-smb">
 			<div className="text-xl font-bold user-select-none text-gray-900 mb-2">
 				<div className="flex">
 					<div className="flex-grow">

@@ -1,14 +1,12 @@
 import Editor from "./editor/Editor";
-import {useState, useCallback, useEffect, useRef} from "react";
+import {useState, useCallback, useEffect, useRef, useContext} from "react";
 import ShareNotePopup from "./ShareNotePopup";
 import axios from "axios";
 import {BACKEND_SERVER_DOMAIN} from "@/config";
-import {useSelector} from "react-redux";
 import _ from "lodash";
 import ExampleDocument, {SlateDocumentType} from "@/utils/ExampleDocument";
 import {Helmet} from "react-helmet";
 import {useParams, useNavigate} from "react-router-dom";
-import {RootState} from "@/App";
 import {NoteType} from "@/types/api";
 import HomeSidebar from "./sidebar/Sidebar";
 import Sidebar from "@/components/Sidebar";
@@ -19,12 +17,13 @@ import {SIDEBAR_NOTES_QUERY} from "@/services/queries";
 import {updateNoteContent} from "@/services/note/update_note_content";
 import {createNote} from "@/services/note/create_note";
 import {NOTE_STATUS} from "./NoteStatusOptions";
+import {UserContext} from "@/App";
 
 export default function Home() {
 	const {noteid} = useParams(); /* from url: '/note/{noteid}' */
 	const sidebarRef = useRef<HTMLDivElement>(null);
 	const navigate = useNavigate();
-	const user = useSelector((state: RootState) => state.user);
+	const user = useContext(UserContext).user;
 	const [status, setStatus] = useState<SavingState | null>(null);
 	const [note, setNote] = useState<NoteType | null>(null);
 	const [document, setDocument] = useState<SlateDocumentType>(ExampleDocument);
@@ -35,7 +34,7 @@ export default function Home() {
 
 	const updateNoteMutation = useMutation({
 		mutationFn: (payload: {title: string; content: SlateDocumentType}) => {
-			return note
+			return user && note
 				? updateNoteContent(user.token, note.id, payload)
 				: Promise.reject("Note not found");
 		},
@@ -59,7 +58,7 @@ export default function Home() {
 
 	const createNoteMutation = useMutation({
 		mutationFn: (payload: {title: string; content: SlateDocumentType}) => {
-			return createNote(user.token, payload);
+			return user ? createNote(user.token, payload) : Promise.reject("User not found");
 		},
 		onSuccess: (res) => {
 			setStatus(null);

@@ -1,12 +1,11 @@
-import React from "react";
+import React, {useContext} from "react";
 import {dateTimePretty, timeSince} from "@/utils/TimeSince";
 import axios from "axios";
 import {BACKEND_SERVER_DOMAIN} from "@/config";
-import {useSelector} from "react-redux";
 import {NoteType} from "@/types/api";
-import {RootState} from "@/App";
 import TitleUpdateDialog from "./TitleUpdateDialog";
 import {NoteListItemType} from "@/types/note";
+import {UserContext} from "@/App";
 
 interface Props {
 	note: NoteListItemType;
@@ -17,9 +16,9 @@ interface Props {
 
 export default function NoteItem({note, isActive, openNote, shareNote}: Props) {
 	const optionsRef = React.useRef<HTMLDivElement>(null);
-	const user = useSelector((state: RootState) => state.user);
 	const [menuOpen, setMenuOpen] = React.useState(false);
 	const [isRenameDialogOpen, setIsRenameDialogOpen] = React.useState(false);
+	const userContext = useContext(UserContext);
 
 	const closeMenu = (e: MouseEvent) => {
 		if (
@@ -43,7 +42,7 @@ export default function NoteItem({note, isActive, openNote, shareNote}: Props) {
 			const config = {
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: user.token,
+					Authorization: userContext.user?.token,
 				},
 			};
 			axios
@@ -66,11 +65,15 @@ export default function NoteItem({note, isActive, openNote, shareNote}: Props) {
 
 	return (
 		<div className="sidebar-notelist-item" aria-current={isActive}>
-			{isRenameDialogOpen && (
+			{isRenameDialogOpen && userContext.user && (
 				<div className="fixed inset-0 z-50">
 					<div className="fixed inset-0 bg-black/30 z-0" onClick={closeEditNameDialog}></div>
 					<div className="fixed inset-0 flex place-items-center justify-center z-[60]">
-						<TitleUpdateDialog note={note} closeFn={closeEditNameDialog} userToken={user.token} />
+						<TitleUpdateDialog
+							note={note}
+							closeFn={closeEditNameDialog}
+							userToken={userContext.user.token}
+						/>
 					</div>
 				</div>
 			)}
