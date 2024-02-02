@@ -8,14 +8,13 @@ import {
 	toggleStyle,
 } from "@/utils/EditorUtils";
 
-import React, {useCallback} from "react";
+import React, {useCallback, useContext} from "react";
 import {useSlateStatic} from "slate-react";
 import {timeSince} from "@/utils/TimeSince";
-import {useSelector} from "react-redux";
-import {RootState} from "@/App";
 import Button from "@/components/ui/button/Button";
 import {NoteType} from "@/types/api";
 import TitleUpdateDialog from "@/components/home/sidebar/TitleUpdateDialog";
+import {UserContext} from "@/App";
 
 const PARAGRAPH_STYLES = ["h1", "h2", "h3", "h4", "codeblock", "quote", "ul", "ol"];
 const CHARACTER_STYLES = [
@@ -32,7 +31,7 @@ const TEXT_ALIGN = ["left", "center", "right", "justify"];
 
 function Toolbar({note}: {note: NoteType | null}) {
 	const editor = useSlateStatic();
-	const userToken = useSelector((state: RootState) => state.user)?.token;
+	const userToken = useContext(UserContext).user?.token;
 	const [isRenameDialogOpen, setIsRenameDialogOpen] = React.useState(false);
 
 	const onBlockTypeChange = useCallback(
@@ -44,7 +43,6 @@ function Toolbar({note}: {note: NoteType | null}) {
 		},
 		[editor]
 	);
-	console.log(note);
 
 	const blockType = getTextBlockStyle(editor);
 

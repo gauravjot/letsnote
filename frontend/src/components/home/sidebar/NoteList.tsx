@@ -1,15 +1,14 @@
-import React from "react";
-import {useSelector} from "react-redux";
+import React, {useContext} from "react";
 import CreateNote from "./CreateNote";
 import NoteItem from "./NoteItem";
 import {monthYear} from "@/utils/TimeSince";
 import {NoteType} from "@/types/api";
-import {RootState} from "@/App";
+import {UserContext} from "@/App";
 import Spinner from "@/components/ui/spinner/Spinner";
 import {useQuery} from "react-query";
-import {getAllNotes} from "@/services/note/get_note_list";
 import {NoteListItemType} from "@/types/note";
 import {SIDEBAR_NOTES_QUERY} from "@/services/queries";
+import {getNoteList} from "@/services/note/get_note_list";
 
 interface Props {
 	currentNote: NoteType["id"] | null;
@@ -18,9 +17,15 @@ interface Props {
 }
 
 export default function NoteList({openNote, shareNote, currentNote}: Props) {
-	const user = useSelector((state: RootState) => state.user);
+	const userContext = useContext(UserContext);
 	const [showCreateBox, setShowCreateBox] = React.useState(false);
-	const notes = useQuery([SIDEBAR_NOTES_QUERY, user], () => getAllNotes(user.token));
+	const notes = useQuery(
+		[SIDEBAR_NOTES_QUERY, userContext.user],
+		() => getNoteList(userContext?.user?.token),
+		{
+			enabled: !!userContext.user,
+		}
+	);
 
 	const newNoteCreated = (note: NoteType) => {
 		setShowCreateBox(false);
@@ -30,7 +35,7 @@ export default function NoteList({openNote, shareNote, currentNote}: Props) {
 
 	let count: string;
 
-	return user ? (
+	return userContext.user ? (
 		<div className="bg-white">
 			<div className="relative mt-6 user-select-none flex flex-wrap">
 				<div className="flex-1 ml-6 mb-2.5">

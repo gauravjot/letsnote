@@ -1,11 +1,10 @@
-import React from "react";
-import {useSelector} from "react-redux";
+import React, {useContext} from "react";
 import axios from "axios";
 import {BACKEND_SERVER_DOMAIN, DEPLOY_DOMAIN} from "@/config";
 import {timeSince, dateTimePretty} from "@/utils/TimeSince";
 import {ShareNote} from "@/types/api";
-import {RootState} from "@/App";
 import {NoteListItemType} from "@/types/note";
+import {UserContext} from "@/App";
 
 interface Link {
 	title: string;
@@ -22,7 +21,7 @@ interface Props {
 }
 
 export default function ShareNotePopup({closePopup, note, open}: Props) {
-	const user = useSelector((state: RootState) => state.user);
+	const user = useContext(UserContext).user;
 	const [link, setLink] = React.useState<Link | null>(null);
 	const [shareLinkList, setShareLinkList] = React.useState<ShareNote[]>([]);
 	const [title, setTitle] = React.useState("");

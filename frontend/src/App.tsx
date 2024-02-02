@@ -1,79 +1,63 @@
 import {Route, Navigate, Routes, BrowserRouter as Router} from "react-router-dom";
-/* Redux */
-import {Provider} from "react-redux";
-import {compose} from "redux";
-import {configureStore} from "@reduxjs/toolkit";
-import userReducer from "./redux/user/reducers";
-/* Cookies */
-import {CookiesProvider} from "react-cookie";
-import {useCookies} from "react-cookie";
 /* Components */
 import Home from "@/components/home/Home";
 import Shared from "@/components/shared/SharePage";
+import React, {createContext, useEffect, useState} from "react";
+import {UserReduxType} from "./services/user/log_in_out";
 
-// Infer the `RootState` and `AppDispatch` types from the store itself
-export type RootState = ReturnType<typeof _store.getState>;
-export type AppDispatch = typeof _store.dispatch;
-// this store is only used for typing
-const reducer_list = {
-	user: userReducer,
-};
-const _store = configureStore({
-	reducer: reducer_list,
+export const UserContext = createContext({
+	user: null,
+	setUser: () => {
+		return null;
+	},
+} as {
+	user: UserReduxType | null;
+	setUser: React.Dispatch<React.SetStateAction<UserReduxType | null>>;
 });
-// Redux browser extension support
-const composeEnhancers =
-	((window as any)["__REDUX_DEVTOOLS_EXTENSION_COMPOSE__"] as typeof compose) || compose;
 
 export default function App() {
-	// Using cookies to for user session
-	const [cookies, setCookie] = useCookies(["user"]);
-
-	// Save cookies
-	function saveToCookies(state: RootState) {
+	const readFromLocalStorage = (): UserReduxType | null => {
 		try {
-			const serializedState = JSON.stringify(state);
-			setCookie("user", encodeURIComponent(serializedState), {
-				path: "/",
-				expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-			});
+			const serializedState = localStorage.getItem("user");
+			if (serializedState === null) {
+				return null;
+			}
+			return JSON.parse(decodeURIComponent(serializedState)).user;
 		} catch (e) {
-			console.log(e);
+			return null;
 		}
-	}
+	};
+	const [user, setUser] = useState<UserReduxType | null>(readFromLocalStorage());
 
-	// Read cookies
-	function loadFromCookies() {
-		try {
-			const serializedState = cookies.user;
-			if (serializedState === null) return undefined;
-			return JSON.parse(decodeURIComponent(serializedState));
-		} catch (e) {
-			return undefined;
+	useEffect(() => {
+		// save
+		if (user) {
+			try {
+				const serializedState = JSON.stringify({user: user});
+				localStorage.setItem("user", encodeURIComponent(serializedState));
+			} catch (e) {
+				console.log(e);
+			}
+		} else {
+			localStorage.removeItem("user");
 		}
-	}
-	const persistedState = loadFromCookies();
-
-	// Make Redux Store and subscribe to changes
-	const store = configureStore({
-		reducer: reducer_list,
-		enhancers: composeEnhancers,
-		preloadedState: persistedState,
-	});
-	store.subscribe(() => saveToCookies(store.getState()));
+	}, [user]);
 
 	return (
-		<CookiesProvider>
-			<Provider store={store}>
-				<Router>
-					<Routes>
-						<Route path="/" element={<Home />} />
-						<Route path="/note/shared/:nui/:shareid" element={<Shared />} />
-						<Route path="/note/:noteid" element={<Home />} />
-						<Route path="*" element={<Navigate to="/" replace />} />
-					</Routes>
-				</Router>
-			</Provider>
-		</CookiesProvider>
+		<UserContext.Provider
+			value={{
+				user: user,
+				setUser: setUser,
+			}}
+		>
+			<Router>
+				<Routes>
+					<Route path="/" element={<Home />} />
+					<Route path="/note/shared/:nui/:shareid" element={<Shared />} />
+					<Route path="/note/:noteid" element={<Home />} />
+					<Route path="*" element={<Navigate to="/" replace />} />
+				</Routes>
+			</Router>
+		</UserContext.Provider>
 	);
 }

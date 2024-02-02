@@ -1,7 +1,5 @@
-import React from "react";
-import {useSelector} from "react-redux";
+import React, {useContext} from "react";
 import {NoteType} from "@/types/api";
-import {RootState} from "@/App";
 import {createNote} from "@/services/note/create_note";
 import {useMutation} from "react-query";
 import ExampleDocument from "@/utils/ExampleDocument";
@@ -9,13 +7,14 @@ import {handleAxiosError} from "@/utils/HandleAxiosError";
 import {AxiosError} from "axios";
 import {useForm} from "react-hook-form";
 import Button from "@/components/ui/button/Button";
+import {UserContext} from "@/App";
 
 export default function CreateNote({
 	onNewNoteCreated,
 }: {
 	onNewNoteCreated: (note: NoteType) => void;
 }) {
-	const user = useSelector((state: RootState) => state.user);
+	const user = useContext(UserContext).user;
 	const [error, setError] = React.useState<string | null>(null);
 	const {
 		register,
@@ -26,7 +25,9 @@ export default function CreateNote({
 
 	const mutation = useMutation({
 		mutationFn: (payload: {title: string}) => {
-			return createNote(user.token, {title: payload.title, content: ExampleDocument});
+			return user
+				? createNote(user.token, {title: payload.title, content: ExampleDocument})
+				: Promise.reject("User not found");
 		},
 		onSuccess: (res) => {
 			reset();
