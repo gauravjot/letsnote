@@ -152,9 +152,10 @@ export default function Home() {
 		),
 		[note, user]
 	);
+
 	const handleEditorChange = useCallback(
 		(value: SlateDocumentType) => {
-			if (!_.isEqual(value, document)) {
+			if (!_.isEqual(value, note ? JSON.parse(note?.content) : document)) {
 				window.onbeforeunload = function () {
 					alert("Note is not yet saved. Please wait!");
 					return true;
@@ -162,7 +163,7 @@ export default function Home() {
 				editorDebounced(value);
 			}
 		},
-		[editorDebounced, document]
+		[editorDebounced, document, note]
 	);
 
 	useEffect(() => {

@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {useSelector, useDispatch} from "react-redux";
-import {setUser, logoutUser} from "@/redux/actions";
+import {setUser, logoutUser} from "@/redux/user/actions";
 import {
 	userLogout,
 	userLogin,

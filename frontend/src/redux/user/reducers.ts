@@ -4,7 +4,7 @@ import {UserReduxType} from "@/services/user/log_in_out";
 
 const userReducer: Reducer<UserReduxType, AnyAction> = (
 	state: UserReduxType | null = null,
-	action: any
+	action: AnyAction
 ) => {
 	const {type, payload} = action;
 	switch (type) {

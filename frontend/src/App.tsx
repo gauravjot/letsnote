@@ -3,7 +3,7 @@ import {Route, Navigate, Routes, BrowserRouter as Router} from "react-router-dom
 import {Provider} from "react-redux";
 import {compose} from "redux";
 import {configureStore} from "@reduxjs/toolkit";
-import userReducer from "./redux/reducers";
+import userReducer from "./redux/user/reducers";
 /* Cookies */
 import {CookiesProvider} from "react-cookie";
 import {useCookies} from "react-cookie";
