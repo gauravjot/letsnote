@@ -108,7 +108,8 @@ def updateNote(request, noteid):
         note.save()
 
         data = NoteListSerializer(note).data
-        data['content'] = request.data['content']
+        # We send json string of the content
+        data['content'] = json.dumps(request.data['content'])
 
         return Response(data=successResponse(data), status=status.HTTP_200_OK)
     except Note.DoesNotExist:

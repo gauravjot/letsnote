@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext} from "react";
 import {useParams} from "react-router-dom";
 import axios from "axios";
 import {BACKEND_SERVER_DOMAIN} from "@/config";
@@ -11,7 +11,7 @@ import {dateTimePretty, timeSince} from "@/utils/TimeSince";
 import ErrorPage from "@/utils/ErrorPage";
 import Sidebar from "@/components/Sidebar";
 import LoginRegister from "@/components/home/sidebar/LoginRegister";
-import {useSelector} from "react-redux";
+import {UserContext} from "@/App";
 
 export type ShareNoteApiResponseType = {
 	noteTitle: string;
@@ -25,7 +25,7 @@ export type ShareNoteApiResponseType = {
 
 export default function Shared() {
 	const {nui, shareid} = useParams();
-	const user = useSelector((state: any) => state.user);
+	const user = useContext(UserContext).user;
 	const [document, setDocument] = React.useState();
 	const [error, setError] = React.useState();
 	const [response, setResponse] = React.useState<ShareNoteApiResponseType | null>(null);

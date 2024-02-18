@@ -40,11 +40,8 @@ export default function Home() {
 		},
 		onSuccess: (res) => {
 			const response = res as NoteType;
-			console.log(note?.id);
-			console.log(response);
 			if (note?.id === response.id) {
 				setNote(response);
-				console.log("Note updated");
 			}
 			setTimeout(() => {
 				setStatus(null);
@@ -139,8 +136,7 @@ export default function Home() {
 		_.debounce(
 			(value: SlateDocumentType) => {
 				if (user) {
-					// If user is logged in then
-					// save the note
+					// If user is logged in then save the note
 					saveNote(value, note);
 				} else {
 					setStatus(null);
@@ -154,6 +150,7 @@ export default function Home() {
 
 	const handleEditorChange = useCallback(
 		(value: SlateDocumentType) => {
+			console.log(note);
 			if (!_.isEqual(value, note ? JSON.parse(note?.content) : document)) {
 				window.onbeforeunload = function () {
 					alert("Note is not yet saved. Please wait!");
