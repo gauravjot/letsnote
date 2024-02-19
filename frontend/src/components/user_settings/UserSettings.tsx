@@ -2,12 +2,78 @@ import {useContext, useState} from "react";
 import Button from "../ui/button/Button";
 import InputField from "../ui/input/Input";
 import {UserContext} from "@/App";
+import {useMutation, useQuery} from "react-query";
+import {ChangeUserNameType, changeName} from "@/services/user/change_user_name";
+import {UserType} from "@/types/user";
+import {ChangeEmailType, changeEmail} from "@/services/user/change_email";
+import {ChangePasswordType, changePassword} from "@/services/user/change_password";
+import {getUserSessions} from "@/services/user/get_session_list";
+import Spinner from "../ui/spinner/Spinner";
+import {timeSince} from "@/utils/TimeSince";
+import {RemoveSessionType, closeSession} from "@/services/user/remove_session";
 
 export function UserSettings({closeFn}: {closeFn: () => void}) {
-	const user = useContext(UserContext).user;
+	const userContext = useContext(UserContext);
 	const [showNameChange, setShowNameChange] = useState(false);
 	const [showEmailChange, setShowEmailChange] = useState(false);
 	const [showPasswordChange, setShowPasswordChange] = useState(false);
+	const sessionsQuery = useQuery(
+		["getSessions"],
+		() =>
+			userContext && userContext.user?.token
+				? getUserSessions(userContext.user?.token)
+				: Promise.reject("User authentication error. Logout and login again to retry"),
+		{
+			enabled: !!userContext.user,
+		}
+	);
+
+	const changeNameMutation = useMutation({
+		mutationFn: (payload: ChangeUserNameType) => {
+			return userContext && userContext.user?.token
+				? changeName(userContext.user?.token, payload)
+				: Promise.reject("User authentication error. Logout and login again to retry.");
+		},
+		onSuccess: (res) => {
+			const response = res.data as UserType;
+			if (userContext.user?.token)
+				userContext.setUser({user: response, token: userContext.user?.token});
+		},
+	});
+
+	const changeEmailMutation = useMutation({
+		mutationFn: (payload: ChangeEmailType) => {
+			return userContext && userContext.user?.token
+				? changeEmail(userContext.user?.token, payload)
+				: Promise.reject("User authentication error. Logout and login again to retry.");
+		},
+		onSuccess: (res) => {
+			const response = res.data as UserType;
+			if (userContext.user?.token)
+				userContext.setUser({user: response, token: userContext.user?.token});
+		},
+	});
+
+	const changePasswordMutation = useMutation({
+		mutationFn: (payload: ChangePasswordType) => {
+			return userContext && userContext.user?.token
+				? changePassword(userContext.user?.token, payload)
+				: Promise.reject("User authentication error. Logout and login again to retry.");
+		},
+		onSuccess: (res) => {
+			const response = res.data as UserType;
+			if (userContext.user?.token)
+				userContext.setUser({user: response, token: userContext.user?.token});
+		},
+	});
+
+	const closeSessionMutation = useMutation({
+		mutationFn: (payload: RemoveSessionType) => {
+			return userContext && userContext.user?.token
+				? closeSession(userContext.user?.token, payload)
+				: Promise.reject("User authentication error. Logout and login again to retry.");
+		},
+	});
 
 	return (
 		<div className="fixed inset-0 flex place-items-center justify-center z-[60]">
@@ -67,7 +133,7 @@ export function UserSettings({closeFn}: {closeFn: () => void}) {
 											elementId="as-name"
 											elementInputType="text"
 											elementLabel="Enter new name"
-											defaultValue={user?.user.name}
+											defaultValue={userContext?.user?.user.name}
 											elementInputMinLength={2}
 											elementInputMaxLength={64}
 											elementIsRequired={true}
@@ -93,7 +159,9 @@ export function UserSettings({closeFn}: {closeFn: () => void}) {
 								</form>
 							) : (
 								<>
-									<p className="mt-3 mx-4 text-gray-900 tracking-wide">{user?.user.name}</p>
+									<p className="mt-3 mx-4 text-gray-900 tracking-wide">
+										{userContext?.user?.user.name}
+									</p>
 									<div className="mx-4 mt-1">
 										<Button
 											elementChildren="Change your name"
@@ -121,7 +189,7 @@ export function UserSettings({closeFn}: {closeFn: () => void}) {
 											elementId="as-email"
 											elementInputType="email"
 											elementLabel="Enter new email address"
-											defaultValue={user?.user.email}
+											defaultValue={userContext?.user?.user.email}
 											elementInputMinLength={5}
 											elementInputMaxLength={256}
 											elementIsRequired={true}
@@ -147,7 +215,9 @@ export function UserSettings({closeFn}: {closeFn: () => void}) {
 								</form>
 							) : (
 								<>
-									<p className="mt-3 mx-4 text-gray-900 tracking-wide">{user?.user.email}</p>
+									<p className="mt-3 mx-4 text-gray-900 tracking-wide">
+										{userContext?.user?.user.email}
+									</p>
 									<div className="mx-4 mt-1">
 										<Button
 											elementChildren="Change email address"
@@ -231,9 +301,54 @@ export function UserSettings({closeFn}: {closeFn: () => void}) {
 						{/** Active Devices */}
 						<div className="my-8 pr-4">
 							<h3 className="text-bb font-medium py-px text-gray-800 border-b">Active Devices</h3>
-							<p className="mt-3 mx-4 text-sm text-gray-600 tracking-wide">
-								You are currently logged in on 3 devices
-							</p>
+							{sessionsQuery.isSuccess ? (
+								<>
+									<p className="mt-3 mx-4 text-sm text-gray-600 tracking-wide">
+										You have {sessionsQuery.data.length} active sessions
+									</p>
+									<p className="mt-5 mx-4 text-xs text-gray-500 tracking-wide border-b pb-2">
+										Showing Oldest → Newest
+									</p>
+									{sessionsQuery.data.map((session) => {
+										return (
+											<div key={session.id} className="mx-4 py-4 border-b last:border-none">
+												<div className="flex gap-2">
+													<div className="flex-1 text-sm text-gray-500">
+														<p className="text-xs text-gray-700 font-medium">Device IP Address:</p>
+														<p>{session.ip}</p>
+														<p className="text-xs text-gray-700 font-medium mt-4">
+															First Logged in:
+														</p>
+														<p>{timeSince(session.created)}</p>
+														<p className="text-xs text-gray-700 font-medium mt-4">User Agent:</p>
+														<p>{session.ua}</p>
+													</div>
+													<div>
+														<Button
+															elementChildren="Close Session"
+															elementState="default"
+															elementStyle="danger"
+															elementSize="xsmall"
+															elementType="button"
+															elementIcon="ic-close"
+															elementIconOnly={true}
+															onClick={() => {
+																console.log("Close session with id: ", session.id);
+															}}
+														/>
+													</div>
+												</div>
+											</div>
+										);
+									})}
+								</>
+							) : sessionsQuery.isLoading ? (
+								<>
+									<Spinner color="gray" size="sm" />
+								</>
+							) : (
+								<></>
+							)}
 						</div>
 
 						{/** Danger */}

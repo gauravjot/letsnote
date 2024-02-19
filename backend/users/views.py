@@ -10,16 +10,15 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 # Models & Serializers
-from .models import User, Verify
-from .serializers import UserSerializer, VerifySerializer
+from .models import User, Verify, Session
+from .serializers import UserSerializer, VerifySerializer, SessionSerializer
 # Session
-from .session import issueToken, dropSession
+from .session import issueToken, dropSession, getUserID
 from backend.utils import tokenResponse, errorResponse, successResponse, hashThis
+
 
 # Sign Up function
 # -----------------------------------------------
-
-
 @api_view(['POST'])
 def register(request):
     # -- user data & hash password
@@ -67,10 +66,9 @@ def register(request):
                 res_string += f"{key}: {userSerializer.errors[key][0]}\n"
         return Response(data=errorResponse(res_string, "A0001"), status=status.HTTP_400_BAD_REQUEST)
 
+
 # Log In function, requires email and password
 # -----------------------------------------------
-
-
 @api_view(['POST'])
 def login(request):
     email = str(request.data['email']).lower()
@@ -87,20 +85,18 @@ def login(request):
     token = issueToken(user.id, request)
     return Response(data=successResponse({"user": UserSerializer(user).data, **tokenResponse(token)}), status=status.HTTP_202_ACCEPTED)
 
+
 # Log Out function, requires token
 # -----------------------------------------------
-
-
 @api_view(['DELETE'])
 def logout(request):
     # Invalidate the token
     dropSession(request)
     return Response(data=successResponse(), status=status.HTTP_200_OK)
 
+
 # Verify Email, requires email verification token
 # -----------------------------------------------
-
-
 @api_view(['PUT'])
 def verifyEmail(request, emailtoken):
     try:
@@ -118,10 +114,88 @@ def verifyEmail(request, emailtoken):
     except (User.DoesNotExist, Verify.DoesNotExist) as err:
         return Response(data=errorResponse("Email verification failed. Resend verification email.", "A0008"), status=status.HTTP_400_BAD_REQUEST)
 
+
+# Change Password, requires old password and new password
+# -----------------------------------------------
+@api_view(['PUT'])
+def changePassword(request):
+    user = getUserID(request)
+    if not request.data['old_password'] or not request.data['new_password']:
+        return Response(data=errorResponse("Old password and new password are required.", "A0010"), status=status.HTTP_400_BAD_REQUEST)
+    if bcrypt.checkpw(request.data['old_password'].encode('utf-8'), user.password.encode('utf-8')):
+        user.password = hashPwd(request.data['new_password'])
+        user.save()
+        return Response(data=successResponse(UserSerializer(user).data), status=status.HTTP_200_OK)
+    return Response(data=errorResponse("Credentials are incorrect.", "A0011"), status=status.HTTP_400_BAD_REQUEST)
+
+
+# Change Name, requires new name
+# -----------------------------------------------
+@api_view(['PUT'])
+def changeName(request):
+    user = getUserID(request)
+    if not request.data['name']:
+        return Response(data=errorResponse("Name is required.", "A0012"), status=status.HTTP_400_BAD_REQUEST)
+    user.name = request.data['name']
+    user.save()
+    return Response(data=successResponse(UserSerializer(user).data), status=status.HTTP_200_OK)
+
+
+# Change Email, requires new email
+# -----------------------------------------------
+@api_view(['PUT'])
+def changeEmail(request):
+    user = getUserID(request)
+    if not request.data['email']:
+        return Response(data=errorResponse("Email is required.", "A0013"), status=status.HTTP_400_BAD_REQUEST)
+    user.email = request.data['email']
+    user.save()
+    return Response(data=successResponse(UserSerializer(user).data), status=status.HTTP_200_OK)
+
+
+# Get User Sessions, requires token
+# -----------------------------------------------
+@api_view(['GET'])
+def getUserSessions(request):
+    user = getUserID(request)
+    sessionSerializer = SessionSerializer(
+        Session.objects.filter(user=user, valid=True), many=True)
+    return Response(data=successResponse(sessionSerializer.data), status=status.HTTP_200_OK)
+
+
+# Delete User, requires password
+# -----------------------------------------------
+@api_view(['PUT'])
+def deleteUser(request):
+    user = getUserID(request)
+    if request.data['password'] and bcrypt.checkpw(request.data['password'].encode('utf-8'), user.password.encode('utf-8')):
+        user.delete()
+        return Response(data=successResponse(), status=status.HTTP_200_OK)
+    return Response(data=errorResponse("Credentials are incorrect.", "A0015"), status=status.HTTP_400_BAD_REQUEST)
+
+
+# Close Session, requires session_id
+# -----------------------------------------------
+@api_view(['PUT'])
+def closeSession(request):
+    user = getUserID(request)
+    try:
+        session = Session.objects.get(
+            user=user,
+            valid=True,
+            id=request.data['session_id']
+        )
+        session.valid = False
+        session.token = "dropped"
+        session.expire = 0
+        session.save()
+    except Session.DoesNotExist:
+        return Response(data=errorResponse("Session not found.", "A0014"), status=status.HTTP_400_BAD_REQUEST)
+    return Response(data=successResponse(), status=status.HTTP_200_OK)
+
+
 # Services
 # -----------------------------------------------
-
-
 def sendEmailVerification(uuid, email, token):
     # Send this token
     return False
@@ -129,6 +203,5 @@ def sendEmailVerification(uuid, email, token):
 
 # Helper Functions
 # -----------------------------------------------
-
 def hashPwd(password):
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
