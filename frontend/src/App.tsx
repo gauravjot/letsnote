@@ -1,7 +1,7 @@
 import {Route, Navigate, Routes, BrowserRouter as Router} from "react-router-dom";
 /* Components */
 import Home from "@/components/home/Home";
-import Shared from "@/components/shared/SharePage";
+import Shared from "@/components/share_sidebar/SharePage";
 import React, {createContext, useEffect, useState} from "react";
 import {UserReduxType} from "./services/user/log_in_out";
 

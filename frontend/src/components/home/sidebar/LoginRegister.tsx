@@ -15,6 +15,7 @@ import InputField from "@/components/ui/input/Input";
 import Button from "@/components/ui/button/Button";
 import {UserRegisterInfo, UserRegisterResponse, userRegister} from "@/services/user/register";
 import {useMutation} from "react-query";
+import {UserSettings} from "@/components/user_settings/UserSettings";
 
 export default function LoginRegister({showLinkToHome = false}: {showLinkToHome?: boolean}) {
 	const userContext = useContext(UserContext);
@@ -241,6 +242,7 @@ function RegisterComponent({
 
 function UserCard({user}: {user: UserReduxType}) {
 	const userContext = useContext(UserContext);
+	const [showSettings, setShowSettings] = React.useState(true);
 
 	const logOut = async () => {
 		if (await userLogout(user.token)) {
@@ -251,33 +253,54 @@ function UserCard({user}: {user: UserReduxType}) {
 	};
 
 	return (
-		<div className="my-3 pb-4 pt-3 px-4 border-b border-gray-300 shadow-smb">
-			<div className="text-xl font-bold user-select-none text-gray-900 mb-2">
-				<div className="flex">
-					<div className="flex-grow">
-						<span className="align-middle">Welcome</span>
+		<>
+			{/** User settings */}
+			{showSettings && <UserSettings closeFn={() => setShowSettings(false)} />}
+
+			{/** Main content */}
+			<div className="my-3 pb-4 pt-3 px-4 border-b border-gray-300 shadow-smb">
+				<div className="text-xl font-bold user-select-none text-gray-900 mb-2">
+					<div className="flex">
+						<div className="flex-grow">
+							<span className="align-middle">Welcome</span>
+						</div>
+						<div className="flex-grow-0 h-max">
+							<button
+								onClick={logOut}
+								className="infotrig ab-btn ab-btn-secondary ab-btn-sm bg-black bg-opacity-30 font-normal text-sm whitespace-nowrap"
+							>
+								<span className="ic ic-white ic-logout align-middle"></span>
+								<div className="infomsg mt-3 bottom-9 right-0 whitespace-nowrap">Logout</div>
+							</button>
+						</div>
 					</div>
-					<div className="flex-grow-0 h-max">
-						<button
-							onClick={logOut}
-							className="infotrig ab-btn ab-btn-secondary ab-btn-sm bg-black bg-opacity-30 font-normal text-sm whitespace-nowrap"
-						>
-							<span className="ic ic-white ic-logout align-middle"></span>
-							<div className="infomsg mt-3 bottom-9 right-0 whitespace-nowrap">Logout</div>
-						</button>
+				</div>
+				<div className="relative group">
+					<div className="flex place-items-center">
+						<span className="ic ic-person ic-black align-middle mr-2"></span>
+						<div className="infotrig align-middle text-gray-800 text-[0.92rem] leading-5 font-medium">
+							<div className="truncate">{user.user.name}</div>
+							<div className="infomsg mt-3 top-2 left-0 whitespace-nowrap">{user.user.email}</div>
+						</div>
+					</div>
+					<div className="ml-6 text-[0.75rem] whitespace-nowrap overflow-hidden text-gray-500">
+						{user.user.id}
+					</div>
+					<div className="hidden group-hover:flex pl-8 justify-center place-items-center bg-gradient-to-r from-transparent via-white to-white absolute top-0 right-0">
+						<Button
+							elementChildren="Close"
+							elementState="default"
+							elementStyle="white_no_border"
+							elementSize="xsmall"
+							elementType="button"
+							elementIcon="ic-settings"
+							elementIconSize="base"
+							elementIconOnly={true}
+							onClick={() => setShowSettings(!showSettings)}
+						/>
 					</div>
 				</div>
 			</div>
-			<div className="flex place-items-center">
-				<span className="ic ic-person ic-black align-middle mr-2"></span>
-				<div className="infotrig align-middle text-gray-800 text-[0.92rem] leading-5 font-medium">
-					<div className="truncate">{user.user.name}</div>
-					<div className="infomsg mt-3 top-2 left-0 whitespace-nowrap">{user.user.email}</div>
-				</div>
-			</div>
-			<div className="ml-6 text-[0.75rem] whitespace-nowrap overflow-hidden text-gray-500">
-				{user.user.id}
-			</div>
-		</div>
+		</>
 	);
 }

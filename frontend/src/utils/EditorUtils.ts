@@ -111,7 +111,7 @@ export function toggleBlockType(editor: CustomEditorType, blockType: string) {
 	// }
 
 	////
-	let format = changeTo;
+	const format = changeTo;
 	const isActive = isBlockActive(
 		editor,
 		format,

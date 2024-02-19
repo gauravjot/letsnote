@@ -20,6 +20,12 @@
 		font-size: revert;
 		font-weight: revert;
 	}
+
+	html,
+	body,
+	div {
+		@apply scroll-smooth;
+	}
 }
 
 @layer components {
