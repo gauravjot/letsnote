@@ -20,6 +20,8 @@ from notes.utils import encrypt_note, decrypt_note, InvalidKeyException
 @api_view(['POST'])
 def createNote(request):
     user = getUserID(request)
+    if type(user) is Response:
+        return user
 
     try:
         # -- user data & hash password
@@ -44,6 +46,8 @@ def createNote(request):
 @api_view(['GET'])
 def myNotes(request):
     user = getUserID(request)
+    if type(user) is Response:
+        return user
 
     try:
         notes = NoteListSerializer(Note.objects.filter(
@@ -69,6 +73,8 @@ def noteOps(request, noteid):
 # Read
 def readNote(request, noteid):
     user = getUserID(request)
+    if type(user) is Response:
+        return user
 
     try:
         note = Note.objects.get(id=noteid, user=user)
@@ -89,6 +95,8 @@ def readNote(request, noteid):
 # Delete
 def deleteNote(request, noteid):
     user = getUserID(request)
+    if type(user) is Response:
+        return user
 
     try:
         Note.objects.get(id=noteid, user=user).delete()
@@ -100,6 +108,8 @@ def deleteNote(request, noteid):
 # Update
 def updateNote(request, noteid):
     user = getUserID(request)
+    if type(user) is Response:
+        return user
     try:
         note = Note.objects.get(id=noteid, user=user)
         note.title = request.data['title']
@@ -120,6 +130,8 @@ def updateNote(request, noteid):
 @api_view(['PUT'])
 def editNoteTitle(request, noteid):
     user = getUserID(request)
+    if type(user) is Response:
+        return user
     try:
         note = Note.objects.get(id=noteid, user=user)
         note.title = request.data['title']
@@ -136,6 +148,8 @@ def editNoteTitle(request, noteid):
 @api_view(['POST'])
 def createNoteShareExternal(request, noteid):
     user = getUserID(request)
+    if type(user) is Response:
+        return user
 
     # Check if the user requesting is the owner
     # try:
@@ -206,6 +220,8 @@ def readNoteShareExternal(request, nui, permkey):
 @api_view(['GET'])
 def readAllLinksNoteShareExt(request, noteid):
     user = getUserID(request)
+    if type(user) is Response:
+        return user
     links = ShareExternalSerializer(ShareExternal.objects.filter(note=noteid, user=user).values(
         'id', 'anonymous', 'created', 'title', 'active').order_by('-created'), many=True).data
     return Response(data=successResponse(links), status=status.HTTP_200_OK)

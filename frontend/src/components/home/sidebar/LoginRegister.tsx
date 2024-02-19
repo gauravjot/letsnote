@@ -242,7 +242,7 @@ function RegisterComponent({
 
 function UserCard({user}: {user: UserReduxType}) {
 	const userContext = useContext(UserContext);
-	const [showSettings, setShowSettings] = React.useState(true);
+	const [showSettings, setShowSettings] = React.useState(false);
 
 	const logOut = async () => {
 		if (await userLogout(user.token)) {
@@ -259,23 +259,8 @@ function UserCard({user}: {user: UserReduxType}) {
 
 			{/** Main content */}
 			<div className="my-3 pb-4 pt-3 px-4 border-b border-gray-300 shadow-smb">
-				<div className="text-xl font-bold user-select-none text-gray-900 mb-2">
-					<div className="flex">
-						<div className="flex-grow">
-							<span className="align-middle">Welcome</span>
-						</div>
-						<div className="flex-grow-0 h-max">
-							<button
-								onClick={logOut}
-								className="infotrig ab-btn ab-btn-secondary ab-btn-sm bg-black bg-opacity-30 font-normal text-sm whitespace-nowrap"
-							>
-								<span className="ic ic-white ic-logout align-middle"></span>
-								<div className="infomsg mt-3 bottom-9 right-0 whitespace-nowrap">Logout</div>
-							</button>
-						</div>
-					</div>
-				</div>
-				<div className="relative group">
+				<div className="text-xl font-bold user-select-none text-gray-900 mb-2.5">Welcome</div>
+				<div className="relative">
 					<div className="flex place-items-center">
 						<span className="ic ic-person ic-black align-middle mr-2"></span>
 						<div className="infotrig align-middle text-gray-800 text-[0.92rem] leading-5 font-medium">
@@ -286,18 +271,21 @@ function UserCard({user}: {user: UserReduxType}) {
 					<div className="ml-6 text-[0.75rem] whitespace-nowrap overflow-hidden text-gray-500">
 						{user.user.id}
 					</div>
-					<div className="hidden group-hover:flex pl-8 justify-center place-items-center bg-gradient-to-r from-transparent via-white to-white absolute top-0 right-0">
-						<Button
-							elementChildren="Close"
-							elementState="default"
-							elementStyle="white_no_border"
-							elementSize="xsmall"
-							elementType="button"
-							elementIcon="ic-settings"
-							elementIconSize="base"
-							elementIconOnly={true}
+					<div className="flex gap-2 pl-24 py-1.5 justify-center place-items-center bg-gradient-to-r from-transparent via-white to-white absolute top-0 right-0">
+						<button
 							onClick={() => setShowSettings(!showSettings)}
-						/>
+							className="infotrig aspect-square h-8 w-8 group border hover:border-transparent hover:bg-gray-900 rounded-md shadow bg-white whitespace-nowrap"
+						>
+							<span className="ic -mt-0.5 group-hover:invert group-hover:opacity-100 ic-black opacity-70 ic-settings align-middle"></span>
+							<div className="infomsg mt-3 bottom-9 right-0 whitespace-nowrap">Settings</div>
+						</button>
+						<button
+							onClick={logOut}
+							className="infotrig aspect-square h-8 w-8 group hover:bg-gray-900 rounded-md shadow bg-gray-600 whitespace-nowrap"
+						>
+							<span className="ic -mt-0.5 ic-white ic-logout align-middle"></span>
+							<div className="infomsg mt-3 bottom-9 right-0 whitespace-nowrap">Logout</div>
+						</button>
 					</div>
 				</div>
 			</div>
