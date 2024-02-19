@@ -18,6 +18,7 @@ export interface UserRegisterResponse {
 			verified: boolean;
 		};
 		token: string;
+		session: number;
 	};
 }
 

@@ -58,7 +58,7 @@ def issueToken(uid, request):
     ))
     if sessionSerializer.is_valid():
         sessionSerializer.save()
-        return newToken
+        return newToken, sessionSerializer.data.get('id')
 
 # Invalidate a token
 

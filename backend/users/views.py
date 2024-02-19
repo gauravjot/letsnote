@@ -51,8 +51,8 @@ def register(request):
             emailSent = sendEmailVerification(
                 userSerializer.data['id'], userSerializer.data['email'], verifyToken)
         # send token to user
-        token = issueToken(userSerializer.data['id'], request)
-        return Response(data=successResponse({"verifyEmailSent": emailSent, "user": userSerializer.data, **tokenResponse(token)}), status=status.HTTP_201_CREATED)
+        token, session_id = issueToken(userSerializer.data['id'], request)
+        return Response(data=successResponse({"verifyEmailSent": emailSent, "user": userSerializer.data, **tokenResponse(token), **dict(session=session_id)}), status=status.HTTP_201_CREATED)
     else:
         res_string = ""
         for key in userSerializer.errors:
@@ -82,8 +82,8 @@ def login(request):
     except User.DoesNotExist:
         return Response(data=errorResponse("Credentials are invalid.", "A0004"), status=status.HTTP_401_UNAUTHORIZED)
     # send token to user
-    token = issueToken(user.id, request)
-    return Response(data=successResponse({"user": UserSerializer(user).data, **tokenResponse(token)}), status=status.HTTP_202_ACCEPTED)
+    token, session_id = issueToken(user.id, request)
+    return Response(data=successResponse({"user": UserSerializer(user).data, **tokenResponse(token), **dict(session=session_id)}), status=status.HTTP_202_ACCEPTED)
 
 
 # Log Out function, requires token
@@ -120,6 +120,8 @@ def verifyEmail(request, emailtoken):
 @api_view(['PUT'])
 def changePassword(request):
     user = getUserID(request)
+    if type(user) is Response:
+        return user
     if not request.data['old_password'] or not request.data['new_password']:
         return Response(data=errorResponse("Old password and new password are required.", "A0010"), status=status.HTTP_400_BAD_REQUEST)
     if bcrypt.checkpw(request.data['old_password'].encode('utf-8'), user.password.encode('utf-8')):
@@ -134,6 +136,8 @@ def changePassword(request):
 @api_view(['PUT'])
 def changeName(request):
     user = getUserID(request)
+    if type(user) is Response:
+        return user
     if not request.data['name']:
         return Response(data=errorResponse("Name is required.", "A0012"), status=status.HTTP_400_BAD_REQUEST)
     user.name = request.data['name']
@@ -146,6 +150,8 @@ def changeName(request):
 @api_view(['PUT'])
 def changeEmail(request):
     user = getUserID(request)
+    if type(user) is Response:
+        return user
     if not request.data['email']:
         return Response(data=errorResponse("Email is required.", "A0013"), status=status.HTTP_400_BAD_REQUEST)
     user.email = request.data['email']
@@ -158,6 +164,8 @@ def changeEmail(request):
 @api_view(['GET'])
 def getUserSessions(request):
     user = getUserID(request)
+    if type(user) is Response:
+        return user
     sessionSerializer = SessionSerializer(
         Session.objects.filter(user=user, valid=True), many=True)
     return Response(data=successResponse(sessionSerializer.data), status=status.HTTP_200_OK)
@@ -168,6 +176,8 @@ def getUserSessions(request):
 @api_view(['PUT'])
 def deleteUser(request):
     user = getUserID(request)
+    if type(user) is Response:
+        return user
     if request.data['password'] and bcrypt.checkpw(request.data['password'].encode('utf-8'), user.password.encode('utf-8')):
         user.delete()
         return Response(data=successResponse(), status=status.HTTP_200_OK)
@@ -179,6 +189,8 @@ def deleteUser(request):
 @api_view(['PUT'])
 def closeSession(request):
     user = getUserID(request)
+    if type(user) is Response:
+        return user
     try:
         session = Session.objects.get(
             user=user,

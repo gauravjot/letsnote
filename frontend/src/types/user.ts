@@ -5,12 +5,9 @@ export interface UserType {
 	verified: boolean;
 }
 
-export interface UserToken {
+export interface UserSession {
 	token: string;
-}
-
-export interface ApiUserType extends UserToken {
-	user: UserType;
+	session: number;
 }
 
 export interface UserSessionType {
