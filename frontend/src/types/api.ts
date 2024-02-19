@@ -14,18 +14,3 @@ export interface ShareNote {
 	anonymous: boolean;
 	active: boolean;
 }
-
-export interface UserType {
-	id: string;
-	name: string;
-	email: string;
-	verified: boolean;
-}
-
-export interface UserToken {
-	token: string;
-}
-
-export interface ApiUserType extends UserToken {
-	user: UserType;
-}
