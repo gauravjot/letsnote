@@ -33,7 +33,10 @@ export default function LoginRegister({showLinkToHome = false}: {showLinkToHome?
 
 			{showLinkToHome && (
 				<div className="m-4">
-					<Link to={"/"} className="text-sm hover:underline hover:underline-offset-4">
+					<Link
+						to={"/"}
+						className="text-sm hover:underline hover:underline-offset-4 whitespace-nowrap overflow-hidden"
+					>
 						&#8592; Go back to Letsnote
 					</Link>
 				</div>

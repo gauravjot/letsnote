@@ -1,7 +1,13 @@
-export default function ErrorPage({error}: {error: any}) {
+export default function ErrorPage({
+	error,
+	title = "Err, note is not found.",
+}: {
+	error: any;
+	title?: string;
+}) {
 	return (
 		<div className="p-8">
-			<div className="text-xl font-serif">Err, note is not found.</div>
+			<div className="text-xl font-serif">{title}</div>
 			<p className="text-sm mt-4 font-mono">
 				Response Code: {error.code}
 				<br />

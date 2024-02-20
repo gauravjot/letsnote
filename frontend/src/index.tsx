@@ -3,8 +3,9 @@ import App from "./App";
 // CSS
 import "@/assets/css/global.css";
 import "@/assets/css/icons.css";
+import "@/assets/css/inputs.css";
 import React from "react";
-import { QueryClient, QueryClientProvider } from "react-query";
+import {QueryClient, QueryClientProvider} from "react-query";
 
 const queryClient = new QueryClient();
 

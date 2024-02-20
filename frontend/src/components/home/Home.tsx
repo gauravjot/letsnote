@@ -223,7 +223,7 @@ export default function Home() {
 								</div>
 								{/* hambuger menu for mobile */}
 								<div className="fixed top-0 right-0 lg:hidden z-[50]">
-									{isSidebarOpen && <div className="z-[40] fixed bg-black/10 inset-0"></div>}
+									{isSidebarOpen && <div className="z-[40] fixed bg-black/20 inset-0"></div>}
 									<button
 										className="mobile-sidebar-toggle relative z-[50]"
 										aria-expanded={isSidebarOpen ? "true" : "false"}

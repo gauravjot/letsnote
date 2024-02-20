@@ -213,7 +213,7 @@ code {
 	transition-property: width, opacity;
 	transition: 0.5s ease-out;
 	@apply fixed left-0 top-0 bottom-0 right-10 z-[55];
-	@apply lg:relative w-[90%] max-w-[28rem];
+	@apply lg:relative w-[80%] max-w-[28rem];
 	@apply lg:w-[18rem] xl:w-[21rem] 2xl:w-[23rem];
 }
 .sidebar-hide-able[aria-hidden="false"] {
@@ -368,13 +368,13 @@ code {
 	@apply fixed right-0 z-10 bg-white shadow-md h-full w-full;
 	@apply transition-all duration-500;
 	@apply max-w-[34rem] w-[80%];
-	@apply 2xl:w-[34rem] lg:w-[28rem];
+	@apply 2xl:w-[34rem] xl:w-[32rem] lg:w-[28rem];
 }
 .share-sidebar[aria-expanded="true"] > .share-sidebar-content {
 	@apply right-0;
 }
 .share-sidebar[aria-expanded="false"] > .share-sidebar-content {
-	@apply -right-[80%] 2xl:-right-[34rem] lg:-right-[28rem] transition-all duration-500;
+	@apply -right-[80%] 2xl:-right-[34rem] xl:-right-[32rem] lg:-right-[28rem] transition-all duration-500;
 }
 
 /*

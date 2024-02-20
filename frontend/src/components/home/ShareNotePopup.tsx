@@ -1,18 +1,18 @@
-import React, {useContext} from "react";
-import axios from "axios";
-import {BACKEND_SERVER_DOMAIN, DEPLOY_DOMAIN} from "@/config";
-import {timeSince, dateTimePretty} from "@/utils/TimeSince";
+import {useCallback, useContext, useEffect, useState} from "react";
+import {AxiosError} from "axios";
+import {DEPLOY_DOMAIN} from "@/config";
+import {timeSince} from "@/utils/TimeSince";
 import {ShareNote} from "@/types/api";
 import {NoteListItemType} from "@/types/note";
 import {UserContext} from "@/App";
-
-interface Link {
-	title: string;
-	urlkey: string;
-	expire: string;
-	anon: boolean;
-	active: boolean;
-}
+import InputField from "../ui/input/Input";
+import {useForm} from "react-hook-form";
+import Button from "../ui/button/Button";
+import {useMutation, useQuery} from "react-query";
+import {ShareNoteQueryType, shareNoteQuery} from "@/services/note/create_share_link";
+import {handleAxiosError} from "@/utils/HandleAxiosError";
+import {getNoteShares} from "@/services/note/get_note_shares";
+import {DisableShareLinkType, disableShareLinkQuery} from "@/services/note/disable_share_link";
 
 interface Props {
 	note: NoteListItemType;
@@ -21,243 +21,273 @@ interface Props {
 }
 
 export default function ShareNotePopup({closePopup, note, open}: Props) {
-	const user = useContext(UserContext).user;
-	const [link, setLink] = React.useState<Link | null>(null);
-	const [shareLinkList, setShareLinkList] = React.useState<ShareNote[]>([]);
-	const [title, setTitle] = React.useState("");
-	const [anon, setAnon] = React.useState(true);
-	const [isCallingAPI, setIsCallingAPI] = React.useState(false);
-	const [isCallingGetLinksAPI, setIsCallingGetLinksAPI] = React.useState(false);
+	const userContext = useContext(UserContext);
+	const shareLinkForm = useForm();
+	const [shareNoteQueryError, setShareNoteQueryError] = useState<string | null>(null);
+	const [passProtect, setPassProtect] = useState(false);
 
-	React.useEffect(() => {
-		let ignore = false;
-		if (user) {
-			setLink(null);
-			setIsCallingGetLinksAPI(true);
+	const shareListQuery = useQuery(
+		["shareList", note.id],
+		() => getNoteShares(userContext?.user?.token, note.id),
+		{
+			refetchOnWindowFocus: false,
+		}
+	);
 
-			setShareLinkList([]);
-			const config = {
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: user.token,
-				},
-			};
-			axios
-				.get(BACKEND_SERVER_DOMAIN + "/api/note/share/links/" + note.id + "/", config)
-				.then(function (response) {
-					if (!ignore) {
-						setShareLinkList(response.data.data);
-						setIsCallingGetLinksAPI(false);
-					}
-				})
-				.catch(function (error) {
-					if (!ignore) {
-						console.log(error);
-						setIsCallingGetLinksAPI(false);
-					}
-				});
+	const shareNoteMutation = useMutation({
+		mutationFn: (payload: ShareNoteQueryType) => {
+			return userContext && userContext.user?.token
+				? shareNoteQuery(userContext.user?.token, note.id, payload)
+				: Promise.reject("User authentication error. Logout and login again to retry.");
+		},
+		onSuccess: () => {
+			setShareNoteQueryError(null);
+			shareListQuery.refetch();
+		},
+		onError: (error: AxiosError) => {
+			handleAxiosError(error, setShareNoteQueryError);
+		},
+	});
+
+	const closeFn = useCallback(() => {
+		closePopup();
+		setTimeout(() => {
+			shareNoteMutation.reset();
+			setShareNoteQueryError(null);
+			shareLinkForm.reset();
+		}, 1000);
+	}, [closePopup, shareNoteMutation, shareLinkForm]);
+
+	useEffect(() => {
+		window.addEventListener("keydown", handleKeyDown);
+
+		function handleKeyDown(event: KeyboardEvent) {
+			if (event.key === "Escape") {
+				closeFn();
+			}
 		}
 		return () => {
-			ignore = true;
+			window.removeEventListener("keydown", handleKeyDown);
 		};
-	}, [user, note.id]);
-
-	const createLink = () => {
-		if (user) {
-			setIsCallingAPI(true);
-			const config = {
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: user.token,
-				},
-			};
-			axios
-				.post(
-					BACKEND_SERVER_DOMAIN + "/api/note/share/" + note.id + "/",
-					JSON.stringify({title: title, anonymous: anon, active: true}),
-					config
-				)
-				.then(function (response) {
-					setShareLinkList([
-						{
-							title: response.data.data.title,
-							id: response.data.data.id,
-							created: response.data.data.created,
-							anonymous: response.data.data.anonymous,
-							active: response.data.data.active,
-						},
-						...shareLinkList,
-					]);
-					setLink({
-						title: response.data.data.title,
-						urlkey: response.data.data.urlkey,
-						expire: response.data.data.expire,
-						anon: response.data.data.anonymous,
-						active: response.data.data.active,
-					});
-					setIsCallingAPI(false);
-				})
-				.catch(() => {
-					window.onbeforeunload = null;
-					setIsCallingAPI(false);
-				});
-		}
-	};
-
-	React.useEffect(() => {
-		if (open) {
-			setLink(null);
-			setTitle("");
-			setAnon(true);
-		}
-	}, [open]);
+	}, [closeFn]);
 
 	return (
 		<div aria-expanded={open} className="share-sidebar">
-			{open && <div className="bg-black/30 inset-0 fixed z-0" onClick={closePopup}></div>}
+			{open && <div className="bg-black/30 inset-0 fixed z-0" onClick={closeFn}></div>}
 			<div className="share-sidebar-content">
-				<div className="p-4">
-					<button
-						className="ab-btn-secondary mt-4 px-2 text-sm font-medium py-1 rounded shadow"
-						onClick={() => {
-							closePopup();
-						}}
-					>
-						Close
-					</button>
-					<div className="text-gray-600 mt-8 text-sm truncate">{note.title}</div>
-					<div className="mb-1 mt-2 text-2xl font-bold text-gray-900 font-sans align-middle">
-						Share Note
-					</div>
+				<div className="px-4 lg:px-6 h-screen flex flex-col">
 					<div>
+						<div className="absolute top-4 right-4 bg-white z-20">
+							<Button
+								elementChildren="Close"
+								elementState="default"
+								elementStyle="white_no_border"
+								elementSize="xsmall"
+								elementType="button"
+								elementIcon="ic-close"
+								elementIconOnly={true}
+								elementIconSize="md"
+								onClick={closeFn}
+							/>
+						</div>
+						<h2 className="pt-9 lg:pt-7 mb-4">Share note</h2>
+						<p className="mt-6 text-gray-900 font-medium text-md tracking-wide">{note.title}</p>
+						<p className="mt-1 text-gray-500 text-bb tracking-wide">
+							Last updated {timeSince(note.updated)}
+						</p>
 						<div>
-							{link ? (
-								<>
-									<div className="font-sans mt-4 mb-2">
-										Your link is ready.{" "}
-										<button
-											id="copy-button"
-											className="text-sky-600 text-xs ml-2 border border-gray-200 px-2 rounded hover:bg-gray-200"
-											onClick={(self) => {
-												navigator.clipboard.writeText(
-													DEPLOY_DOMAIN +
-														"/note/shared/" +
-														note.id.split("-")[0] +
-														"/" +
-														link.urlkey
-												);
-												self.currentTarget.innerHTML = "Copied!";
-											}}
+							<div>
+								{shareNoteMutation.isSuccess ? (
+									<>
+										<div className="mt-6 text-gray-900 font-medium text-md tracking-wide">
+											Your link is ready
+										</div>
+										<div className="mt-3 py-1 px-2 text-sm text-yellow-800 bg-yellow-100">
+											This is the only time you will see this link. Save it somewhere safe. You can
+											make more in future.
+										</div>
+										<div className="flex gap-2 mt-4">
+											<input
+												type="text"
+												className="w-full border border-gray-400 rounded-md py-1.5 px-2 bg-gray-100 text-bb focus-visible:outline-none"
+												value={DEPLOY_DOMAIN + "/shared/" + shareNoteMutation.data.urlkey}
+												readOnly
+											/>
+											<button
+												id="copy-button"
+												className="text-primary-600 text-sm font-bold uppercase border border-primary-500 px-2 py-0.5 rounded-md shadow-sm hover:bg-primary-50 hover:outline hover:outline-primary-200"
+												onClick={(self) => {
+													navigator.clipboard.writeText(
+														DEPLOY_DOMAIN + "/shared/" + shareNoteMutation.data.urlkey
+													);
+													self.currentTarget.innerHTML = "Copied!";
+												}}
+											>
+												Copy
+											</button>
+										</div>
+										<div className="text-sm mt-3 text-gray-600 flex gap-2">
+											<span className="text-gray-700 font-medium">Anonymous:</span>
+											<span>{shareNoteMutation.data.anonymous ? "Yes" : "No"}</span>
+										</div>
+										<div className="text-sm mt-1.5 text-gray-600 flex gap-2">
+											<span className="text-gray-700 font-medium">Password Protected:</span>
+											<span>{shareNoteMutation.data.isPasswordProtected ? "Yes" : "No"}</span>
+										</div>
+									</>
+								) : (
+									<>
+										<h3 className="text-bb font-medium py-px mt-8 text-gray-800 border-b">
+											Share with
+										</h3>
+										{shareNoteQueryError && (
+											<p className="mx-4 mt-4 text-red-700 text-sm">{shareNoteQueryError}</p>
+										)}
+
+										<form
+											className="mx-2"
+											onSubmit={shareLinkForm.handleSubmit((d) => {
+												shareNoteMutation.mutate({
+													title: d.title,
+													anonymous: d.anon,
+													active: true,
+													password: d.password ? d.password : null,
+												});
+											})}
 										>
-											Copy
-										</button>
-									</div>
-									<div className="mt-2 mb-2 text-sm text-yellow-700">
-										This is the only time you will see this link. Save it somewhere safe. You can
-										make more in future.
-									</div>
-									<input
-										type="text"
-										className="w-full border border-gray-300 rounded py-1 px-2 bg-sky-100 text-sm"
-										value={
-											DEPLOY_DOMAIN + "/note/shared/" + note.id.split("-")[0] + "/" + link.urlkey
-										}
-										readOnly
-									/>
-									<div className="text-sm my-1 mt-2">Anonymous: {link.anon ? "Yes" : "No"}</div>
-								</>
-							) : (
-								<div>
-									<label className="user-select-none text-gray-600 pl-0.5 text-sm" htmlFor="title">
-										Group name
-									</label>
-									<input
-										type="text"
-										id="title"
-										value={title}
-										onChange={(e) => {
-											setTitle(e.target.value);
-										}}
-										placeholder="friends, work, ..."
-										className="mb-2 mt-1 rounded bg-gray-200 font-medium w-full px-3 py-1.5 text-sm text-gray-700 focus-visible:outline-gray-400"
-										disabled={isCallingAPI}
-									/>
-									<label
-										className="user-select-none text-sm text-gray-700 pl-0.5 pr-2"
-										htmlFor="anon"
-									>
-										Share as anonymous
-									</label>
-									<input
-										id="anon"
-										type="checkbox"
-										onChange={(e) => {
-											setAnon(e.target.checked);
-										}}
-										checked={anon}
-									/>
-									<button
-										className="block mt-3 ab-btn ab-btn-sm"
-										onClick={() => createLink()}
-										disabled={isCallingAPI}
-									>
-										Get Share Link
-									</button>
-								</div>
-							)}
+											<fieldset disabled={shareNoteMutation.isLoading}>
+												<InputField
+													elementId="title"
+													elementInputType="text"
+													elementLabel=""
+													elementIsRequired={false}
+													placeholder="friends, work, ..."
+													elementWidth="full"
+													elementHookFormRegister={shareLinkForm.register}
+												/>
+												<div className="mt-4 flex place-items-center">
+													<label
+														className="user-select-none cursor-pointer text-sm text-gray-700 pl-0.5 pr-2"
+														htmlFor="pass_protect"
+													>
+														Password protect the link
+													</label>
+													<input
+														className="cursor-pointer"
+														id="pass_protect"
+														type="checkbox"
+														checked={passProtect}
+														onChange={(e) => setPassProtect(e.target.checked)}
+													/>
+												</div>
+												{passProtect && (
+													<InputField
+														elementId="password"
+														elementInputType="password"
+														elementLabel=""
+														elementIsRequired={false}
+														elementHookFormRegister={shareLinkForm.register}
+													/>
+												)}
+												<div className="mt-4 mb-4 flex place-items-center">
+													<label
+														className="user-select-none cursor-pointer text-sm text-gray-700 pl-0.5 pr-2"
+														htmlFor="anon"
+													>
+														Share as anonymous
+													</label>
+													<input
+														className="cursor-pointer"
+														id="anon"
+														type="checkbox"
+														{...shareLinkForm.register("anon")}
+													/>
+												</div>
+												<div className="mt-4">
+													<Button
+														elementChildren="Get Share Link"
+														elementState={shareNoteMutation.isLoading ? "loading" : "default"}
+														elementStyle="primary"
+														elementType="submit"
+													/>
+												</div>
+											</fieldset>
+										</form>
+									</>
+								)}
+							</div>
 						</div>
 					</div>
-					{isCallingGetLinksAPI ? (
-						<div className="w-full my-2 mt-16 text-center">
-							<div className="anim-ripple">
-								<div></div>
-								<div></div>
+					<div className="flex-1 flex flex-col h-full overflow-auto">
+						{shareListQuery.isSuccess ? (
+							<>
+								<h2 className="pt-7 pb-2">Past Shares</h2>
+								<div className="flex-1 overflow-y-auto	h-full">
+									{shareListQuery.data.map((link) => {
+										return <ShareLinkItem link={link} />;
+									})}
+								</div>
+							</>
+						) : shareListQuery.isLoading ? (
+							<div className="w-full my-2 mt-16 text-center">
+								<div className="anim-ripple">
+									<div></div>
+									<div></div>
+								</div>
 							</div>
-						</div>
-					) : (
-						<></>
-					)}
-					{shareLinkList.length > 0 ? (
-						<div className="max-h-96">
-							<div className="font-bold mt-8 text-2xl pl-1 mb-2 text-gray-900 font-sans whitespace-nowrap overflow-hidden">
-								Past Shares
-							</div>
-							<div className="overflow-y-auto max-h-80">
-								{shareLinkList.map((link) => {
-									return (
-										<div
-											className="ab-link-share-row flex relative py-1 pb-1.5 hover:bg-gray-200 border-b border-gray-200 whitespace-nowrap overflow-hidden"
-											key={link.id}
-										>
-											<div className="text-xs text-gray-500 pt-1 pl-2 mr-2 w-24">
-												{timeSince(link.created)}
-											</div>
-											<div className="flex-grow px-1 text-sm pt-0.5">
-												{link.title ? (
-													link.title
-												) : (
-													<span className="text-gray-500 text-xs">
-														{dateTimePretty(link.created)}
-													</span>
-												)}
-											</div>
-											<div className="px-1 text-xs text-gray-500 mr-4 pt-0.5">
-												{link.anonymous === true ? "Anonymous" : ""}
-											</div>
-											<div className="ab-link-share-delete px-2 lg:absolute mr-3 right-0 top-0 bottom-0 bg-gradient-to-r from-transparent lg:to-gray-200 lg:pl-64 lg:hidden">
-												<button className="bg-red-600 hover:bg-red-900 text-white px-2 py-1 rounded font-medium text-xs align-sub">
-													Delete
-												</button>
-											</div>
-										</div>
-									);
-								})}
-							</div>
-						</div>
-					) : (
-						<></>
-					)}
+						) : shareListQuery.isError ? (
+							<p className="mx-4 mt-4 text-red-700 text-sm">
+								Some error prevented fetching past shares
+							</p>
+						) : (
+							<></>
+						)}
+					</div>
 				</div>
+			</div>
+		</div>
+	);
+}
+
+function ShareLinkItem({link}: {link: ShareNote}) {
+	const userContext = useContext(UserContext);
+
+	const disableShareLinkMutation = useMutation({
+		mutationFn: (payload: DisableShareLinkType) => {
+			return userContext && userContext.user
+				? disableShareLinkQuery(userContext.user.token, payload)
+				: Promise.reject("User authentication error. Logout and login again to retry.");
+		},
+	});
+
+	return (
+		<div
+			className="last:mb-4 grid grid-cols-5 items-center py-0.5 pl-2 gap-3 border-b border-gray-100 whitespace-nowrap overflow-hidden"
+			key={link.id}
+		>
+			<div className="col-span-1 text-xs text-gray-500">{timeSince(link.created)}</div>
+			<div className="col-span-2 text-sm flex gap-1 place-items-center">
+				{link.isPasswordProtected ? (
+					<span className="ic ic-green ic-sm ic-lock" title="Password Protected"></span>
+				) : (
+					<></>
+				)}
+				{link.title ? link.title : <span className="text-gray-500 text-xs">no title</span>}
+			</div>
+			<div className="col-span-1 text-xs text-gray-500">{link.anonymous ? "Anonymous" : ""}</div>
+			<div className="col-span-1 text-right">
+				<Button
+					elementChildren={
+						disableShareLinkMutation.isSuccess || !link.active ? "Disabled" : "Disable"
+					}
+					elementState={disableShareLinkMutation.isLoading ? "loading" : "default"}
+					elementDisabled={disableShareLinkMutation.isSuccess || !link.active}
+					elementStyle={disableShareLinkMutation.isSuccess || !link.active ? "black" : "danger"}
+					elementInvert={true}
+					elementType="button"
+					elementSize="xsmall"
+					onClick={() => disableShareLinkMutation.mutate({id: link.id})}
+				/>
 			</div>
 		</div>
 	);
