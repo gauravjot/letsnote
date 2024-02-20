@@ -115,8 +115,8 @@ export function UserSettings({closeFn}: {closeFn: () => void}) {
 
 	return (
 		<div className="fixed inset-0 flex place-items-center justify-center z-[60]">
-			<div className="bg-black/30 absolute inset-0 z-10"></div>
-			<div className="bg-white overflow-hidden rounded-lg shadow relative z-20 w-[90vw] md:w-[70vw] max-w-[60rem]">
+			<div className="bg-black/30 absolute inset-0 z-10 backdrop-blur-[2px]"></div>
+			<div className="bg-white overflow-hidden rounded-lg shadow relative z-20 w-[95vw] md:w-[70vw] max-w-[60rem]">
 				<div className="absolute top-4 right-4 bg-white z-20">
 					<Button
 						elementChildren="Close"
@@ -155,7 +155,7 @@ export function UserSettings({closeFn}: {closeFn: () => void}) {
 						</ul>
 					</div>
 					{/** main content */}
-					<div className="col-span-3 h-[80vh] max-h-[45rem] overflow-auto px-4 relative">
+					<div className="col-span-3 h-[95vh] md:h-[80vh] md:max-h-[45rem] overflow-auto px-4 relative">
 						<h2 id="account-settings" className="pt-7 pb-2">
 							Account
 						</h2>
@@ -287,7 +287,7 @@ export function UserSettings({closeFn}: {closeFn: () => void}) {
 												elementStyle="white_no_border"
 												elementType="button"
 												elementSize="small"
-												onClick={() => setShowEmailChange(true)}
+												onClick={() => setShowEmailChange(false)}
 											/>
 										</div>
 									</fieldset>
@@ -320,6 +320,13 @@ export function UserSettings({closeFn}: {closeFn: () => void}) {
 									</div>
 								</>
 							)}
+						</div>
+
+						<div className="my-8 pr-4">
+							<h3 className="text-bb font-medium py-px text-gray-800 border-b">Other details</h3>
+							<p className="mt-3 mx-4 text-gray-900 tracking-wide text-bb">
+								User ID: {userContext.user?.user.id}
+							</p>
 						</div>
 
 						<h2 id="security-settings" className="pt-7 pb-2">

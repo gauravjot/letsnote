@@ -1,5 +1,5 @@
 import Editor from "./editor/Editor";
-import {useState, useCallback, useEffect, useRef, useContext} from "react";
+import {useState, useCallback, useEffect, useContext} from "react";
 import ShareNotePopup from "./ShareNotePopup";
 import axios from "axios";
 import {BACKEND_SERVER_DOMAIN} from "@/config";
@@ -21,7 +21,6 @@ import {UserContext} from "@/App";
 
 export default function Home() {
 	const {noteid} = useParams(); /* from url: '/note/{noteid}' */
-	const sidebarRef = useRef<HTMLDivElement>(null);
 	const navigate = useNavigate();
 	const user = useContext(UserContext).user;
 	const [status, setStatus] = useState<SavingState | null>(null);
@@ -30,6 +29,7 @@ export default function Home() {
 	const [isNoteLoading, setIsNoteLoading] = useState(false);
 	const [sharePopupNote, setSharePopupNote] = useState(false);
 	const [shareNote, setShareNote] = useState<NoteListItemType | null>(null);
+	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 	const queryClient = useQueryClient();
 
 	const updateNoteMutation = useMutation({
@@ -102,7 +102,7 @@ export default function Home() {
 					.then(function (response) {
 						// Close the sidebar on mobile if open
 						if (window.innerWidth < 1024) {
-							sidebarRef.current?.setAttribute("aria-hidden", "true");
+							setIsSidebarOpen(false);
 						}
 						// smooth scroll to top
 						window.scrollTo({top: 0, behavior: "smooth"});
@@ -181,7 +181,7 @@ export default function Home() {
 			</Helmet>
 			<div className="App min-h-screen">
 				<div className="mx-auto lg:flex w-full">
-					<div ref={sidebarRef} id="sidebar" aria-hidden="false" className="sidebar-hide-able">
+					<div id="sidebar" aria-hidden={!isSidebarOpen} className="sidebar-hide-able">
 						<Sidebar
 							component={
 								<HomeSidebar
@@ -195,7 +195,7 @@ export default function Home() {
 							}
 						/>
 					</div>
-					<div className="min-h-screen w-full md:px-4 bg-gray-200 relative">
+					<div className="min-h-screen w-full md:px-4 bg-gray-200 relative z-0">
 						{/*
 						 * Toggle to close the sidebar
 						 */}
@@ -205,13 +205,11 @@ export default function Home() {
 								<div className="hidden lg:block sticky top-2 right-auto z-50 -ml-4 left-0 h-0">
 									<button
 										className="sidebar-expand-btn"
-										aria-expanded={
-											sidebarRef.current?.getAttribute("aria-hidden") === "true" ? "false" : "true"
-										}
+										aria-expanded={isSidebarOpen ? "true" : "false"}
 										aria-controls="sidebar"
 										onClick={(e) => {
-											const isOpen = sidebarRef.current?.getAttribute("aria-hidden") === "false";
-											sidebarRef.current?.setAttribute("aria-hidden", isOpen ? "true" : "false");
+											const isOpen = isSidebarOpen ? false : true;
+											setIsSidebarOpen(isOpen);
 											e.currentTarget.setAttribute("aria-expanded", isOpen ? "false" : "true");
 										}}
 										title="Toggle Sidebar"
@@ -220,16 +218,15 @@ export default function Home() {
 									</button>
 								</div>
 								{/* hambuger menu for mobile */}
-								<div className="fixed top-0 right-0 lg:hidden z-[55]">
+								<div className="fixed top-0 right-0 lg:hidden z-[50]">
+									{isSidebarOpen && <div className="z-[40] fixed bg-black/10 inset-0"></div>}
 									<button
-										className="mobile-sidebar-toggle"
-										aria-expanded={
-											sidebarRef.current?.getAttribute("aria-hidden") === "true" ? "false" : "true"
-										}
+										className="mobile-sidebar-toggle relative z-[50]"
+										aria-expanded={isSidebarOpen ? "true" : "false"}
 										aria-controls="sidebar"
 										onClick={(e) => {
-											const isOpen = sidebarRef.current?.getAttribute("aria-hidden") === "false";
-											sidebarRef.current?.setAttribute("aria-hidden", isOpen ? "true" : "false");
+											const isOpen = isSidebarOpen ? false : true;
+											setIsSidebarOpen(isOpen);
 											e.currentTarget.setAttribute("aria-expanded", isOpen ? "false" : "true");
 										}}
 										title="Toggle Mobile Sidebar"

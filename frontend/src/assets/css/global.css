@@ -220,10 +220,6 @@ code {
 	@apply opacity-100;
 	@apply lg:min-w-[18rem] xl:min-w-[21rem] 2xl:min-w-[23rem];
 }
-.sidebar-hide-able[aria-hidden="false"]:after {
-	content: "";
-	@apply fixed bg-black/30 inset-0 -z-10 lg:hidden;
-}
 .sidebar-hide-able[aria-hidden="true"] {
 	@apply w-0 opacity-0;
 	@apply lg:min-w-0 xl:min-w-0 2xl:min-w-0;
