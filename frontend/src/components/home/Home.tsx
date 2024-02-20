@@ -29,7 +29,7 @@ export default function Home() {
 	const [isNoteLoading, setIsNoteLoading] = useState(false);
 	const [sharePopupNote, setSharePopupNote] = useState(false);
 	const [shareNote, setShareNote] = useState<NoteListItemType | null>(null);
-	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+	const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 	const queryClient = useQueryClient();
 
 	const updateNoteMutation = useMutation({
@@ -181,7 +181,11 @@ export default function Home() {
 			</Helmet>
 			<div className="App min-h-screen">
 				<div className="mx-auto lg:flex w-full">
-					<div id="sidebar" aria-hidden={!isSidebarOpen} className="sidebar-hide-able">
+					<div
+						id="sidebar"
+						aria-hidden={isSidebarOpen ? "false" : "true"}
+						className="sidebar-hide-able"
+					>
 						<Sidebar
 							component={
 								<HomeSidebar
