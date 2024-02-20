@@ -47,7 +47,7 @@ Account Management
 
 There are several ways you can contribute to this project:
 
-1. Code Contributions: You can help us by writing code, fixing bugs, and implementing new features. Check out the Issues section for tasks that need attention or suggest your improvements.
+1. Code Contributions: You can help us by writing code, fixing bugs, and implementing new features. Check out the Issues section for tasks that need attention or suggest improvements.
 
 2. Bug Reports: If you encounter a bug while using Letsnote, please report it in the Issues section. Be sure to include relevant details that can help us reproduce the issue.
 
