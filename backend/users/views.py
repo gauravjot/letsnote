@@ -30,7 +30,8 @@ def register(request):
         email=str(request.data['email']).lower(),
         password=hashPwd(str(request.data['password'])),
         created=dateStamp,
-        updated=dateStamp
+        updated=dateStamp,
+        password_updated=dateStamp
     ))
 
     # -- check if data is without bad actors
@@ -126,6 +127,7 @@ def changePassword(request):
         return Response(data=errorResponse("Old password and new password are required.", "A0010"), status=status.HTTP_400_BAD_REQUEST)
     if bcrypt.checkpw(request.data['old_password'].encode('utf-8'), user.password.encode('utf-8')):
         user.password = hashPwd(request.data['new_password'])
+        user.password_updated = datetime.now(pytz.utc)
         user.save()
         return Response(data=successResponse(UserSerializer(user).data), status=status.HTTP_200_OK)
     return Response(data=errorResponse("Credentials are incorrect.", "A0011"), status=status.HTTP_400_BAD_REQUEST)
@@ -141,6 +143,7 @@ def changeName(request):
     if not request.data['name']:
         return Response(data=errorResponse("Name is required.", "A0012"), status=status.HTTP_400_BAD_REQUEST)
     user.name = request.data['name']
+    user.updated = datetime.now(pytz.utc)
     user.save()
     return Response(data=successResponse(UserSerializer(user).data), status=status.HTTP_200_OK)
 
@@ -155,6 +158,7 @@ def changeEmail(request):
     if not request.data['email']:
         return Response(data=errorResponse("Email is required.", "A0013"), status=status.HTTP_400_BAD_REQUEST)
     user.email = request.data['email']
+    user.updated = datetime.now(pytz.utc)
     user.save()
     return Response(data=successResponse(UserSerializer(user).data), status=status.HTTP_200_OK)
 
