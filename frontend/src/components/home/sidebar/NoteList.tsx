@@ -1,7 +1,7 @@
 import React, {useContext} from "react";
 import CreateNote from "./CreateNote";
 import NoteItem from "./NoteItem";
-import {monthYear} from "@/utils/TimeSince";
+import {monthYear} from "@/utils/DateTimeUtils";
 import {NoteType} from "@/types/api";
 import {UserContext} from "@/App";
 import Spinner from "@/components/ui/spinner/Spinner";

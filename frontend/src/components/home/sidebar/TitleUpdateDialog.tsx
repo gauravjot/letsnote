@@ -1,6 +1,6 @@
 import Button from "@/components/ui/button/Button";
 import InputField from "@/components/ui/input/Input";
-import {editNoteTitle} from "@/services/note/edit_note_title";
+import {updateNoteTitle} from "@/services/note/update_note_title";
 import {SIDEBAR_NOTES_QUERY} from "@/services/queries";
 import {NoteListItemType} from "@/types/note";
 import {handleAxiosError} from "@/utils/HandleAxiosError";
@@ -8,7 +8,7 @@ import {AxiosError} from "axios";
 import {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 import {useMutation, useQueryClient} from "react-query";
-import {dateTimePretty} from "@/utils/TimeSince";
+import {dateTimePretty} from "@/utils/DateTimeUtils";
 
 export interface IEditNoteNameDialogProps {
 	note: NoteListItemType;
@@ -28,7 +28,7 @@ export default function TitleUpdateDialog(props: IEditNoteNameDialogProps) {
 
 	const mutation = useMutation({
 		mutationFn: (payload: {editnotename: string}) => {
-			return editNoteTitle(props.userToken, props.note.id, {title: payload.editnotename});
+			return updateNoteTitle(props.userToken, props.note.id, {title: payload.editnotename});
 		},
 		onSuccess: () => {
 			setError(null);

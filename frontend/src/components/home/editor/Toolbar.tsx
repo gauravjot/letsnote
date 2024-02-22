@@ -10,7 +10,7 @@ import {
 
 import React, {useCallback, useContext} from "react";
 import {useSlateStatic} from "slate-react";
-import {timeSince} from "@/utils/TimeSince";
+import {timeSince} from "@/utils/DateTimeUtils";
 import Button from "@/components/ui/button/Button";
 import {NoteType} from "@/types/api";
 import TitleUpdateDialog from "@/components/home/sidebar/TitleUpdateDialog";

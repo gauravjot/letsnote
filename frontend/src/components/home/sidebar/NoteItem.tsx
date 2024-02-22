@@ -1,5 +1,5 @@
 import React, {useContext} from "react";
-import {dateTimePretty, timeSince} from "@/utils/TimeSince";
+import {dateTimePretty, timeSince} from "@/utils/DateTimeUtils";
 import axios from "axios";
 import {BACKEND_SERVER_DOMAIN} from "@/config";
 import {NoteType} from "@/types/api";

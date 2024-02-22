@@ -9,12 +9,13 @@ import {ChangeEmailType, changeEmail} from "@/services/user/change_email";
 import {ChangePasswordType, changePassword} from "@/services/user/change_password";
 import {getUserSessions} from "@/services/user/get_session_list";
 import Spinner from "../ui/spinner/Spinner";
-import {timeSince} from "@/utils/TimeSince";
+import {timeSince} from "@/utils/DateTimeUtils";
 import {RemoveSessionType, closeSession} from "@/services/user/remove_session";
 import {useForm} from "react-hook-form";
 import {AxiosError} from "axios";
 import {handleAxiosError} from "@/utils/HandleAxiosError";
 import {UAParser} from "ua-parser-js";
+import {datePretty, dateTimePretty} from "../../utils/DateTimeUtils";
 
 export function UserSettings({closeFn}: {closeFn: () => void}) {
 	const userContext = useContext(UserContext);
@@ -324,9 +325,32 @@ export function UserSettings({closeFn}: {closeFn: () => void}) {
 
 						<div className="my-8 pr-4">
 							<h3 className="text-bb font-medium py-px text-gray-800 border-b">Other details</h3>
-							<p className="mt-3 mx-4 text-gray-900 tracking-wide text-bb">
-								User ID: {userContext.user?.user.id}
-							</p>
+							{userContext.user && (
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+									<div>
+										<h4 className="text-bb font-medium">User ID</h4>
+										<p className="mt-1 text-gray-600 text-bb">{userContext.user.user.id}</p>
+									</div>
+									<div>
+										<h4 className="text-bb font-medium">Joined Letsnote</h4>
+										<p className="mt-1 text-gray-600 text-bb">
+											{datePretty(userContext.user.user.created)}
+										</p>
+									</div>
+									<div>
+										<h4 className="text-bb font-medium">Profile last modified</h4>
+										<p className="mt-1 text-gray-600 text-bb">
+											{dateTimePretty(userContext.user.user.updated)}
+										</p>
+									</div>
+									<div>
+										<h4 className="text-bb font-medium">Password last changed</h4>
+										<p className="mt-1 text-gray-600 text-bb">
+											{timeSince(userContext.user.user.password_updated)}
+										</p>
+									</div>
+								</div>
+							)}
 						</div>
 
 						<h2 id="security-settings" className="pt-7 pb-2">

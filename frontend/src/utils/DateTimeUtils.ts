@@ -49,6 +49,27 @@ export function dateTimePretty(dt: string) {
 	);
 }
 
+export function datePretty(dt: string) {
+	const x = new Date(dt);
+	const dd = x.getDate();
+	const yy = x.getFullYear();
+	const monthNames = [
+		"January",
+		"February",
+		"March",
+		"April",
+		"May",
+		"June",
+		"July",
+		"August",
+		"September",
+		"October",
+		"November",
+		"December",
+	];
+	return monthNames[x.getMonth()] + " " + dd + ", " + yy;
+}
+
 export function monthYear(dt: string) {
 	// 2022-11-02T23:15:14.327407Z
 	const monthNames = [

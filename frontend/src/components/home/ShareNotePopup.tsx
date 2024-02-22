@@ -1,7 +1,7 @@
 import {useCallback, useContext, useEffect, useState} from "react";
 import {AxiosError} from "axios";
 import {DEPLOY_DOMAIN} from "@/config";
-import {timeSince} from "@/utils/TimeSince";
+import {timeSince} from "@/utils/DateTimeUtils";
 import {ShareNote} from "@/types/api";
 import {NoteListItemType} from "@/types/note";
 import {UserContext} from "@/App";

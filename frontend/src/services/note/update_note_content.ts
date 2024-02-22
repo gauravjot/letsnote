@@ -4,7 +4,6 @@ import {SlateDocumentType} from "@/utils/ExampleDocument";
 import axios from "axios";
 
 export interface UpdateNoteContentType {
-	title: string;
 	content: SlateDocumentType;
 }
 

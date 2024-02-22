@@ -14,7 +14,7 @@ import NoteStatus, {SavingState} from "./NoteStatus";
 import {NoteListItemType} from "@/types/note";
 import {useMutation, useQueryClient} from "react-query";
 import {SIDEBAR_NOTES_QUERY} from "@/services/queries";
-import {updateNoteContent} from "@/services/note/update_note_content";
+import {UpdateNoteContentType, updateNoteContent} from "@/services/note/update_note_content";
 import {createNote} from "@/services/note/create_note";
 import {NOTE_STATUS} from "./NoteStatusOptions";
 import {UserContext} from "@/App";
@@ -33,7 +33,7 @@ export default function Home() {
 	const queryClient = useQueryClient();
 
 	const updateNoteMutation = useMutation({
-		mutationFn: (payload: {title: string; content: SlateDocumentType}) => {
+		mutationFn: (payload: UpdateNoteContentType) => {
 			return user && note
 				? updateNoteContent(user.token, note.id, payload)
 				: Promise.reject("Note not found");
@@ -77,7 +77,7 @@ export default function Home() {
 		if (user) {
 			if (note) {
 				// Update note
-				updateNoteMutation.mutate({title, content});
+				updateNoteMutation.mutate({content: content});
 			} else {
 				// Create note
 				createNoteMutation.mutate({title, content});

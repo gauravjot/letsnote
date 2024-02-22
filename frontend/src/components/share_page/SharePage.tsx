@@ -6,7 +6,7 @@ import useEditorConfig from "@/hooks/useEditorConfig";
 // Slate
 import {createEditor} from "slate";
 import {Slate, Editable, withReact} from "slate-react";
-import {dateTimePretty, timeSince} from "@/utils/TimeSince";
+import {dateTimePretty, timeSince} from "@/utils/DateTimeUtils";
 import ErrorPage from "@/utils/ErrorPage";
 import Sidebar from "@/components/Sidebar";
 import LoginRegister from "@/components/home/sidebar/LoginRegister";
