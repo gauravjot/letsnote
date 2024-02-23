@@ -30,7 +30,7 @@ export function getTextBlockStyle(editor: CustomEditorType) {
 	const topLevelBlockNodesInSelection = Editor.nodes(editor, {
 		at: editor.selection,
 		mode: "highest",
-		match: (n) => Editor.isBlock(editor, n),
+		match: (n) => Editor.isBlock(editor, n as BaseElement),
 	} as EditorNodesOptions<Node>);
 
 	let blockType = null;
@@ -57,7 +57,7 @@ export function getTextAlignStyle(editor: CustomEditorType) {
 	const topLevelBlockNodesInSelection = Editor.nodes(editor, {
 		at: editor.selection,
 		mode: "highest",
-		match: (n) => Editor.isBlock(editor, n),
+		match: (n) => Editor.isBlock(editor, n as BaseElement),
 	} as EditorNodesOptions<Node>);
 
 	let blockType = null;
@@ -276,7 +276,7 @@ function createLinkForRange(
 					children: [{text: linkText}],
 				} as CustomBaseElement,
 				range != null ? {at: range} : undefined
-		  )
+			)
 		: Transforms.wrapNodes(
 				editor,
 				{
@@ -285,5 +285,5 @@ function createLinkForRange(
 					children: [{text: linkText}],
 				} as CustomBaseElement,
 				{split: true, at: range || undefined}
-		  );
+			);
 }

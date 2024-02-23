@@ -50,7 +50,7 @@ export default function Editor({
 	}
 
 	return (
-		<Slate editor={editor} value={document} onChange={onChangeLocal}>
+		<Slate editor={editor} initialValue={document} onChange={onChangeLocal}>
 			<EditorToolbar note={note} />
 			{document === ExampleDocument ? (
 				<div className="z-10 top-1/2 mx-auto left-0 right-0 text-center font-thin text-2xl text-gray-300 user-select-none absolute">

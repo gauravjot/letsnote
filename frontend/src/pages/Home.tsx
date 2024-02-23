@@ -202,7 +202,7 @@ export default function Home() {
 							}
 						/>
 					</div>
-					<div className="min-h-screen w-full md:px-4 bg-gray-200 relative z-0">
+					<div className="min-h-screen h-full w-full md:px-4 bg-gray-200 relative z-0">
 						{/*
 						 * Toggle to close the sidebar
 						 */}
@@ -251,10 +251,10 @@ export default function Home() {
 						{/*
 						 * Editor area
 						 */}
-						<div className={(isNoteLoading ? "blur-sm " : "") + "z-40 h-full"}>
+						<div className={(isNoteLoading ? "blur-sm " : "") + "min-h-screen h-full"}>
 							<Suspense
 								fallback={
-									<div className="flex place-items-center flex-row gap-4 justify-center h-full">
+									<div className="flex place-items-center flex-row gap-4 justify-center min-h-screen h-full">
 										<Spinner color="black" size="md" />
 										<p className="inline-block bg-black/5 border border-gray-300 px-2 py-0.5 rounded-md text-bb">
 											Loading editor...

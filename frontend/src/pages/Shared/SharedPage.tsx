@@ -190,7 +190,7 @@ export default function SharedPage() {
 						</div>
 						<div className="z-40">
 							{noteMutation.isSuccess && document ? (
-								<Slate editor={editor} value={document}>
+								<Slate editor={editor} initialValue={document}>
 									<div className="editor-container">
 										<div className="editor">
 											<div role="textbox">
