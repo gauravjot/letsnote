@@ -18,12 +18,9 @@ export default function CheckBox({
 }: ICheckBoxProps) {
 	return (
 		<div className="my-4 flex place-items-center">
-			<label
-				className="select-none cursor-pointer text-sm text-gray-700 pl-0.5 pr-2"
-				htmlFor="consent"
-			>
+			<label className="select-none cursor-pointer text-sm text-gray-700 pl-0.5 pr-2" htmlFor={id}>
 				{errors && errors["consent"] && (
-					<span className="text-red-600">
+					<span className="text-red-700">
 						{errors["consent"].message?.toString()}
 						{": "}
 					</span>
@@ -32,9 +29,9 @@ export default function CheckBox({
 			</label>
 			<input
 				className="cursor-pointer"
-				id="consent"
+				id={id}
 				type="checkbox"
-				{...(register && register("consent", {required: "Please confirm"}))}
+				{...(register && register(id, isRequired ? {required: "Please confirm"} : {}))}
 				{...rest}
 			/>
 		</div>
