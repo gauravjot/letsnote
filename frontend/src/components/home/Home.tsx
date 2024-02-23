@@ -18,6 +18,7 @@ import {UpdateNoteContentType, updateNoteContent} from "@/services/note/update_n
 import {createNote} from "@/services/note/create_note";
 import {NOTE_STATUS} from "./NoteStatusOptions";
 import {UserContext} from "@/App";
+import Spinner from "../ui/spinner/Spinner";
 
 export default function Home() {
 	const {noteid} = useParams(); /* from url: '/note/{noteid}' */
@@ -258,11 +259,8 @@ export default function Home() {
 							<NoteStatus status={status} isLoggedIn={user ? true : false} />
 						</div>
 						{isNoteLoading && (
-							<div className="absolute z-30 top-0 left-0 h-full w-full text-center">
-								<div className="lds-ripple">
-									<div></div>
-									<div></div>
-								</div>
+							<div className="absolute z-30 inset-0 flex justify-center place-items-center">
+								<Spinner color="black" size="xl" />
 							</div>
 						)}
 					</div>

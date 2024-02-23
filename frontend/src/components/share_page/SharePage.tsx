@@ -137,7 +137,7 @@ export default function Shared() {
 						/>
 					</div>
 
-					<div className="min-h-screen w-full lg:flex-1 md:px-4 relative z-0">
+					<div className="min-h-screen bg-gray-200 w-full lg:flex-1 md:px-4 relative z-0">
 						{/*
 						 * Toggle to close the sidebar
 						 */}

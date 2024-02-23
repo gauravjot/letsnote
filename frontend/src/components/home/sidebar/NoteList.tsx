@@ -56,7 +56,7 @@ export default function NoteList({openNote, shareNote, currentNote}: Props) {
 						aria-selected={showCreateBox}
 						className="infotrig sidebar-make-note-popup cursor-pointer"
 					>
-						<span className="ic-close inline-block align-baseline h-4 w-4 p-1 invert"></span>
+						<span className="ic ic-close inline-block align-baseline h-4 w-4 p-1 invert"></span>
 						<div className="infomsg bottom-1.5 right-10 whitespace-nowrap">
 							{showCreateBox ? "Close" : "Make new note"}
 						</div>

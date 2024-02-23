@@ -7,9 +7,8 @@
 }
 
 .editor {
-	position: relative;
 	font-family: "Roboto";
-	@apply mt-8;
+	@apply mt-8 relative;
 }
 
 .editor > div[role="textbox"] {
@@ -21,9 +20,8 @@
 }
 
 .editor code {
-	font-size: 0.94rem;
 	font-family: "Source Code Pro", "Consolas", monospace;
-	@apply bg-gray-300/80 text-gray-700 tracking-tight rounded px-1 mx-px py-px font-bold;
+	@apply bg-gray-300/80 text-bb text-gray-700 tracking-tight rounded px-1 mx-px py-px font-bold;
 }
 
 /*
@@ -103,12 +101,11 @@
 
 .editor-p,
 li {
-	line-height: 1.6rem;
-	font-size: 1rem;
+	@apply text-base leading-7;
 }
 
 .editor-p > span {
-	display: inline;
+	@apply inline;
 }
 
 .editor-p + .editor-p {
@@ -133,7 +130,7 @@ li {
 }
 
 .editor-codeblock + .editor-p {
-	margin-top: 1.125rem;
+	@apply mt-4;
 }
 
 .editor-quote + .editor-codeblock,
@@ -194,10 +191,10 @@ li {
 .editor-h1 + .editor-ol,
 .editor-h2 + .editor-ol,
 .editor-h3 + .editor-ol {
-	@apply mt-3;
+	@apply !mt-4;
 }
 
 .editor-h4 + .editor-ul,
 .editor-h4 + .editor-ol {
-	@apply mt-2.5;
+	@apply !mt-3.5;
 }

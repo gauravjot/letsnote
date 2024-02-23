@@ -178,9 +178,7 @@ function ToolBarButton(props: any) {
 		>
 			<span
 				className={
-					(isActive ? "ic-black " : "ic-gray-50 ") +
-					"ic ic-md align-middle " +
-					getIconForButton(label)
+					(isActive ? "ic-black " : "ic-gray-50 ") + "ic-md align-middle " + getIconForButton(label)
 				}
 			></span>
 			<div className="infomsg mt-3 z-30 whitespace-nowrap">{getTitleForTool(label)}</div>
@@ -294,7 +292,7 @@ function Element({element, title, onSelect}: any) {
 			<span
 				className={
 					(title === getLabelForBlockStyle(element) ? "ic-black " : "ic-gray-50 ") +
-					"ic ic-md align-middle ic-" +
+					"ic-md align-middle ic-" +
 					element
 				}
 			></span>
