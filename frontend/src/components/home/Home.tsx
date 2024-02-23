@@ -1,6 +1,4 @@
-import Editor from "./editor/Editor";
-import {useState, useCallback, useEffect, useContext} from "react";
-import ShareNotePopup from "./ShareNotePopup";
+import {useState, useCallback, useEffect, useContext, lazy, Suspense} from "react";
 import axios from "axios";
 import {BACKEND_SERVER_DOMAIN} from "@/config";
 import _ from "lodash";
@@ -19,6 +17,10 @@ import {createNote} from "@/services/note/create_note";
 import {NOTE_STATUS} from "./NoteStatusOptions";
 import {UserContext} from "@/App";
 import Spinner from "../ui/spinner/Spinner";
+
+// Lazy imports
+const Editor = lazy(() => import("./editor/Editor"));
+const ShareNotePopup = lazy(() => import("./ShareNotePopup"));
 
 export default function Home() {
 	const {noteid} = useParams(); /* from url: '/note/{noteid}' */
@@ -249,13 +251,24 @@ export default function Home() {
 						{/*
 						 * Editor area
 						 */}
-						<div className={isNoteLoading ? "blur-sm z-40" : "z-40"}>
-							<Editor
-								document={document}
-								onChange={handleEditorChange}
-								key={note !== null ? note.id : ""}
-								note={note}
-							/>
+						<div className={(isNoteLoading ? "blur-sm " : "") + "z-40 h-full"}>
+							<Suspense
+								fallback={
+									<div className="flex place-items-center flex-row gap-4 justify-center h-full">
+										<Spinner color="black" size="md" />
+										<p className="inline-block bg-black/5 border border-gray-300 px-2 py-0.5 rounded-md text-bb">
+											Loading editor...
+										</p>
+									</div>
+								}
+							>
+								<Editor
+									document={document}
+									onChange={handleEditorChange}
+									key={note !== null ? note.id : ""}
+									note={note}
+								/>
+							</Suspense>
 							<NoteStatus status={status} isLoggedIn={user ? true : false} />
 						</div>
 						{isNoteLoading && (
@@ -268,21 +281,23 @@ export default function Home() {
 				{/*
 				 * Note sharing component
 				 */}
-				{shareNote !== null ? (
-					<ShareNotePopup
-						note={shareNote}
-						closePopup={() => setSharePopupNote(false)}
-						open={sharePopupNote}
-					/>
-				) : note !== null ? (
-					<ShareNotePopup
-						note={note}
-						closePopup={() => setSharePopupNote(false)}
-						open={sharePopupNote}
-					/>
-				) : (
-					<></>
-				)}
+				<Suspense fallback={<></>}>
+					{shareNote !== null ? (
+						<ShareNotePopup
+							note={shareNote}
+							closePopup={() => setSharePopupNote(false)}
+							open={sharePopupNote}
+						/>
+					) : note !== null ? (
+						<ShareNotePopup
+							note={note}
+							closePopup={() => setSharePopupNote(false)}
+							open={sharePopupNote}
+						/>
+					) : (
+						<></>
+					)}
+				</Suspense>
 			</div>
 		</>
 	);

@@ -1,4 +1,4 @@
-import {useContext, useEffect, useState} from "react";
+import {Suspense, lazy, useContext, useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import {AxiosError} from "axios";
 import {Helmet} from "react-helmet";
@@ -9,7 +9,6 @@ import {Slate, Editable, withReact} from "slate-react";
 import {dateTimePretty, timeSince} from "@/utils/DateTimeUtils";
 import ErrorPage from "@/utils/ErrorPage";
 import Sidebar from "@/components/Sidebar";
-import LoginRegister from "@/components/home/sidebar/LoginRegister";
 import {UserContext} from "@/App";
 import {useForm} from "react-hook-form";
 import InputField from "../ui/input/Input";
@@ -17,6 +16,9 @@ import Button from "../ui/button/Button";
 import {useMutation} from "react-query";
 import {getSharedNote} from "@/services/note/get_shared_note";
 import {handleAxiosError} from "@/utils/HandleAxiosError";
+import LoginSkeleton from "../ui/skeleton/LoginSkeleton";
+
+const LoginRegister = lazy(() => import("@/components/home/sidebar/LoginRegister"));
 
 export type ShareNoteApiResponseType = {
 	noteTitle: string;
@@ -81,7 +83,9 @@ export default function Shared() {
 						<Sidebar
 							component={
 								<div>
-									<LoginRegister showLinkToHome={true} />
+									<Suspense fallback={<LoginSkeleton />}>
+										<LoginRegister showLinkToHome={true} />
+									</Suspense>
 									{response && (
 										<div className="p-4 shadow-smb border-b border-gray-300">
 											<div className="text-xl font-bold text-gray-900 mb-4">

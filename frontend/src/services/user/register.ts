@@ -16,6 +16,9 @@ export interface UserRegisterResponse {
 			name: string;
 			email: string;
 			verified: boolean;
+			created: string;
+			updated: string;
+			password_updated: string;
 		};
 		token: string;
 		session: number;
