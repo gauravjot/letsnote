@@ -4,9 +4,8 @@ import {createEditor} from "slate";
 import {withHistory} from "slate-history";
 import "@/assets/css/editor.css";
 
-import useEditorConfig from "@/hooks/useEditorConfig";
+import useEditorConfig, {LinkEditor} from "@/hooks/useEditorConfig";
 
-import LinkEditor from "./LinkEditor";
 import ExampleDocument, {SlateDocumentType, SlateNodeType} from "@/utils/ExampleDocument";
 import {identifyLinksInTextIfAny, isLinkNodeAtSelection} from "@/utils/EditorUtils";
 import useSelection from "@/hooks/useSelection";

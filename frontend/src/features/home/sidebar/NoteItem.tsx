@@ -3,7 +3,7 @@ import {dateTimePretty, timeSince} from "@/utils/DateTimeUtils";
 import axios from "axios";
 import {BACKEND_SERVER_DOMAIN} from "@/config";
 import {NoteType} from "@/types/api";
-import TitleUpdateDialog from "./TitleUpdateDialog";
+import TitleUpdateDialog from "../TitleUpdateDialog";
 import {NoteListItemType} from "@/types/note";
 import {UserContext} from "@/App";
 

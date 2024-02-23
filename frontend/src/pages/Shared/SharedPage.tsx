@@ -1,5 +1,5 @@
-import {Suspense, lazy, useContext, useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
+import {useContext, useEffect, useState} from "react";
+import {Link, useParams} from "react-router-dom";
 import {AxiosError} from "axios";
 import {Helmet} from "react-helmet";
 import useEditorConfig from "@/hooks/useEditorConfig";
@@ -8,17 +8,16 @@ import {createEditor} from "slate";
 import {Slate, Editable, withReact} from "slate-react";
 import {dateTimePretty, timeSince} from "@/utils/DateTimeUtils";
 import ErrorPage from "@/utils/ErrorPage";
-import Sidebar from "@/components/Sidebar";
+import Sidebar from "@/features/sidebar/Sidebar";
 import {UserContext} from "@/App";
 import {useForm} from "react-hook-form";
-import InputField from "../ui/input/Input";
-import Button from "../ui/button/Button";
+import InputField from "../../components/ui/input/Input";
+import Button from "../../components/ui/button/Button";
 import {useMutation} from "react-query";
 import {getSharedNote} from "@/services/note/get_shared_note";
 import {handleAxiosError} from "@/utils/HandleAxiosError";
-import LoginSkeleton from "../ui/skeleton/LoginSkeleton";
 
-const LoginRegister = lazy(() => import("@/components/home/sidebar/LoginRegister"));
+import "@/assets/css/editor.css";
 
 export type ShareNoteApiResponseType = {
 	noteTitle: string;
@@ -30,7 +29,7 @@ export type ShareNoteApiResponseType = {
 	noteUpdated: string;
 };
 
-export default function Shared() {
+export default function SharedPage() {
 	const {shareid} = useParams();
 	const user = useContext(UserContext).user;
 	const [document, setDocument] = useState();
@@ -49,6 +48,7 @@ export default function Shared() {
 		onSuccess: (res) => {
 			setDocument(JSON.parse(res.noteContent));
 			setResponse(res);
+			setError(null);
 		},
 		onError: (error: AxiosError) => {
 			handleAxiosError(error, setError);
@@ -82,10 +82,15 @@ export default function Shared() {
 					>
 						<Sidebar
 							component={
-								<div>
-									<Suspense fallback={<LoginSkeleton />}>
-										<LoginRegister showLinkToHome={true} />
-									</Suspense>
+								<>
+									<div className="m-4">
+										<Link
+											to={"/"}
+											className="text-sm hover:underline hover:underline-offset-4 whitespace-nowrap overflow-hidden"
+										>
+											&#8592; Go back to editor
+										</Link>
+									</div>
 									{response && (
 										<div className="p-4 shadow-smb border-b border-gray-300">
 											<div className="text-xl font-bold text-gray-900 mb-4">
@@ -136,7 +141,7 @@ export default function Shared() {
 											</ul>
 										</div>
 									)}
-								</div>
+								</>
 							}
 						/>
 					</div>

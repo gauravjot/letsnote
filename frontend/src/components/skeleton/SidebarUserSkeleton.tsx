@@ -1,4 +1,4 @@
-export default function LoginSkeleton() {
+export default function SidebarUserSkeleton() {
 	return (
 		<div className="my-3 py-4 px-4 border-b border-gray-300 shadow-smb animate-pulse">
 			<div className="h-6 bg-gray-200 w-28 rounded my-2"></div>

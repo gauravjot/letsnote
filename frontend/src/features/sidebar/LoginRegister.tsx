@@ -7,7 +7,6 @@ import {
 	UserReduxType,
 } from "@/services/user/log_in_out";
 import {UserContext} from "@/App";
-import {Link} from "react-router-dom";
 import {useForm} from "react-hook-form";
 import {AxiosError} from "axios";
 import {handleAxiosError} from "@/utils/HandleAxiosError";
@@ -15,9 +14,9 @@ import InputField from "@/components/ui/input/Input";
 import Button from "@/components/ui/button/Button";
 import {UserRegisterInfo, UserRegisterResponse, userRegister} from "@/services/user/register";
 import {useMutation} from "react-query";
-import {UserSettings} from "@/components/user_settings/UserSettings";
+import {Settings} from "@/features/settings/Settings";
 
-export default function LoginRegister({showLinkToHome = false}: {showLinkToHome?: boolean}) {
+export default function LoginRegister() {
 	const userContext = useContext(UserContext);
 	const [showRegister, setShowRegister] = React.useState(false);
 
@@ -29,17 +28,6 @@ export default function LoginRegister({showLinkToHome = false}: {showLinkToHome?
 				<RegisterComponent showRegister={setShowRegister} />
 			) : (
 				<Login switchToRegister={setShowRegister} />
-			)}
-
-			{showLinkToHome && (
-				<div className="m-4">
-					<Link
-						to={"/"}
-						className="text-sm hover:underline hover:underline-offset-4 whitespace-nowrap overflow-hidden"
-					>
-						&#8592; Go back to Letsnote
-					</Link>
-				</div>
 			)}
 		</>
 	);
@@ -258,7 +246,7 @@ function UserCard({user}: {user: UserReduxType}) {
 	return (
 		<>
 			{/** User settings */}
-			{showSettings && <UserSettings closeFn={() => setShowSettings(false)} />}
+			{showSettings && <Settings closeFn={() => setShowSettings(false)} />}
 
 			{/** Main content */}
 			<div className="my-3 pb-4 pt-3 px-4 border-b border-gray-300 shadow-smb">

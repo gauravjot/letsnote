@@ -1,7 +1,7 @@
 import {Route, Navigate, Routes, BrowserRouter as Router} from "react-router-dom";
 /* Components */
-import Home from "@/components/home/Home";
-import Shared from "@/components/share_page/SharePage";
+import Home from "@/pages/Home";
+import SharedPage from "@/pages/Shared/SharedPage";
 import React, {createContext, useEffect, useState} from "react";
 import {UserReduxType} from "./services/user/log_in_out";
 
@@ -53,8 +53,8 @@ export default function App() {
 			<Router>
 				<Routes>
 					<Route path="/" element={<Home />} />
-					<Route path="/shared/:shareid" element={<Shared />} />
-					<Route path="/note/shared/:nui/:shareid" element={<Shared />} /> {/* Legacy */}
+					<Route path="/shared/:shareid" element={<SharedPage />} />
+					<Route path="/note/shared/:nui/:shareid" element={<SharedPage />} /> {/* Legacy */}
 					<Route path="/note/:noteid" element={<Home />} />
 					<Route path="*" element={<Navigate to="/" replace />} />
 				</Routes>

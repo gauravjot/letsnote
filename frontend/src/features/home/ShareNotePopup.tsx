@@ -5,14 +5,15 @@ import {timeSince} from "@/utils/DateTimeUtils";
 import {ShareNote} from "@/types/api";
 import {NoteListItemType} from "@/types/note";
 import {UserContext} from "@/App";
-import InputField from "../ui/input/Input";
+import InputField from "@/components/ui/input/Input";
 import {useForm} from "react-hook-form";
-import Button from "../ui/button/Button";
+import Button from "@/components/ui/button/Button";
 import {useMutation, useQuery} from "react-query";
 import {ShareNoteQueryType, shareNoteQuery} from "@/services/note/create_share_link";
 import {handleAxiosError} from "@/utils/HandleAxiosError";
 import {getNoteShares} from "@/services/note/get_note_shares";
 import {DisableShareLinkType, disableShareLinkQuery} from "@/services/note/disable_share_link";
+import CheckBox from "@/components/ui/checkbox/CheckBox";
 
 interface Props {
 	note: NoteListItemType;
@@ -167,7 +168,7 @@ export default function ShareNotePopup({closePopup, note, open}: Props) {
 												/>
 												<div className="mt-4 flex place-items-center">
 													<label
-														className="user-select-none cursor-pointer text-sm text-gray-700 pl-0.5 pr-2"
+														className="select-none cursor-pointer text-sm text-gray-700 pl-0.5 pr-2"
 														htmlFor="pass_protect"
 													>
 														Password protect the link
@@ -189,28 +190,17 @@ export default function ShareNotePopup({closePopup, note, open}: Props) {
 														elementHookFormRegister={shareLinkForm.register}
 													/>
 												)}
-												<div className="mt-4 mb-4 flex place-items-center">
-													<label
-														className="user-select-none cursor-pointer text-sm text-gray-700 pl-0.5 pr-2"
-														htmlFor="anon"
-													>
-														Share as anonymous
-													</label>
-													<input
-														className="cursor-pointer"
-														id="anon"
-														type="checkbox"
-														{...shareLinkForm.register("anon")}
-													/>
-												</div>
-												<div className="mt-4">
-													<Button
-														elementChildren="Get Share Link"
-														elementState={shareNoteMutation.isLoading ? "loading" : "default"}
-														elementStyle="primary"
-														elementType="submit"
-													/>
-												</div>
+												<CheckBox
+													elementId="anon"
+													elementLabel="Share as anonymous"
+													elementHookFormRegister={shareLinkForm.register}
+												/>
+												<Button
+													elementChildren="Get Share Link"
+													elementState={shareNoteMutation.isLoading ? "loading" : "default"}
+													elementStyle="primary"
+													elementType="submit"
+												/>
 											</fieldset>
 										</form>
 									</>

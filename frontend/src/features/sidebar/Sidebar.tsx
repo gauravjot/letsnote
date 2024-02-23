@@ -1,5 +1,7 @@
 import * as React from "react";
 import {Link} from "react-router-dom";
+import LoginRegister from "./LoginRegister";
+import SidebarUserSkeleton from "@/components/skeleton/SidebarUserSkeleton";
 
 export interface ISidebarProps {
 	component: React.ReactNode;
@@ -15,6 +17,9 @@ export default function Sidebar(props: ISidebarProps) {
 					</span>
 				</Link>
 			</div>
+			<React.Suspense fallback={<SidebarUserSkeleton />}>
+				<LoginRegister />
+			</React.Suspense>
 			{props.component}
 		</div>
 	);

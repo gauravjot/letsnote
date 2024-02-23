@@ -69,8 +69,9 @@ export default function TitleUpdateDialog(props: IEditNoteNameDialogProps) {
 						elementIcon="close"
 						elementType="button"
 						elementState="default"
-						elementStyle="white_border"
+						elementStyle="white_no_border"
 						elementSize="xsmall"
+						elementIconSize="base"
 						elementIconOnly={true}
 						onClick={closeDialog}
 					/>

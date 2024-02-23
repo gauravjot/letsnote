@@ -1,25 +1,26 @@
-import { DefaultElement, ReactEditor } from "slate-react";
-import Image from "@/components/home/editor/Image";
-import Link from "@/components/home/editor/Link";
-import LinkEditor from "@/components/home/editor/LinkEditor";
+import {DefaultElement, ReactEditor} from "slate-react";
 import isHotkey from "is-hotkey";
-import { toggleStyle, insertContent, toggleBlockType } from "@/utils/EditorUtils";
-import { BaseEditor } from "slate";
+import {toggleStyle, insertContent, toggleBlockType} from "@/utils/EditorUtils";
+import {BaseEditor, Node} from "slate";
+import {Editor, Transforms} from "slate";
+import {useCallback, useState, useEffect, useRef} from "react";
+import {useSlateStatic} from "slate-react";
+import Button from "@/components/ui/button/Button";
 
 export default function useEditorConfig(editor: BaseEditor & ReactEditor) {
-	const { isVoid } = editor;
+	const {isVoid} = editor;
 	editor.isVoid = (element: any) => {
 		return ["image"].includes(element.type) || isVoid(element);
 	};
 
 	editor.isInline = (element: any) => ["link"].includes(element.type);
 
-	return { renderElement, renderLeaf, KeyBindings };
+	return {renderElement, renderLeaf, KeyBindings};
 }
 
 function renderElement(props: any) {
-	const { element, children, attributes } = props;
-	const style = { textAlign: element.align };
+	const {element, children, attributes} = props;
+	const style = {textAlign: element.align};
 	switch (element.type) {
 		case "image":
 			return <Image {...props} />;
@@ -55,12 +56,7 @@ function renderElement(props: any) {
 			);
 		case "codeblock":
 			return (
-				<div
-					className="editor-codeblock"
-					style={style}
-					{...attributes}
-					spellCheck="false"
-				>
+				<div className="editor-codeblock" style={style} {...attributes} spellCheck="false">
 					{children}
 				</div>
 			);
@@ -165,7 +161,7 @@ const KeyBindings = {
 	},
 };
 
-function StyledText({ attributes, children, leaf }: any) {
+function StyledText({attributes, children, leaf}: any) {
 	if (leaf.bold) {
 		children = <strong {...attributes}>{children}</strong>;
 	}
@@ -203,4 +199,196 @@ function StyledText({ attributes, children, leaf }: any) {
 	}
 
 	return <span {...attributes}>{children}</span>;
+}
+
+export const Image = ({attributes, children, element}: any) => {
+	const [isEditingCaption, setEditingCaption] = useState(false);
+	const [caption, setCaption] = useState(element.caption);
+	const editor = useSlateStatic();
+
+	const applyCaptionChange = useCallback(
+		(captionInput: any) => {
+			const imageNodeEntry = Editor.above(editor, {
+				match: (n: any) => n.type === "image",
+			});
+			if (imageNodeEntry == null) {
+				return;
+			}
+
+			if (captionInput != null) {
+				setCaption(captionInput);
+			}
+
+			Transforms.setNodes(editor, {}, {at: imageNodeEntry[1]});
+		},
+		[editor, setCaption]
+	);
+
+	const onCaptionChange = useCallback(
+		(event: any) => {
+			setCaption(event.target.value);
+		},
+		[setCaption]
+	);
+
+	const onKeyDown = useCallback(
+		(event: any) => {
+			if (!isHotkey("enter", event)) {
+				return;
+			}
+			event.preventDefault();
+
+			applyCaptionChange(event.target.value);
+			setEditingCaption(false);
+		},
+		[applyCaptionChange, setEditingCaption]
+	);
+
+	const onToggleCaptionEditMode = useCallback(() => {
+		const wasEditing = isEditingCaption;
+		setEditingCaption(!isEditingCaption);
+		wasEditing && applyCaptionChange(caption);
+	}, [isEditingCaption, applyCaptionChange, caption]);
+
+	return (
+		<div contentEditable={false} {...attributes}>
+			<div>
+				{!element.isUploading && element.url != null ? (
+					<img src={String(element.url)} alt={caption} className={"image"} />
+				) : (
+					<div className={"image-upload-placeholder"}>
+						<div />
+					</div>
+				)}
+				{isEditingCaption ? (
+					<div
+						autoFocus={true}
+						className={"image-caption-input"}
+						defaultValue={caption}
+						onKeyDown={onKeyDown}
+						onChange={onCaptionChange}
+						onBlur={onToggleCaptionEditMode}
+					/>
+				) : (
+					<div className={"image-caption-read-mode"} onClick={onToggleCaptionEditMode}>
+						{element.caption}
+					</div>
+				)}
+			</div>
+			{children}
+		</div>
+	);
+};
+
+export function Link({element, attributes, children}: any) {
+	return (
+		<a href={element.url} {...attributes} className={"link"}>
+			{children}
+		</a>
+	);
+}
+
+export function LinkEditor({editorOffsets, selectionForLink}: any) {
+	const linkEditorRef = useRef<HTMLDivElement>(null);
+	const [saveBtnIcon, setSaveBtnIcon] = useState<"done" | "save">("save");
+	const editor = useSlateStatic();
+	const [node, path] = Editor.above(editor, {
+		at: selectionForLink,
+		match: (n: any) => n.type === "link",
+	}) || [null, null];
+
+	const [linkURL, setLinkURL] = useState((node as {url?: string})?.url);
+
+	useEffect(() => {
+		setLinkURL((node as {url?: string})?.url);
+	}, [node]);
+
+	const onLinkURLChange = useCallback(
+		(event: any) => {
+			setSaveBtnIcon("save");
+			setLinkURL(event.target.value);
+		},
+		[setLinkURL]
+	);
+
+	const onApply = useCallback(() => {
+		setSaveBtnIcon("done");
+		let url = String(linkURL);
+		if (!(url.includes("//") || url.includes("\\\\"))) {
+			url = "http://" + url;
+		}
+		setLinkURL(url);
+
+		// ...
+
+		if (path !== null) {
+			Transforms.setNodes(
+				editor,
+				{
+					url: url as string,
+				} as Partial<Node>,
+				{at: path}
+			);
+		}
+	}, [editor, linkURL, path]);
+
+	useEffect(() => {
+		const editorEl = linkEditorRef.current;
+		if (editorEl == null || node == null || editorOffsets == null) {
+			return;
+		}
+
+		// ...
+
+		const linkDOMNode = ReactEditor.toDOMNode(editor as ReactEditor, node); // Cast editor as ReactEditor
+		const {x: nodeX, height: nodeHeight, y: nodeY} = linkDOMNode.getBoundingClientRect();
+
+		editorEl.style.display = "block";
+		editorEl.style.top = `${nodeY + nodeHeight - editorOffsets.y}px`;
+		editorEl.style.left = `${nodeX - editorOffsets.x}px`;
+	}, [editor, editorOffsets.x, editorOffsets.y, node]);
+
+	if (editorOffsets == null) {
+		return null;
+	}
+
+	return (
+		<div
+			ref={linkEditorRef}
+			className="absolute max-sm:left-4 z-20 bg-white shadow border border-solid border-gray-100 rounded-xl px-2 mt-2"
+		>
+			<div className="text-sm flex place-items-center">
+				<Button
+					elementChildren="Open in new"
+					elementIcon="open-in-new"
+					elementType="button"
+					elementState="default"
+					elementStyle="white_no_border"
+					elementSize="xsmall"
+					elementIconOnly={true}
+					onClick={() => window.open(linkURL, "_blank")}
+					elementDisabled={String(linkURL).length < 3}
+				/>
+				<input
+					className="ml-2 my-2 mr-2 px-2 py-1 rounded bg-opacity-50 focus:outline-none active:outline-none focus-visible:outline-none bg-gray-200 focus-visible:bg-opacity-80 text-sm border"
+					type="text"
+					value={linkURL}
+					placeholder="insert a link here"
+					onChange={onLinkURLChange}
+				/>
+				<Button
+					elementChildren="Apply"
+					elementIcon={saveBtnIcon}
+					elementType="button"
+					elementState="default"
+					elementStyle="white_no_border"
+					elementSize="xsmall"
+					elementIconSize="md"
+					elementIconOnly={true}
+					onClick={onApply}
+					elementDisabled={String(linkURL).length < 3}
+				/>
+			</div>
+		</div>
+	);
 }

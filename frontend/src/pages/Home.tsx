@@ -6,21 +6,21 @@ import ExampleDocument, {SlateDocumentType} from "@/utils/ExampleDocument";
 import {Helmet} from "react-helmet";
 import {useParams, useNavigate} from "react-router-dom";
 import {NoteType} from "@/types/api";
-import HomeSidebar from "./sidebar/Sidebar";
-import Sidebar from "@/components/Sidebar";
-import NoteStatus, {SavingState} from "./NoteStatus";
+import HomeSidebar from "@/features/home/sidebar/HomeSidebar";
+import Sidebar from "@/features/sidebar/Sidebar";
+import NoteStatus, {SavingState} from "@/features/home/NoteStatus";
 import {NoteListItemType} from "@/types/note";
 import {useMutation, useQueryClient} from "react-query";
 import {SIDEBAR_NOTES_QUERY} from "@/services/queries";
 import {UpdateNoteContentType, updateNoteContent} from "@/services/note/update_note_content";
 import {createNote} from "@/services/note/create_note";
-import {NOTE_STATUS} from "./NoteStatusOptions";
+import {NOTE_STATUS} from "@/features/home/NoteStatusOptions";
 import {UserContext} from "@/App";
-import Spinner from "../ui/spinner/Spinner";
+import Spinner from "../components/ui/spinner/Spinner";
 
 // Lazy imports
-const Editor = lazy(() => import("./editor/Editor"));
-const ShareNotePopup = lazy(() => import("./ShareNotePopup"));
+const Editor = lazy(() => import("@/features/home/editor/Editor"));
+const ShareNotePopup = lazy(() => import("@/features/home/ShareNotePopup"));
 
 export default function Home() {
 	const {noteid} = useParams(); /* from url: '/note/{noteid}' */

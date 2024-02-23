@@ -4,11 +4,11 @@ import NoteItem from "./NoteItem";
 import {monthYear} from "@/utils/DateTimeUtils";
 import {NoteType} from "@/types/api";
 import {UserContext} from "@/App";
-import Spinner from "@/components/ui/spinner/Spinner";
 import {useQuery} from "react-query";
 import {NoteListItemType} from "@/types/note";
 import {SIDEBAR_NOTES_QUERY} from "@/services/queries";
 import {getNoteList} from "@/services/note/get_note_list";
+import SideBarNotelistSkeleton from "@/components/skeleton/SidebarNotelistSkeleton";
 
 interface Props {
 	currentNote: NoteType["id"] | null;
@@ -98,9 +98,7 @@ export default function NoteList({openNote, shareNote, currentNote}: Props) {
 					It's so empty here. Make a note in editor!
 				</div>
 			) : notes.isLoading ? (
-				<div className="flex justify-center">
-					<Spinner color="primary" size="md" />
-				</div>
+				<SideBarNotelistSkeleton />
 			) : notes.isError ? (
 				<div className="px-6 py-4 text-xl text-gray-400 font-thin user-select-none">
 					Unable to fetch notes. Please reload page try again.

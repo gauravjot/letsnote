@@ -13,7 +13,7 @@ import {useSlateStatic} from "slate-react";
 import {timeSince} from "@/utils/DateTimeUtils";
 import Button from "@/components/ui/button/Button";
 import {NoteType} from "@/types/api";
-import TitleUpdateDialog from "@/components/home/sidebar/TitleUpdateDialog";
+import TitleUpdateDialog from "@/features/home/TitleUpdateDialog";
 import {UserContext} from "@/App";
 
 const PARAGRAPH_STYLES = ["h1", "h2", "h3", "h4", "codeblock", "quote", "ul", "ol"];
