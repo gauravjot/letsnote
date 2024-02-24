@@ -1,4 +1,4 @@
-import Spinner from "../ui/spinner/Spinner";
+import Spinner from "@/components/ui/spinner/Spinner";
 import {NOTE_STATUS} from "./NoteStatusOptions";
 
 /*
@@ -37,8 +37,8 @@ export default function NoteStatus(props: INoteStatusProps) {
 				)
 			) : (
 				<div className="fixed bottom-0 right-0 bg-red-900 shadow rounded-md px-2 py-1 font-medium text-sm text-white z-30 m-6">
-					<span className="ic align-middle ic-cloud-fail"></span>
-					&nbsp; Sign-in to auto-save
+					<span className="ic ic-white align-middle ic-cloud-fail"></span>
+					&nbsp; Sign-in and save in cloud
 				</div>
 			)}
 		</>

@@ -1,18 +1,18 @@
 import React, {useContext} from "react";
 import CreateNote from "./CreateNote";
 import NoteItem from "./NoteItem";
-import {monthYear} from "@/utils/TimeSince";
+import {monthYear} from "@/utils/DateTimeUtils";
 import {NoteType} from "@/types/api";
 import {UserContext} from "@/App";
-import Spinner from "@/components/ui/spinner/Spinner";
 import {useQuery} from "react-query";
 import {NoteListItemType} from "@/types/note";
 import {SIDEBAR_NOTES_QUERY} from "@/services/queries";
 import {getNoteList} from "@/services/note/get_note_list";
+import SideBarNotelistSkeleton from "@/components/skeleton/SidebarNotelistSkeleton";
 
 interface Props {
 	currentNote: NoteType["id"] | null;
-	openNote: (nid: NoteType["id"]) => void;
+	openNote: (nid: NoteType["id"] | null) => void;
 	shareNote: (note: NoteListItemType) => void;
 }
 
@@ -20,8 +20,11 @@ export default function NoteList({openNote, shareNote, currentNote}: Props) {
 	const userContext = useContext(UserContext);
 	const [showCreateBox, setShowCreateBox] = React.useState(false);
 	const notes = useQuery(
-		[SIDEBAR_NOTES_QUERY, userContext.user],
-		() => getNoteList(userContext?.user?.token),
+		[SIDEBAR_NOTES_QUERY, userContext.user?.user.id],
+		() =>
+			userContext.user
+				? getNoteList(userContext?.user?.token)
+				: Promise.reject("User not logged in"),
 		{
 			enabled: !!userContext.user,
 		}
@@ -56,7 +59,7 @@ export default function NoteList({openNote, shareNote, currentNote}: Props) {
 						aria-selected={showCreateBox}
 						className="infotrig sidebar-make-note-popup cursor-pointer"
 					>
-						<span className="ic-close inline-block align-baseline h-4 w-4 p-1 invert"></span>
+						<span className="ic ic-close inline-block align-baseline h-4 w-4 p-1 invert"></span>
 						<div className="infomsg bottom-1.5 right-10 whitespace-nowrap">
 							{showCreateBox ? "Close" : "Make new note"}
 						</div>
@@ -98,9 +101,7 @@ export default function NoteList({openNote, shareNote, currentNote}: Props) {
 					It's so empty here. Make a note in editor!
 				</div>
 			) : notes.isLoading ? (
-				<div className="flex justify-center">
-					<Spinner color="primary" size="md" />
-				</div>
+				<SideBarNotelistSkeleton />
 			) : notes.isError ? (
 				<div className="px-6 py-4 text-xl text-gray-400 font-thin user-select-none">
 					Unable to fetch notes. Please reload page try again.

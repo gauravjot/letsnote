@@ -3,6 +3,9 @@ export interface UserType {
 	name: string;
 	email: string;
 	verified: boolean;
+	created: string;
+	updated: string;
+	password_updated: string;
 }
 
 export interface UserSession {

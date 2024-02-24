@@ -4,8 +4,8 @@ import {SlateDocumentType} from "@/utils/ExampleDocument";
 import axios from "axios";
 
 export interface UpdateNoteContentType {
-	title: string;
 	content: SlateDocumentType;
+	note_id: string;
 }
 
 /**
@@ -15,13 +15,9 @@ export interface UpdateNoteContentType {
  * @param {UpdateNoteContentType} payload
  * @returns {Promise<NoteType>}
  */
-export async function updateNoteContent(
-	token: string,
-	note_id: string,
-	payload: UpdateNoteContentType
-) {
+export async function updateNoteContent(token: string, payload: UpdateNoteContentType) {
 	return await axios
-		.put(BACKEND_SERVER_DOMAIN + "/api/note/" + note_id + "/", JSON.stringify(payload), {
+		.put(BACKEND_SERVER_DOMAIN + "/api/note/" + payload.note_id + "/", JSON.stringify(payload), {
 			headers: {
 				"Content-Type": "application/json",
 				Authorization: token,

@@ -4,14 +4,14 @@ import {createEditor} from "slate";
 import {withHistory} from "slate-history";
 import "@/assets/css/editor.css";
 
-import useEditorConfig from "@/hooks/useEditorConfig";
+import useEditorConfig, {LinkEditor} from "@/hooks/useEditorConfig";
 
-import LinkEditor from "./LinkEditor";
 import ExampleDocument, {SlateDocumentType, SlateNodeType} from "@/utils/ExampleDocument";
 import {identifyLinksInTextIfAny, isLinkNodeAtSelection} from "@/utils/EditorUtils";
 import useSelection from "@/hooks/useSelection";
 import {NoteType} from "@/types/api";
 import {EditorToolbar} from "./Toolbar";
+import {isEqual} from "lodash";
 
 export default function Editor({
 	document,
@@ -25,6 +25,7 @@ export default function Editor({
 	const [editor] = useState(() => withReact(withHistory(createEditor())));
 	const editorRef = useRef<HTMLDivElement>(null);
 	const {renderLeaf, renderElement, KeyBindings} = useEditorConfig(editor);
+	const [isEdited, setIsEdited] = useState(!isEqual(document, ExampleDocument) || false);
 
 	const onKeyDown = useCallback(
 		(event: any) => KeyBindings.onKeyDown(editor, event),
@@ -36,6 +37,7 @@ export default function Editor({
 	// we update selection here because Slate fires an onChange even on pure selection change.
 	const onChangeLocal = useCallback(
 		(doc: any) => {
+			setIsEdited(true);
 			onChange(doc);
 			setSelection(editor.selection);
 			identifyLinksInTextIfAny(editor);
@@ -51,9 +53,9 @@ export default function Editor({
 	}
 
 	return (
-		<Slate editor={editor} value={document} onChange={onChangeLocal}>
+		<Slate editor={editor} initialValue={document} onChange={onChangeLocal}>
 			<EditorToolbar note={note} />
-			{document === ExampleDocument ? (
+			{!isEdited ? (
 				<div className="z-10 top-1/2 mx-auto left-0 right-0 text-center font-thin text-2xl text-gray-300 user-select-none absolute">
 					start typing and we'll auto save
 				</div>

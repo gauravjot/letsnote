@@ -13,4 +13,5 @@ export interface ShareNote {
 	created: string;
 	anonymous: boolean;
 	active: boolean;
+	isPasswordProtected: boolean;
 }

@@ -10,10 +10,10 @@ import {
 
 import React, {useCallback, useContext} from "react";
 import {useSlateStatic} from "slate-react";
-import {timeSince} from "@/utils/TimeSince";
+import {timeSince} from "@/utils/DateTimeUtils";
 import Button from "@/components/ui/button/Button";
 import {NoteType} from "@/types/api";
-import TitleUpdateDialog from "@/components/home/sidebar/TitleUpdateDialog";
+import TitleUpdateDialog from "@/features/home/TitleUpdateDialog";
 import {UserContext} from "@/App";
 
 const PARAGRAPH_STYLES = ["h1", "h2", "h3", "h4", "codeblock", "quote", "ul", "ol"];
@@ -178,9 +178,7 @@ function ToolBarButton(props: any) {
 		>
 			<span
 				className={
-					(isActive ? "ic-black " : "ic-gray-50 ") +
-					"ic ic-md align-middle " +
-					getIconForButton(label)
+					(isActive ? "ic-black " : "ic-gray-50 ") + "ic-md align-middle " + getIconForButton(label)
 				}
 			></span>
 			<div className="infomsg mt-3 z-30 whitespace-nowrap">{getTitleForTool(label)}</div>
@@ -294,7 +292,7 @@ function Element({element, title, onSelect}: any) {
 			<span
 				className={
 					(title === getLabelForBlockStyle(element) ? "ic-black " : "ic-gray-50 ") +
-					"ic ic-md align-middle ic-" +
+					"ic-md align-middle ic-" +
 					element
 				}
 			></span>

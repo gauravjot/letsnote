@@ -1,6 +1,8 @@
 import pytz
 import json
 import uuid
+import random
+import string
 from datetime import datetime
 # RestFramework
 from rest_framework import status
@@ -44,7 +46,7 @@ def createNote(request):
 # Get all notes
 # -----------------------------------------------
 @api_view(['GET'])
-def myNotes(request):
+def getUserNotes(request):
     user = getUserID(request)
     if type(user) is Response:
         return user
@@ -64,7 +66,7 @@ def noteOps(request, noteid):
     if request.method == 'GET':
         return readNote(request, noteid)
     elif request.method == 'PUT':
-        return updateNote(request, noteid)
+        return updateNoteContent(request, noteid)
     elif request.method == 'DELETE':
         return deleteNote(request, noteid)
     return Response(errorResponse("Cannot perform note action.", "N0412"), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -106,13 +108,12 @@ def deleteNote(request, noteid):
 
 
 # Update
-def updateNote(request, noteid):
+def updateNoteContent(request, noteid):
     user = getUserID(request)
     if type(user) is Response:
         return user
     try:
         note = Note.objects.get(id=noteid, user=user)
-        note.title = request.data['title']
         note.content = encrypt_note(request.data['content'])
         note.updated = datetime.now(pytz.utc)
         note.save()
@@ -128,7 +129,7 @@ def updateNote(request, noteid):
 
 # Update
 @api_view(['PUT'])
-def editNoteTitle(request, noteid):
+def updateNoteTitle(request, noteid):
     user = getUserID(request)
     if type(user) is Response:
         return user
@@ -146,57 +147,71 @@ def editNoteTitle(request, noteid):
 # -----------------------------------------------
 # Create a URL
 @api_view(['POST'])
-def createNoteShareExternal(request, noteid):
+def createNoteShareLink(request, noteid):
     user = getUserID(request)
     if type(user) is Response:
         return user
 
     # Check if the user requesting is the owner
-    # try:
-    note = Note.objects.select_related('user').get(id=noteid)
-    note_owner = note.user
-    if user == note_owner:
-        rid = uuid.uuid4()
-        active = request.data['active'] if type(
-            request.data['active']) is bool else True
-        title = request.data['title']
-        anon = request.data['anonymous'] if type(
-            request.data['anonymous']) is bool else True
-        created = datetime.now(pytz.utc)
-        dbid = uuid.uuid4()
-        row = ShareExternal(
-            id=dbid,
-            title=title,
-            passkey=hashThis(rid),
-            note=note,
-            active=active,
-            user=note_owner,
-            created=created,
-            anonymous=anon
-        )
-        row.save()
+    try:
+        note = Note.objects.select_related('user').get(id=noteid)
+        note_owner = note.user
+        if user == note_owner:
+            rid = ''.join(random.choice(string.ascii_letters+"0123456789$")
+                          for m in range(6))
+            active = request.data['active'] if type(
+                request.data['active']) is bool else True
+            title = request.data['title']
+            anon = request.data['anonymous'] if type(
+                request.data['anonymous']) is bool else True
+            created = datetime.now(pytz.utc)
+            dbid = uuid.uuid4()
+            isPassword = 'password' in request.data and request.data['password'] is not None and len(
+                request.data['password']) > 1
+            row = ShareExternal(
+                id=dbid,
+                title=title,
+                passkey=hashThis(rid),
+                password=hashThis(
+                    request.data['password']) if isPassword else "",
+                note=note,
+                active=active,
+                user=note_owner,
+                created=created,
+                anonymous=anon
+            )
+            row.save()
 
-        data = dict(
-            title=title,
-            urlkey=rid,
-            active=active,
-            anonymous=anon,
-            id=dbid,
-            created=created
-        )
-        return Response(data=successResponse(data), status=status.HTTP_201_CREATED)
-    # except:
-    #     return Response(data=errorResponse("The request could not be processed.","N1012"), status=status.HTTP_400_BAD_REQUEST)
+            data = dict(
+                title=title,
+                urlkey=rid,
+                active=active,
+                anonymous=anon,
+                isPasswordProtected=isPassword,
+                id=dbid,
+                created=created
+            )
+            return Response(data=successResponse(data), status=status.HTTP_201_CREATED)
+    except Note.DoesNotExist:
+        return Response(data=errorResponse("The request could not be processed.", "N1012"), status=status.HTTP_400_BAD_REQUEST)
 
     return Response(data=errorResponse("The request is invalid.", "N1001"), status=status.HTTP_400_BAD_REQUEST)
 
 
 # Read the note
-@api_view(['GET'])
-def readNoteShareExternal(request, nui, permkey):
+@api_view(['POST'])
+def readNoteViaShareLink(request, permkey):
     try:
         query = ShareExternal.objects.select_related('note', 'user').get(
-            passkey=hashThis(permkey), note__id__startswith=nui, active=1)
+            passkey=hashThis(permkey), active=1)
+
+        # Password is required
+        if len(query.password) > 0 and ('password' not in request.data or len(request.data['password']) < 1):
+            return Response(data=errorResponse("This link is password protected.", "N1401"), status=status.HTTP_401_UNAUTHORIZED)
+
+        # Check password
+        if len(query.password) > 0 and query.password != hashThis(request.data['password']):
+            return Response(data=errorResponse("Incorrect Password!", "N1402"), status=status.HTTP_401_UNAUTHORIZED)
 
         # We keep person who externally shared the note anonymous
         response = dict(
@@ -218,12 +233,33 @@ def readNoteShareExternal(request, nui, permkey):
 
 # Read all share links for the note
 @api_view(['GET'])
-def readAllLinksNoteShareExt(request, noteid):
+def getNoteShareLinks(request, noteid):
     user = getUserID(request)
     if type(user) is Response:
         return user
-    links = ShareExternalSerializer(ShareExternal.objects.filter(note=noteid, user=user).values(
-        'id', 'anonymous', 'created', 'title', 'active').order_by('-created'), many=True).data
-    return Response(data=successResponse(links), status=status.HTTP_200_OK)
-    # except ShareExternal.DoesNotExist:
-    #     return Response(data=errorResponse("No share links for this note yet.", "N1410"), status=status.HTTP_404_NOT_FOUND)
+    links = ShareExternal.objects.filter(note=noteid, user=user).values(
+        'id', 'anonymous', 'created', 'title', 'active', 'password').order_by('-created')
+
+    result = []
+
+    for link in links:
+        result.append({**ShareExternalSerializer(link).data,
+                      'isPasswordProtected': True if len(link['password']) > 0 else False})
+
+    return Response(data=successResponse(result), status=status.HTTP_200_OK)
+
+
+# Disable a share link
+@api_view(['PUT'])
+def disableNoteShareLink(request):
+    user = getUserID(request)
+    if type(user) is Response:
+        return user
+
+    try:
+        query = ShareExternal.objects.get(id=request.data['id'], user=user)
+        query.active = False
+        query.save()
+        return Response(data=successResponse(), status=status.HTTP_200_OK)
+    except ShareExternal.DoesNotExist:
+        return Response(data=errorResponse("This link does not exist.", "N1411"), status=status.HTTP_404_NOT_FOUND)

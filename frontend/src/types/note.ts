@@ -7,3 +7,13 @@ export type NoteListItemType = {
 };
 
 export type NoteListType = NoteListItemType[];
+
+export type SharedNoteType = {
+	noteTitle: string;
+	noteContent: string;
+	noteSharedBy: string;
+	noteSharedByUID: string;
+	noteSharedOn: string;
+	noteCreated: string;
+	noteUpdated: string;
+};

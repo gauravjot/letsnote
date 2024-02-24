@@ -10,6 +10,7 @@ class User(models.Model):
     password = models.CharField(max_length=72)
     created = models.DateTimeField()
     updated = models.DateTimeField()
+    password_updated = models.DateTimeField()
 
     def __str__(self):
         return f"id:{self.pk}, {self.name}, {self.email} (verified: {self.verified})"

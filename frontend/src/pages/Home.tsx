@@ -1,6 +1,4 @@
-import Editor from "./editor/Editor";
-import {useState, useCallback, useEffect, useContext} from "react";
-import ShareNotePopup from "./ShareNotePopup";
+import {useState, useCallback, useEffect, useContext, lazy, Suspense} from "react";
 import axios from "axios";
 import {BACKEND_SERVER_DOMAIN} from "@/config";
 import _ from "lodash";
@@ -8,16 +6,21 @@ import ExampleDocument, {SlateDocumentType} from "@/utils/ExampleDocument";
 import {Helmet} from "react-helmet";
 import {useParams, useNavigate} from "react-router-dom";
 import {NoteType} from "@/types/api";
-import HomeSidebar from "./sidebar/Sidebar";
-import Sidebar from "@/components/Sidebar";
-import NoteStatus, {SavingState} from "./NoteStatus";
+import HomeSidebar from "@/features/home/sidebar/HomeSidebar";
+import Sidebar from "@/features/sidebar/Sidebar";
+import NoteStatus, {SavingState} from "@/features/home/NoteStatusIndicator";
 import {NoteListItemType} from "@/types/note";
 import {useMutation, useQueryClient} from "react-query";
 import {SIDEBAR_NOTES_QUERY} from "@/services/queries";
-import {updateNoteContent} from "@/services/note/update_note_content";
+import {UpdateNoteContentType, updateNoteContent} from "@/services/note/update_note_content";
 import {createNote} from "@/services/note/create_note";
-import {NOTE_STATUS} from "./NoteStatusOptions";
+import {NOTE_STATUS} from "@/features/home/NoteStatusOptions";
 import {UserContext} from "@/App";
+import Spinner from "../components/ui/spinner/Spinner";
+
+// Lazy imports
+const Editor = lazy(() => import("@/features/home/editor/Editor"));
+const ShareNotePopup = lazy(() => import("@/features/home/ShareNotePopup"));
 
 export default function Home() {
 	const {noteid} = useParams(); /* from url: '/note/{noteid}' */
@@ -33,10 +36,8 @@ export default function Home() {
 	const queryClient = useQueryClient();
 
 	const updateNoteMutation = useMutation({
-		mutationFn: (payload: {title: string; content: SlateDocumentType}) => {
-			return user && note
-				? updateNoteContent(user.token, note.id, payload)
-				: Promise.reject("Note not found");
+		mutationFn: (payload: UpdateNoteContentType) => {
+			return user ? updateNoteContent(user.token, payload) : Promise.reject("Note not found");
 		},
 		onSuccess: (res) => {
 			const response = res as NoteType;
@@ -45,7 +46,7 @@ export default function Home() {
 			}
 			setTimeout(() => {
 				setStatus(null);
-			}, 1500);
+			}, 500);
 			window.onbeforeunload = null;
 		},
 		onError: () => {
@@ -77,7 +78,7 @@ export default function Home() {
 		if (user) {
 			if (note) {
 				// Update note
-				updateNoteMutation.mutate({title, content});
+				updateNoteMutation.mutate({content: content, note_id: note.id});
 			} else {
 				// Create note
 				createNoteMutation.mutate({title, content});
@@ -88,8 +89,8 @@ export default function Home() {
 	};
 
 	const openNote = useCallback(
-		(n_id: NoteType["id"]) => {
-			if (user) {
+		(n_id: NoteType["id"] | null) => {
+			if (user && n_id) {
 				setIsNoteLoading(true);
 				const config = {
 					headers: {
@@ -134,7 +135,7 @@ export default function Home() {
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const editorDebounced = useCallback(
 		_.debounce(
-			(value: SlateDocumentType) => {
+			(note: NoteType, value: SlateDocumentType) => {
 				if (user) {
 					// If user is logged in then save the note
 					saveNote(value, note);
@@ -142,24 +143,30 @@ export default function Home() {
 					setStatus(null);
 				}
 			},
-			2000,
+			500,
 			{leading: false, trailing: true, maxWait: 60000}
 		),
-		[note, user]
+		[user]
 	);
 
 	const handleEditorChange = useCallback(
-		(value: SlateDocumentType) => {
-			console.log(note);
+		(document: SlateDocumentType, note: NoteType | null, value: SlateDocumentType) => {
+			/**
+			 * We need to pass `document` and `note` instead of reading from document level
+			 * variable to prevent wrongful saves in case user switches to another note while
+			 * the previous note is still saving.
+			 */
 			if (!_.isEqual(value, note ? JSON.parse(note?.content) : document)) {
-				window.onbeforeunload = function () {
-					alert("Note is not yet saved. Please wait!");
-					return true;
-				};
-				editorDebounced(value);
+				if (note) {
+					window.onbeforeunload = function () {
+						alert("Note is not yet saved. Please wait!");
+						return true;
+					};
+					editorDebounced(note, value);
+				}
 			}
 		},
-		[editorDebounced, document, note]
+		[editorDebounced]
 	);
 
 	useEffect(() => {
@@ -199,7 +206,7 @@ export default function Home() {
 							}
 						/>
 					</div>
-					<div className="min-h-screen w-full md:px-4 bg-gray-200 relative z-0">
+					<div className="min-h-screen h-full w-full md:px-4 bg-gray-200 relative z-0">
 						{/*
 						 * Toggle to close the sidebar
 						 */}
@@ -223,7 +230,7 @@ export default function Home() {
 								</div>
 								{/* hambuger menu for mobile */}
 								<div className="fixed top-0 right-0 lg:hidden z-[50]">
-									{isSidebarOpen && <div className="z-[40] fixed bg-black/10 inset-0"></div>}
+									{isSidebarOpen && <div className="z-[40] fixed bg-black/20 inset-0"></div>}
 									<button
 										className="mobile-sidebar-toggle relative z-[50]"
 										aria-expanded={isSidebarOpen ? "true" : "false"}
@@ -248,21 +255,29 @@ export default function Home() {
 						{/*
 						 * Editor area
 						 */}
-						<div className={isNoteLoading ? "blur-sm z-40" : "z-40"}>
-							<Editor
-								document={document}
-								onChange={handleEditorChange}
-								key={note !== null ? note.id : ""}
-								note={note}
-							/>
+						<div className={(isNoteLoading ? "blur-sm " : "") + "min-h-screen h-full"}>
+							<Suspense
+								fallback={
+									<div className="flex place-items-center flex-row gap-4 justify-center min-h-screen h-full">
+										<Spinner color="black" size="md" />
+										<p className="inline-block bg-black/5 border border-gray-300 px-2 py-0.5 rounded-md text-bb">
+											Loading editor...
+										</p>
+									</div>
+								}
+							>
+								<Editor
+									document={document}
+									onChange={(value) => handleEditorChange(document, note, value)}
+									key={note !== null ? note.id : ""}
+									note={note}
+								/>
+							</Suspense>
 							<NoteStatus status={status} isLoggedIn={user ? true : false} />
 						</div>
 						{isNoteLoading && (
-							<div className="absolute z-30 top-0 left-0 h-full w-full text-center">
-								<div className="lds-ripple">
-									<div></div>
-									<div></div>
-								</div>
+							<div className="absolute z-30 inset-0 flex justify-center place-items-center">
+								<Spinner color="black" size="xl" />
 							</div>
 						)}
 					</div>
@@ -270,21 +285,23 @@ export default function Home() {
 				{/*
 				 * Note sharing component
 				 */}
-				{shareNote !== null ? (
-					<ShareNotePopup
-						note={shareNote}
-						closePopup={() => setSharePopupNote(false)}
-						open={sharePopupNote}
-					/>
-				) : note !== null ? (
-					<ShareNotePopup
-						note={note}
-						closePopup={() => setSharePopupNote(false)}
-						open={sharePopupNote}
-					/>
-				) : (
-					<></>
-				)}
+				<Suspense fallback={<></>}>
+					{shareNote !== null ? (
+						<ShareNotePopup
+							note={shareNote}
+							closePopup={() => setSharePopupNote(false)}
+							open={sharePopupNote}
+						/>
+					) : note !== null ? (
+						<ShareNotePopup
+							note={note}
+							closePopup={() => setSharePopupNote(false)}
+							open={sharePopupNote}
+						/>
+					) : (
+						<></>
+					)}
+				</Suspense>
 			</div>
 		</>
 	);
