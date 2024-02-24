@@ -7,13 +7,14 @@ A rich text note-writing application. Letsnote's engine automatically saves note
 _Demo acc: `test@letsnote.io`
 Password: `@lphaT3sting`_
 
-## Technologies
+### Sections
 
-| Stack    | Tech         |
-| -------- | ------------ |
-| Frontend | `React.js`   |
-| Backend  | `Django`     |
-| Database | `PostgreSQL` |
+-   [Features](#features)
+-   [Gallery](#gallery)
+-   [Technologies](#technologies)
+-   [Installation](#installation)
+-   [Contributing](#contributing)
+-   [License](#license)
 
 ## Features
 
@@ -42,6 +43,88 @@ Share page
 
 Account Management
 ![Letsnote.io](press/screenshots/shot_2.webp)
+
+## Technologies
+
+Current Letsnote Version in Production: `v0.3.0`
+
+| Stack    | Tech               |
+| -------- | ------------------ |
+| Backend  | `Django`           |
+| Python   | `3.10.12`          |
+| Database | `PostgreSQL 16`    |
+| Frontend | `React.js`         |
+| Editor   | `Slatejs v0.102.0` |
+
+## Installation
+
+1. Clone the repository
+
+    ```bash
+    git clone https://github.com/gauravjot/letsnote.git
+    ```
+
+2. Set up a virtual environment and activate it.
+
+    ```bash
+    cd ./backend
+    python3 -m venv venv
+    ```
+
+    Linux/MacOS
+
+    ```bash
+    source venv/bin/activate
+    ```
+
+    Windows
+
+    ```bash
+    .\venv\Scripts\activate
+    ```
+
+    Install the required packages
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+3. Set environment variables for Django. Rename `sample.env` to `.env` and fill in the required fields.
+4. Go to `backend/notes` and run `python generate_key.py` to generate an encryption key for notes.
+5. Run database migrations
+
+    ```bash
+    python manage.py makemigrations
+    python manage.py migrate
+    ```
+
+    If you encounter any issues, please refer to the [Django Documentation](https://docs.djangoproject.com/en/3.2/topics/migrations/).
+
+6. **For Production**: Set up a Django production environment. Follow this guide - [Deploy Django REST APIs on Ubuntu Server with uWSGI](https://gauravjot.com/blog/deploy_django_api_with_uwsgi_on_ubuntu).
+   **For Development**: Run the Django server
+
+    ```bash
+    python manage.py runserver 0.0.0.0:8000
+    ```
+
+7. Go to the `frontend` directory and install the required packages
+
+    ```bash
+    npm install
+    ```
+
+8. Set environment variables for the front-end. Rename `sample.env` to `.env` and update fields as required.
+9. **For Production**: Build the frontend
+
+    ```bash
+    npm run build
+    ```
+
+    **For Development**: Run the frontend server
+
+    ```bash
+    npm run dev
+    ```
 
 ## Contributing
 
