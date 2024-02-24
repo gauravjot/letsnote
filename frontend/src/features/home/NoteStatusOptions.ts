@@ -1,4 +1,4 @@
-import {SavingState} from "./NoteStatus";
+import {SavingState} from "./NoteStatusIndicator";
 
 export const NOTE_STATUS: {[key: string]: SavingState} = {
 	saving: {

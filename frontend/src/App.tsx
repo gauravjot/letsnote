@@ -54,62 +54,64 @@ export default function App() {
 			}}
 		>
 			<Router>
-				<Routes>
-					<Route path="/" element={<Home />} />
-					<Route
-						path="/shared/:shareid"
-						element={
-							<Suspense
-								fallback={
-									<div className="fixed inset-0 size-full flex gap-4 place-items-center justify-center">
-										<Spinner size="md" color="gray" />
-										<p className="inline-block bg-black/5 border border-gray-300 px-2 py-0.5 rounded-md text-bb">
-											Loading page...
-										</p>
-									</div>
-								}
-							>
-								<SharedPage />
-							</Suspense>
-						}
-					/>
-					<Route
-						path="/note/shared/:nui/:shareid"
-						element={
-							<Suspense
-								fallback={
-									<div className="fixed inset-0 size-full flex gap-4 place-items-center justify-center">
-										<Spinner size="md" color="gray" />
-										<p className="inline-block bg-black/5 border border-gray-300 px-2 py-0.5 rounded-md text-bb">
-											Loading page...
-										</p>
-									</div>
-								}
-							>
-								<SharedPage />
-							</Suspense>
-						}
-					/>{" "}
-					{/* Legacy */}
-					<Route
-						path="/note/:noteid"
-						element={
-							<Suspense
-								fallback={
-									<div className="fixed inset-0 size-full flex gap-4 place-items-center justify-center">
-										<Spinner size="md" color="gray" />
-										<p className="inline-block bg-black/5 border border-gray-300 px-2 py-0.5 rounded-md text-bb">
-											Loading page...
-										</p>
-									</div>
-								}
-							>
-								<Home />
-							</Suspense>
-						}
-					/>
-					<Route path="*" element={<Navigate to="/" replace />} />
-				</Routes>
+				<Suspense>
+					<Routes>
+						<Route path="/" element={<Home />} />
+						<Route
+							path="/shared/:shareid"
+							element={
+								<Suspense
+									fallback={
+										<div className="fixed inset-0 size-full flex gap-4 place-items-center justify-center">
+											<Spinner size="md" color="gray" />
+											<p className="inline-block bg-black/5 border border-gray-300 px-2 py-0.5 rounded-md text-bb">
+												Loading page...
+											</p>
+										</div>
+									}
+								>
+									<SharedPage />
+								</Suspense>
+							}
+						/>
+						<Route
+							path="/note/shared/:nui/:shareid"
+							element={
+								<Suspense
+									fallback={
+										<div className="fixed inset-0 size-full flex gap-4 place-items-center justify-center">
+											<Spinner size="md" color="gray" />
+											<p className="inline-block bg-black/5 border border-gray-300 px-2 py-0.5 rounded-md text-bb">
+												Loading page...
+											</p>
+										</div>
+									}
+								>
+									{/* Legacy */}
+									<SharedPage />
+								</Suspense>
+							}
+						/>
+						<Route
+							path="/note/:noteid"
+							element={
+								<Suspense
+									fallback={
+										<div className="fixed inset-0 size-full flex gap-4 place-items-center justify-center">
+											<Spinner size="md" color="gray" />
+											<p className="inline-block bg-black/5 border border-gray-300 px-2 py-0.5 rounded-md text-bb">
+												Loading page...
+											</p>
+										</div>
+									}
+								>
+									<Home />
+								</Suspense>
+							}
+						/>
+						<Route path="*" element={<Navigate to="/" replace />} />
+					</Routes>
+				</Suspense>
 			</Router>
 		</UserContext.Provider>
 	);

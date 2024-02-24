@@ -8,7 +8,7 @@ const NoteList = lazy(() => import("@/features/home/sidebar/NoteList"));
 
 interface ISidebarProps {
 	currentNoteID: NoteType["id"] | null;
-	openNote: (nid: NoteType["id"]) => void;
+	openNote: (nid: NoteType["id"] | null) => void;
 	openShareNote: (note: NoteListItemType) => void;
 }
 

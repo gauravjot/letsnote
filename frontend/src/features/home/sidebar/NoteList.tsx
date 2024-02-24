@@ -12,7 +12,7 @@ import SideBarNotelistSkeleton from "@/components/skeleton/SidebarNotelistSkelet
 
 interface Props {
 	currentNote: NoteType["id"] | null;
-	openNote: (nid: NoteType["id"]) => void;
+	openNote: (nid: NoteType["id"] | null) => void;
 	shareNote: (note: NoteListItemType) => void;
 }
 
@@ -20,8 +20,11 @@ export default function NoteList({openNote, shareNote, currentNote}: Props) {
 	const userContext = useContext(UserContext);
 	const [showCreateBox, setShowCreateBox] = React.useState(false);
 	const notes = useQuery(
-		[SIDEBAR_NOTES_QUERY, userContext.user],
-		() => getNoteList(userContext?.user?.token),
+		[SIDEBAR_NOTES_QUERY, userContext.user?.user.id],
+		() =>
+			userContext.user
+				? getNoteList(userContext?.user?.token)
+				: Promise.reject("User not logged in"),
 		{
 			enabled: !!userContext.user,
 		}

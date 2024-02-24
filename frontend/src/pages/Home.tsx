@@ -8,7 +8,7 @@ import {useParams, useNavigate} from "react-router-dom";
 import {NoteType} from "@/types/api";
 import HomeSidebar from "@/features/home/sidebar/HomeSidebar";
 import Sidebar from "@/features/sidebar/Sidebar";
-import NoteStatus, {SavingState} from "@/features/home/NoteStatus";
+import NoteStatus, {SavingState} from "@/features/home/NoteStatusIndicator";
 import {NoteListItemType} from "@/types/note";
 import {useMutation, useQueryClient} from "react-query";
 import {SIDEBAR_NOTES_QUERY} from "@/services/queries";
@@ -37,9 +37,7 @@ export default function Home() {
 
 	const updateNoteMutation = useMutation({
 		mutationFn: (payload: UpdateNoteContentType) => {
-			return user && note
-				? updateNoteContent(user.token, note.id, payload)
-				: Promise.reject("Note not found");
+			return user ? updateNoteContent(user.token, payload) : Promise.reject("Note not found");
 		},
 		onSuccess: (res) => {
 			const response = res as NoteType;
@@ -48,7 +46,7 @@ export default function Home() {
 			}
 			setTimeout(() => {
 				setStatus(null);
-			}, 1500);
+			}, 500);
 			window.onbeforeunload = null;
 		},
 		onError: () => {
@@ -80,7 +78,7 @@ export default function Home() {
 		if (user) {
 			if (note) {
 				// Update note
-				updateNoteMutation.mutate({content: content});
+				updateNoteMutation.mutate({content: content, note_id: note.id});
 			} else {
 				// Create note
 				createNoteMutation.mutate({title, content});
@@ -91,8 +89,8 @@ export default function Home() {
 	};
 
 	const openNote = useCallback(
-		(n_id: NoteType["id"]) => {
-			if (user) {
+		(n_id: NoteType["id"] | null) => {
+			if (user && n_id) {
 				setIsNoteLoading(true);
 				const config = {
 					headers: {
@@ -137,7 +135,7 @@ export default function Home() {
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const editorDebounced = useCallback(
 		_.debounce(
-			(value: SlateDocumentType) => {
+			(note: NoteType, value: SlateDocumentType) => {
 				if (user) {
 					// If user is logged in then save the note
 					saveNote(value, note);
@@ -145,24 +143,30 @@ export default function Home() {
 					setStatus(null);
 				}
 			},
-			2000,
+			500,
 			{leading: false, trailing: true, maxWait: 60000}
 		),
-		[note, user]
+		[user]
 	);
 
 	const handleEditorChange = useCallback(
-		(value: SlateDocumentType) => {
-			console.log(note);
+		(document: SlateDocumentType, note: NoteType | null, value: SlateDocumentType) => {
+			/**
+			 * We need to pass `document` and `note` instead of reading from document level
+			 * variable to prevent wrongful saves in case user switches to another note while
+			 * the previous note is still saving.
+			 */
 			if (!_.isEqual(value, note ? JSON.parse(note?.content) : document)) {
-				window.onbeforeunload = function () {
-					alert("Note is not yet saved. Please wait!");
-					return true;
-				};
-				editorDebounced(value);
+				if (note) {
+					window.onbeforeunload = function () {
+						alert("Note is not yet saved. Please wait!");
+						return true;
+					};
+					editorDebounced(note, value);
+				}
 			}
 		},
-		[editorDebounced, document, note]
+		[editorDebounced]
 	);
 
 	useEffect(() => {
@@ -264,7 +268,7 @@ export default function Home() {
 							>
 								<Editor
 									document={document}
-									onChange={handleEditorChange}
+									onChange={(value) => handleEditorChange(document, note, value)}
 									key={note !== null ? note.id : ""}
 									note={note}
 								/>
