@@ -52,8 +52,19 @@ def register(request):
             emailSent = sendEmailVerification(
                 userSerializer.data['id'], userSerializer.data['email'], verifyToken)
         # send token to user
-        token, session_id = issueToken(userSerializer.data['id'], request)
-        return Response(data=successResponse({"verifyEmailSent": emailSent, "user": userSerializer.data, **tokenResponse(token), **dict(session=session_id)}), status=status.HTTP_201_CREATED)
+        token, session_id, expire = issueToken(
+            userSerializer.data['id'], request)
+        response = Response(data=successResponse({"verifyEmailSent": emailSent, "user": userSerializer.data,
+                            **tokenResponse(token), **dict(session=session_id)}), status=status.HTTP_201_CREATED)
+        response.set_cookie(
+            key='auth',
+            value=token,
+            expires=expire,
+            secure=True,
+            httponly=True,
+            samesite='Strict'
+        )
+        return response
     else:
         res_string = ""
         for key in userSerializer.errors:
@@ -83,8 +94,19 @@ def login(request):
     except User.DoesNotExist:
         return Response(data=errorResponse("Credentials are invalid.", "A0004"), status=status.HTTP_401_UNAUTHORIZED)
     # send token to user
-    token, session_id = issueToken(user.id, request)
-    return Response(data=successResponse({"user": UserSerializer(user).data, **tokenResponse(token), **dict(session=session_id)}), status=status.HTTP_202_ACCEPTED)
+    token, session_id, expire = issueToken(user.id, request)
+    response = Response(data=successResponse({"user": UserSerializer(
+        user).data, **tokenResponse(token), **dict(session=session_id)}), status=status.HTTP_202_ACCEPTED)
+    response.set_cookie(
+        key='auth',
+        value=token,
+        expires=expire,
+        secure=True,
+        httponly=True,
+        samesite='Strict',
+        domain='.letsnote.io'
+    )
+    return response
 
 
 # Log Out function, requires token

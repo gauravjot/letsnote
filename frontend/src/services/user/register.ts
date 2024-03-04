@@ -36,6 +36,7 @@ export async function userRegister(info: UserRegisterInfo) {
 			headers: {
 				"Content-Type": "application/json",
 			},
+			withCredentials: true,
 		})
 		.then((res) => {
 			return res.data;
