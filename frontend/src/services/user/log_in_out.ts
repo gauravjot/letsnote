@@ -23,6 +23,7 @@ export async function userLogin(info: UserLoginInfo) {
 			headers: {
 				"Content-Type": "application/json",
 			},
+			withCredentials: true,
 		})
 		.then(function (response) {
 			return response.data;
