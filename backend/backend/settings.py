@@ -42,9 +42,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -75,32 +75,47 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # CORS
 # https://github.com/adamchainz/django-cors-headers
 
-ALLOWED_HOSTS = ['10.55.0.103', 'localhost']
-
-CORS_ORIGIN_ALLOW_ALL = True
+ALLOWED_HOSTS = ['*']
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "http://127.0.0.1:8000",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://letsnote.io",
+    "https://www.letsnote.io",
+    "https://api.letsnote.io"
 ]
 
 CORS_ORIGIN_WHITELIST = CORS_ALLOWED_ORIGINS
 
-CORS_ALLOW_METHODS = [
+CORS_ALLOW_METHODS = (
     'DELETE',
     'GET',
     'OPTIONS',
     'PATCH',
     'POST',
     'PUT',
-]
+)
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'http://localhost:5173',
+    'https://letsnote.io',
+    'https://api.letsnote.io',
+    'https://www.letsnote.io'
 ]
+
+CORS_ALLOW_HEADERS = (
+    "accept",
+    "authorization",
+    "content-type",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+)
+
+CORS_ALLOW_CREDENTIALS = True
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
