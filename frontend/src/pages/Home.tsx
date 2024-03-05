@@ -37,7 +37,7 @@ export default function Home() {
 
 	const updateNoteMutation = useMutation({
 		mutationFn: (payload: UpdateNoteContentType) => {
-			return user ? updateNoteContent(user.token, payload) : Promise.reject("Note not found");
+			return user ? updateNoteContent(payload) : Promise.reject("Note not found");
 		},
 		onSuccess: (res) => {
 			const response = res as NoteType;
@@ -56,7 +56,7 @@ export default function Home() {
 
 	const createNoteMutation = useMutation({
 		mutationFn: (payload: {title: string; content: SlateDocumentType}) => {
-			return user ? createNote(user.token, payload) : Promise.reject("User not found");
+			return user ? createNote(payload) : Promise.reject("User not found");
 		},
 		onSuccess: (res) => {
 			setStatus(null);
@@ -95,8 +95,8 @@ export default function Home() {
 				const config = {
 					headers: {
 						"Content-Type": "application/json",
-						Authorization: user.token,
 					},
+					withCredentials: true,
 				};
 				axios
 					.get(BACKEND_SERVER_DOMAIN + "/api/note/" + n_id + "/", config)

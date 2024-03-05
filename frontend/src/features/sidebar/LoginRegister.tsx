@@ -1,11 +1,5 @@
 import React, {useContext, useState} from "react";
-import {
-	userLogout,
-	userLogin,
-	UserLoginResponse,
-	UserLoginInfo,
-	UserReduxType,
-} from "@/services/user/log_in_out";
+import {userLogout, userLogin, UserLoginInfo} from "@/services/user/log_in_out";
 import {UserContext} from "@/App";
 import {useForm} from "react-hook-form";
 import {AxiosError} from "axios";
@@ -15,6 +9,7 @@ import Button from "@/components/ui/button/Button";
 import {UserRegisterInfo, UserRegisterResponse, userRegister} from "@/services/user/register";
 import {useMutation} from "react-query";
 import {Settings} from "@/features/settings/Settings";
+import {UserType} from "@/types/user";
 
 export default function LoginRegister() {
 	const userContext = useContext(UserContext);
@@ -22,7 +17,7 @@ export default function LoginRegister() {
 
 	return (
 		<>
-			{userContext.user && userContext.user.token.length > 0 ? (
+			{userContext.user ? (
 				<UserCard user={userContext.user} />
 			) : showRegister ? (
 				<RegisterComponent showRegister={setShowRegister} />
@@ -52,10 +47,10 @@ function Login({
 		mutationFn: (payload: UserLoginInfo) => {
 			return userLogin(payload);
 		},
-		onSuccess: (data: UserLoginResponse) => {
+		onSuccess: (data: UserType) => {
 			setError(null);
 			reset();
-			userContext.setUser(data.data);
+			userContext.setUser(data);
 		},
 		onError: (error: AxiosError) => {
 			handleAxiosError(error, setError);
@@ -144,7 +139,7 @@ function RegisterComponent({
 		onSuccess: (data: UserRegisterResponse) => {
 			setError(null);
 			reset();
-			userContext.setUser(data.data);
+			userContext.setUser(data);
 			showRegister && showRegister(false);
 		},
 		onError: (error: AxiosError) => {
@@ -231,12 +226,12 @@ function RegisterComponent({
 	);
 }
 
-function UserCard({user}: {user: UserReduxType}) {
+function UserCard({user}: {user: UserType}) {
 	const userContext = useContext(UserContext);
 	const [showSettings, setShowSettings] = React.useState(false);
 
 	const logOut = async () => {
-		if (await userLogout(user.token)) {
+		if (await userLogout()) {
 			userContext.setUser(null);
 		} else {
 			console.log("Could not terminate session.");

@@ -26,7 +26,7 @@ export default function CreateNote({
 	const mutation = useMutation({
 		mutationFn: (payload: {title: string}) => {
 			return user
-				? createNote(user.token, {title: payload.title, content: ExampleDocument})
+				? createNote({title: payload.title, content: ExampleDocument})
 				: Promise.reject("User not found");
 		},
 		onSuccess: (res) => {

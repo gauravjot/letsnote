@@ -7,17 +7,16 @@ export interface DeleteAccountType {
 
 /**
  *
- * @param {string} token
  * @param {ChangeUserNameType} payload
  * @returns {Promise<any>}
  */
-export async function deleteAccount(token: string, payload: DeleteAccountType) {
+export async function deleteAccount(payload: DeleteAccountType) {
 	return await axios
 		.put(BACKEND_SERVER_DOMAIN + "/api/user/delete/", JSON.stringify(payload), {
 			headers: {
 				"Content-Type": "application/json",
-				Authorization: token,
 			},
+			withCredentials: true,
 		})
 		.then(function (response) {
 			return response.data;

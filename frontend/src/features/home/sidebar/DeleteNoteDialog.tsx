@@ -22,9 +22,7 @@ export default function DeleteNoteDialog(props: IDeleteNoteDialogProps) {
 
 	const mutation = useMutation({
 		mutationFn: () => {
-			return userContext.user
-				? deleteNote(userContext.user?.token, props.note.id)
-				: Promise.reject("User not logged in");
+			return userContext.user ? deleteNote(props.note.id) : Promise.reject("User not logged in");
 		},
 		onSuccess: () => {
 			setError(null);

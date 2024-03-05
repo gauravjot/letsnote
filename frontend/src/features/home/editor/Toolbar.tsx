@@ -31,7 +31,7 @@ const TEXT_ALIGN = ["left", "center", "right", "justify"];
 
 function Toolbar({note}: {note: NoteType | null}) {
 	const editor = useSlateStatic();
-	const userToken = useContext(UserContext).user?.token;
+	const userToken = useContext(UserContext).user;
 	const [isRenameDialogOpen, setIsRenameDialogOpen] = React.useState(false);
 
 	const onBlockTypeChange = useCallback(
@@ -54,7 +54,7 @@ function Toolbar({note}: {note: NoteType | null}) {
 				<div className="fixed inset-0 z-[100]">
 					<div className="fixed inset-0 bg-black/30 z-0" onClick={closeEditNameDialog}></div>
 					<div className="fixed inset-0 flex place-items-center justify-center z-[60]">
-						<TitleUpdateDialog note={note} closeFn={closeEditNameDialog} userToken={userToken} />
+						<TitleUpdateDialog note={note} closeFn={closeEditNameDialog} />
 					</div>
 				</div>
 			)}

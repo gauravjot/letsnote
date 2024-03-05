@@ -14,6 +14,7 @@ import {handleAxiosError} from "@/utils/HandleAxiosError";
 import {getNoteShares} from "@/services/note/get_note_shares";
 import {DisableShareLinkType, disableShareLinkQuery} from "@/services/note/disable_share_link";
 import CheckBox from "@/components/ui/checkbox/CheckBox";
+import Spinner from "@/components/ui/spinner/Spinner";
 
 interface Props {
 	note: NoteListItemType;
@@ -27,18 +28,14 @@ export default function ShareNotePopup({closePopup, note, open}: Props) {
 	const [shareNoteQueryError, setShareNoteQueryError] = useState<string | null>(null);
 	const [passProtect, setPassProtect] = useState(false);
 
-	const shareListQuery = useQuery(
-		["shareList", note.id],
-		() => getNoteShares(userContext?.user?.token, note.id),
-		{
-			refetchOnWindowFocus: false,
-		}
-	);
+	const shareListQuery = useQuery(["shareList", note.id], () => getNoteShares(note.id), {
+		refetchOnWindowFocus: false,
+	});
 
 	const shareNoteMutation = useMutation({
 		mutationFn: (payload: ShareNoteQueryType) => {
-			return userContext && userContext.user?.token
-				? shareNoteQuery(userContext.user?.token, note.id, payload)
+			return userContext && userContext.user
+				? shareNoteQuery(note.id, payload)
 				: Promise.reject("User authentication error. Logout and login again to retry.");
 		},
 		onSuccess: () => {
@@ -213,17 +210,20 @@ export default function ShareNotePopup({closePopup, note, open}: Props) {
 							<>
 								<h2 className="pt-7 pb-2">Past Shares</h2>
 								<div className="flex-1 overflow-y-auto	h-full">
-									{shareListQuery.data.map((link) => {
-										return <ShareLinkItem link={link} />;
-									})}
+									{shareListQuery.data.length > 0 ? (
+										shareListQuery.data.map((link) => {
+											return <ShareLinkItem link={link} key={link.id} />;
+										})
+									) : (
+										<p className="mt-4 text-gray-600 text-sm">
+											The links you create to share will appear here!
+										</p>
+									)}
 								</div>
 							</>
 						) : shareListQuery.isLoading ? (
-							<div className="w-full my-2 mt-16 text-center">
-								<div className="anim-ripple">
-									<div></div>
-									<div></div>
-								</div>
+							<div className="flex justify-center py-12">
+								<Spinner color="primary" size="sm" />
 							</div>
 						) : shareListQuery.isError ? (
 							<p className="mx-4 mt-4 text-red-700 text-sm">
@@ -245,27 +245,36 @@ function ShareLinkItem({link}: {link: ShareNote}) {
 	const disableShareLinkMutation = useMutation({
 		mutationFn: (payload: DisableShareLinkType) => {
 			return userContext && userContext.user
-				? disableShareLinkQuery(userContext.user.token, payload)
+				? disableShareLinkQuery(payload)
 				: Promise.reject("User authentication error. Logout and login again to retry.");
 		},
 	});
 
 	return (
 		<div
-			className="last:mb-4 grid grid-cols-5 items-center py-0.5 pl-2 gap-3 border-b border-gray-100 whitespace-nowrap overflow-hidden"
+			className="last:mb-4 flex items-center py-0.5 pl-2 gap-3 border-b border-gray-100 whitespace-nowrap overflow-hidden"
 			key={link.id}
 		>
-			<div className="col-span-1 text-xs text-gray-500">{timeSince(link.created)}</div>
-			<div className="col-span-2 text-sm flex gap-1 place-items-center">
-				{link.isPasswordProtected ? (
-					<span className="ic ic-green ic-sm ic-lock" title="Password Protected"></span>
-				) : (
-					<></>
-				)}
-				{link.title ? link.title : <span className="text-gray-500 text-xs">no title</span>}
+			<div className="grid md:grid-cols-4 md:gap-3 py-4 lg:py-0 flex-1 truncate">
+				<div className="col-span-1 text-xs text-gray-500">{timeSince(link.created)}</div>
+				<div className="col-span-2 text-sm flex gap-1 place-items-center truncate">
+					{link.isPasswordProtected ? (
+						<span
+							className="ic ic-green !size-3 lg:!size-3.5 ic-lock"
+							title="Password Protected"
+						></span>
+					) : (
+						<></>
+					)}
+					{link.title ? (
+						link.title
+					) : (
+						<span className="text-gray-500 text-xs truncate">no title</span>
+					)}
+				</div>
+				<div className="col-span-1 text-xs text-gray-500">{link.anonymous ? "Anonymous" : ""}</div>
 			</div>
-			<div className="col-span-1 text-xs text-gray-500">{link.anonymous ? "Anonymous" : ""}</div>
-			<div className="col-span-1 text-right">
+			<div className="col-span-1 text-right pr-2">
 				<Button
 					elementChildren={
 						disableShareLinkMutation.isSuccess || !link.active ? "Disabled" : "Disable"

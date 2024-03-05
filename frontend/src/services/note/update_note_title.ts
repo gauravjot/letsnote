@@ -7,22 +7,17 @@ export interface UpdateNoteTitleType {
 
 /**
  *
- * @param {string} token
  * @param {string} note_id
  * @param {UpdateNoteTitleType} payload
  * @returns {Promise<any>}
  */
-export async function updateNoteTitle(
-	token: string,
-	note_id: string,
-	payload: UpdateNoteTitleType
-) {
+export async function updateNoteTitle(note_id: string, payload: UpdateNoteTitleType) {
 	return await axios
 		.put(BACKEND_SERVER_DOMAIN + "/api/note/" + note_id + "/edit/title/", JSON.stringify(payload), {
 			headers: {
 				"Content-Type": "application/json",
-				Authorization: token,
 			},
+			withCredentials: true,
 		})
 		.then(function (response) {
 			return response.data;

@@ -8,17 +8,16 @@ export interface ChangePasswordType {
 
 /**
  *
- * @param {string} token
  * @param {ChangePasswordType} payload
  * @returns {Promise<any>}
  */
-export async function changePassword(token: string, payload: ChangePasswordType) {
+export async function changePassword(payload: ChangePasswordType) {
 	return await axios
 		.put(BACKEND_SERVER_DOMAIN + "/api/user/change/password/", JSON.stringify(payload), {
 			headers: {
 				"Content-Type": "application/json",
-				Authorization: token,
 			},
+			withCredentials: true,
 		})
 		.then(function (response) {
 			return response.data;

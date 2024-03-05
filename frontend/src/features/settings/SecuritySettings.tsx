@@ -25,8 +25,8 @@ export default function SecuritySettings() {
 	const sessionsQuery = useQuery(
 		["getSessions"],
 		() =>
-			userContext && userContext.user?.token
-				? getUserSessions(userContext.user?.token)
+			userContext && userContext.user
+				? getUserSessions()
 				: Promise.reject("User authentication error. Logout and login again to retry"),
 		{
 			enabled: !!userContext.user,
@@ -38,8 +38,8 @@ export default function SecuritySettings() {
 	const changePasswordForm = useForm();
 	const changePasswordMutation = useMutation({
 		mutationFn: (payload: ChangePasswordType) => {
-			return userContext && userContext.user?.token
-				? changePassword(userContext.user?.token, payload)
+			return userContext && userContext.user
+				? changePassword(payload)
 				: Promise.reject("User authentication error. Logout and login again to retry.");
 		},
 		onSuccess: () => {
@@ -216,8 +216,8 @@ function UserSession({session}: {session: UserSessionType}) {
 
 	const closeSessionMutation = useMutation({
 		mutationFn: (payload: RemoveSessionType) => {
-			return userContext && userContext.user?.token
-				? closeSession(userContext.user?.token, payload)
+			return userContext && userContext.user
+				? closeSession(payload)
 				: Promise.reject("User authentication error. Logout and login again to retry.");
 		},
 		onSuccess: () => {
@@ -287,7 +287,7 @@ function DeleteAccountDialog({closeFn}: {closeFn: () => void}) {
 	const deleteAccountMutation = useMutation({
 		mutationFn: (payload: DeleteAccountType) =>
 			userContext.user
-				? deleteAccount(userContext.user.token, payload)
+				? deleteAccount(payload)
 				: Promise.reject("User authentication error. Logout and login again to retry"),
 		onSuccess: () => {
 			// Let user know account is deleted

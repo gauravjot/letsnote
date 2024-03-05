@@ -41,7 +41,7 @@ export default function SharedPage() {
 
 	const noteMutation = useMutation({
 		mutationFn: (payload: {password: string}) => {
-			return shareid && user && user.token
+			return shareid && user
 				? getSharedNote(shareid, payload.password)
 				: Promise.reject("Share ID is null");
 		},

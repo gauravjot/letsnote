@@ -7,17 +7,16 @@ export interface ChangeUserNameType {
 
 /**
  *
- * @param {string} token
  * @param {ChangeUserNameType} payload
  * @returns {Promise<any>}
  */
-export async function changeName(token: string, payload: ChangeUserNameType) {
+export async function changeName(payload: ChangeUserNameType) {
 	return await axios
 		.put(BACKEND_SERVER_DOMAIN + "/api/user/change/name/", JSON.stringify(payload), {
 			headers: {
 				"Content-Type": "application/json",
-				Authorization: token,
 			},
+			withCredentials: true,
 		})
 		.then(function (response) {
 			return response.data;

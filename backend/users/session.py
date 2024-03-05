@@ -16,13 +16,23 @@ from backend.utils import errorResponse, hashThis
 
 
 def getUserID(request):
-    # Check if token is present in header
+    # Check if token in present in cookie
     try:
-        token = request.headers['Authorization'].split()[-1]
+        token = request.COOKIES['auth']
         if len(token) < 48:
             raise KeyError
     except KeyError:
-        return Response(errorResponse("Unauthorized.", "A1001"), status=status.HTTP_401_UNAUTHORIZED)
+        # Check if token is present in header
+        try:
+            token = request.headers['Authorization'].split()[-1]
+            if len(token) < 48:
+                raise KeyError
+            pass
+        except KeyError:
+            return Response(errorResponse("Unauthorized.", "A1001"), status=status.HTTP_401_UNAUTHORIZED)
+        if len(token) < 48:
+            return Response(errorResponse("Unauthorized.", "A1001"), status=status.HTTP_401_UNAUTHORIZED)
+
     # Check if token is present in database and is valid
     try:
         session = Session.objects.select_related(
@@ -43,6 +53,38 @@ def getUserID(request):
             return Response(errorResponse("Unauthorized.", "A1002"), status=status.HTTP_401_UNAUTHORIZED)
     except Session.DoesNotExist:
         return Response(errorResponse("Unauthorized.", "A1003"), status=status.HTTP_401_UNAUTHORIZED)
+
+
+def getSesson(request):
+    # Check if token in present in cookie
+    try:
+        token = request.COOKIES['auth']
+        if len(token) < 48:
+            raise KeyError
+    except KeyError:
+        # Check if token is present in header
+        try:
+            token = request.headers['Authorization'].split()[-1]
+            if len(token) < 48:
+                raise KeyError
+            pass
+        except KeyError:
+            return Response(errorResponse("Unauthorized.", "A1001"), status=status.HTTP_401_UNAUTHORIZED)
+        if len(token) < 48:
+            return Response(errorResponse("Unauthorized.", "A1001"), status=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        session = Session.objects.select_related(
+            'user').get(token=hashThis(token))
+        # Check if session is expired
+        isSessionExpired = False
+        gap = datetime.now(tz=pytz.utc) - session.created
+        if gap > timedelta(minutes=session.expire):
+            isSessionExpired = True
+        if session.valid and not isSessionExpired:
+            return session.id
+    except Session.DoesNotExist:
+        return ""
 
 # Create a token
 
@@ -65,14 +107,29 @@ def issueToken(uid, request):
 
 def dropSession(request):
     try:
-        session = Session.objects.get(token=hashThis(
-            request.headers['Authorization'].split()[-1]))
-        session.valid = False
-        session.token = "dropped"
-        session.expire = 0
-        session.save()
-    except Session.DoesNotExist:
-        pass
+        token = request.COOKIES['auth']
+        if len(token) < 48:
+            raise KeyError
+    except KeyError:
+        # Check if token is present in header
+        try:
+            token = request.headers['Authorization'].split()[-1]
+            if len(token) < 48:
+                raise KeyError
+            pass
+        except KeyError:
+            return Response(errorResponse("Unauthorized.", "A1001"), status=status.HTTP_401_UNAUTHORIZED)
+        if len(token) < 48:
+            return Response(errorResponse("Unauthorized.", "A1001"), status=status.HTTP_401_UNAUTHORIZED)
+    if len(token) >= 48:
+        try:
+            session = Session.objects.get(token=hashThis(token))
+            session.valid = False
+            session.token = "dropped"
+            session.expire = 0
+            session.save()
+        except Session.DoesNotExist:
+            pass
 
 # Get Client IP Address
 

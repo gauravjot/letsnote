@@ -3,18 +3,17 @@ import axios from "axios";
 
 /**
  *
- * @param {string} token
  * @param {string} note_id
  * @param {DeleteNoteType} payload
  * @returns {Promise<NoteType>}
  */
-export async function deleteNote(token: string, note_id: string) {
+export async function deleteNote(note_id: string) {
 	return await axios
 		.delete(BACKEND_SERVER_DOMAIN + "/api/note/" + note_id + "/", {
 			headers: {
 				"Content-Type": "application/json",
-				Authorization: token,
 			},
+			withCredentials: true,
 		})
 		.then(function (response) {
 			return response.data;

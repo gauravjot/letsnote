@@ -1,4 +1,5 @@
 import {REGISTER_EP} from "@/config";
+import {UserType} from "@/types/user";
 import axios from "axios";
 
 export interface UserRegisterInfo {
@@ -7,22 +8,8 @@ export interface UserRegisterInfo {
 	password: string;
 }
 
-export interface UserRegisterResponse {
-	success: boolean;
-	data: {
-		verifyEmailSent: boolean;
-		user: {
-			id: string;
-			name: string;
-			email: string;
-			verified: boolean;
-			created: string;
-			updated: string;
-			password_updated: string;
-		};
-		token: string;
-		session: number;
-	};
+export interface UserRegisterResponse extends UserType {
+	verifyEmailSent: boolean;
 }
 
 /**
@@ -39,6 +26,6 @@ export async function userRegister(info: UserRegisterInfo) {
 			withCredentials: true,
 		})
 		.then((res) => {
-			return res.data;
+			return res.data.data as UserRegisterResponse;
 		});
 }

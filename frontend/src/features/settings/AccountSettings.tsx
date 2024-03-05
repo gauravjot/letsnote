@@ -3,7 +3,6 @@ import Button from "@/components/ui/button/Button";
 import InputField from "@/components/ui/input/Input";
 import {ChangeEmailType, changeEmail} from "@/services/user/change_email";
 import {ChangeUserNameType, changeName} from "@/services/user/change_user_name";
-import {UserType} from "@/types/user";
 import {datePretty, dateTimePretty, timeSince} from "@/utils/DateTimeUtils";
 import {handleAxiosError} from "@/utils/HandleAxiosError";
 import {AxiosError} from "axios";
@@ -20,16 +19,15 @@ export default function AccountSettings() {
 	const changeNameForm = useForm();
 	const changeNameMutation = useMutation({
 		mutationFn: (payload: ChangeUserNameType) => {
-			return userContext && userContext.user?.token
-				? changeName(userContext.user?.token, payload)
+			return userContext && userContext.user
+				? changeName(payload)
 				: Promise.reject("User authentication error. Logout and login again to retry.");
 		},
 		onSuccess: (res) => {
-			const response = res.data as UserType;
+			const response = res.data;
 			if (userContext.user) {
 				userContext.setUser({
 					user: response,
-					token: userContext.user.token,
 					session: userContext.user.session,
 				});
 				setShowNameChange(false);
@@ -45,16 +43,15 @@ export default function AccountSettings() {
 	const changeEmailForm = useForm();
 	const changeEmailMutation = useMutation({
 		mutationFn: (payload: ChangeEmailType) => {
-			return userContext && userContext.user?.token
-				? changeEmail(userContext.user?.token, payload)
+			return userContext && userContext.user
+				? changeEmail(payload)
 				: Promise.reject("User authentication error. Logout and login again to retry.");
 		},
 		onSuccess: (res) => {
-			const response = res.data as UserType;
+			const response = res.data;
 			if (userContext.user) {
 				userContext.setUser({
 					user: response,
-					token: userContext.user.token,
 					session: userContext.user.session,
 				});
 				setShowEmailChange(false);

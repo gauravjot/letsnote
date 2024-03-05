@@ -1,20 +1,11 @@
 import axios from "axios";
 import {LOGIN_EP, LOGOUT_EP} from "@/config";
 import {handleApiError} from "@/services/handle_error";
-import {UserSession, UserType} from "@/types/user";
+import {UserType} from "@/types/user";
 
 export interface UserLoginInfo {
 	email: string;
 	password: string;
-}
-
-export interface UserReduxType extends UserSession {
-	user: UserType;
-}
-
-export interface UserLoginResponse {
-	success: boolean;
-	data: UserReduxType;
 }
 
 export async function userLogin(info: UserLoginInfo) {
@@ -26,17 +17,17 @@ export async function userLogin(info: UserLoginInfo) {
 			withCredentials: true,
 		})
 		.then(function (response) {
-			return response.data;
+			return response.data.data as UserType;
 		});
 }
 
-export function userLogout(token: string) {
+export function userLogout() {
 	return axios
 		.delete(LOGOUT_EP, {
 			headers: {
 				"Content-Type": "multipart/form-data",
-				Authorization: token,
 			},
+			withCredentials: true,
 		})
 		.then(() => {
 			return true;

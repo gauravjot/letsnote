@@ -7,17 +7,16 @@ export interface DisableShareLinkType {
 
 /**
  *
- * @param {string} token
  * @param {DisableShareLinkType} payload
  * @returns {Promise<any>}
  */
-export async function disableShareLinkQuery(token: string, payload: DisableShareLinkType) {
+export async function disableShareLinkQuery(payload: DisableShareLinkType) {
 	return await axios
 		.put(BACKEND_SERVER_DOMAIN + "/api/note/share/links/disable/", JSON.stringify(payload), {
 			headers: {
 				"Content-Type": "application/json",
-				Authorization: token,
 			},
+			withCredentials: true,
 		})
 		.then(function (response) {
 			return response.data;

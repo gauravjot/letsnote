@@ -13,7 +13,6 @@ import {dateTimePretty} from "@/utils/DateTimeUtils";
 export interface IEditNoteNameDialogProps {
 	note: NoteListItemType;
 	closeFn: () => void;
-	userToken: string;
 }
 
 export default function TitleUpdateDialog(props: IEditNoteNameDialogProps) {
@@ -28,7 +27,7 @@ export default function TitleUpdateDialog(props: IEditNoteNameDialogProps) {
 
 	const mutation = useMutation({
 		mutationFn: (payload: {editnotename: string}) => {
-			return updateNoteTitle(props.userToken, props.note.id, {title: payload.editnotename});
+			return updateNoteTitle(props.note.id, {title: payload.editnotename});
 		},
 		onSuccess: () => {
 			setError(null);

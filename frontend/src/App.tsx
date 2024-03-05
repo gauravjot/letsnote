@@ -1,8 +1,10 @@
 import {Route, Navigate, Routes, BrowserRouter as Router} from "react-router-dom";
 /* Components */
 import React, {Suspense, createContext, useEffect, useState} from "react";
-import {UserReduxType} from "./services/user/log_in_out";
 import Spinner from "./components/ui/spinner/Spinner";
+import {UserType} from "./types/user";
+import axios from "axios";
+import {BACKEND_SERVER_DOMAIN} from "./config";
 
 // lazy imports
 const Home = React.lazy(() => import("@/pages/Home"));
@@ -14,37 +16,32 @@ export const UserContext = createContext({
 		return null;
 	},
 } as {
-	user: UserReduxType | null;
-	setUser: React.Dispatch<React.SetStateAction<UserReduxType | null>>;
+	user: UserType | null;
+	setUser: React.Dispatch<React.SetStateAction<UserType | null>>;
 });
 
 export default function App() {
-	const readFromLocalStorage = (): UserReduxType | null => {
-		try {
-			const serializedState = localStorage.getItem("user");
-			if (serializedState === null) {
-				return null;
-			}
-			return JSON.parse(decodeURIComponent(serializedState)).user;
-		} catch (e) {
-			return null;
-		}
-	};
-	const [user, setUser] = useState<UserReduxType | null>(readFromLocalStorage());
+	const [user, setUser] = useState<UserType | null>(null);
 
 	useEffect(() => {
-		// save
-		if (user) {
-			try {
-				const serializedState = JSON.stringify({user: user});
-				localStorage.setItem("user", encodeURIComponent(serializedState));
-			} catch (e) {
-				console.log(e);
-			}
-		} else {
-			localStorage.removeItem("user");
+		// Check if user is logged in
+		async function checkUser() {
+			await axios
+				.get(BACKEND_SERVER_DOMAIN + "/api/user/profile/", {
+					headers: {
+						"Content-Type": "application/json",
+					},
+					withCredentials: true,
+				})
+				.then((response) => {
+					setUser(response.data.data);
+				})
+				.catch(() => {
+					return setUser(null);
+				});
 		}
-	}, [user]);
+		checkUser();
+	}, []);
 
 	return (
 		<UserContext.Provider

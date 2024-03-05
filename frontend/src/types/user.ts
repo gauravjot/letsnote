@@ -1,15 +1,13 @@
 export interface UserType {
-	id: string;
-	name: string;
-	email: string;
-	verified: boolean;
-	created: string;
-	updated: string;
-	password_updated: string;
-}
-
-export interface UserSession {
-	token: string;
+	user: {
+		id: string;
+		name: string;
+		email: string;
+		verified: boolean;
+		created: string;
+		updated: string;
+		password_updated: string;
+	};
 	session: number;
 }
 

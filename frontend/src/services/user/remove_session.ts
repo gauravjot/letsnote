@@ -7,17 +7,16 @@ export interface RemoveSessionType {
 
 /**
  *
- * @param {string} token
  * @param {RemoveSessionType} payload
  * @returns {Promise<any>}
  */
-export async function closeSession(token: string, payload: RemoveSessionType) {
+export async function closeSession(payload: RemoveSessionType) {
 	return await axios
 		.put(BACKEND_SERVER_DOMAIN + "/api/user/session/close/", JSON.stringify(payload), {
 			headers: {
 				"Content-Type": "application/json",
-				Authorization: token,
 			},
+			withCredentials: true,
 		})
 		.then(function (response) {
 			return response.data;

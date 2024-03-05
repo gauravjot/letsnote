@@ -13,8 +13,9 @@ from rest_framework.decorators import api_view
 from .models import User, Verify, Session
 from .serializers import UserSerializer, VerifySerializer, SessionSerializer
 # Session
-from .session import issueToken, dropSession, getUserID
+from .session import issueToken, dropSession, getUserID, getSesson
 from backend.utils import tokenResponse, errorResponse, successResponse, hashThis
+from decouple import config
 
 
 # Sign Up function
@@ -54,15 +55,17 @@ def register(request):
         # send token to user
         token, session_id, expire = issueToken(
             userSerializer.data['id'], request)
-        response = Response(data=successResponse({"verifyEmailSent": emailSent, "user": userSerializer.data,
-                            **tokenResponse(token), **dict(session=session_id)}), status=status.HTTP_201_CREATED)
+        response = Response(data=successResponse(
+            {"verifyEmailSent": emailSent, "user": userSerializer.data, **dict(session=session_id)}), status=status.HTTP_201_CREATED)
+        # expire is in minutes so we multiply by 60
         response.set_cookie(
             key='auth',
             value=token,
-            expires=expire,
-            secure=True,
+            expires=expire*60,
             httponly=True,
-            samesite='Strict'
+            secure=config('AUTH_COOKIE_SAMESITE', default=True),
+            samesite=config('AUTH_COOKIE_SAMESITE', default='Strict'),
+            domain=config('AUTH_COOKIE_DOMAIN', default='localhost')
         )
         return response
     else:
@@ -96,15 +99,16 @@ def login(request):
     # send token to user
     token, session_id, expire = issueToken(user.id, request)
     response = Response(data=successResponse({"user": UserSerializer(
-        user).data, **tokenResponse(token), **dict(session=session_id)}), status=status.HTTP_202_ACCEPTED)
+        user).data, **dict(session=session_id)}), status=status.HTTP_202_ACCEPTED)
+    # expire is in minutes so we multiply by 60
     response.set_cookie(
         key='auth',
         value=token,
-        expires=expire,
-        secure=True,
+        expires=expire*60,
         httponly=True,
-        samesite='Strict',
-        domain='.letsnote.io'
+        secure=config('AUTH_COOKIE_SAMESITE', default=True),
+        samesite=config('AUTH_COOKIE_SAMESITE', default='Strict'),
+        domain=config('AUTH_COOKIE_DOMAIN', default='localhost')
     )
     return response
 
@@ -115,7 +119,12 @@ def login(request):
 def logout(request):
     # Invalidate the token
     dropSession(request)
-    return Response(data=successResponse(), status=status.HTTP_200_OK)
+    response = Response(data=successResponse(), status=status.HTTP_200_OK)
+    response.delete_cookie(
+        key='auth',
+        domain=config('AUTH_COOKIE_DOMAIN', default='localhost')
+    )
+    return response
 
 
 # Verify Email, requires email verification token
@@ -136,6 +145,17 @@ def verifyEmail(request, emailtoken):
         return Response(data=errorResponse("Email verification failed. Resend verification email.", "A0007"), status=status.HTTP_400_BAD_REQUEST)
     except (User.DoesNotExist, Verify.DoesNotExist) as err:
         return Response(data=errorResponse("Email verification failed. Resend verification email.", "A0008"), status=status.HTTP_400_BAD_REQUEST)
+
+
+# Get User Profile, requires token
+# -----------------------------------------------
+@api_view(['GET'])
+def getUserProfile(request):
+    user = getUserID(request)
+    if type(user) is Response:
+        return user
+    return Response(data=successResponse({"user": UserSerializer(
+        user).data, **dict(session=getSesson(request))}), status=status.HTTP_202_ACCEPTED)
 
 
 # Change Password, requires old password and new password

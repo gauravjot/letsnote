@@ -9,13 +9,13 @@ import axios from "axios";
  * @returns {Promise<NoteType>}
  */
 
-export default async function getNoteById(note_id: string, userToken: string) {
+export default async function getNoteById(note_id: string) {
 	return await axios
 		.get(BACKEND_SERVER_DOMAIN + "/api/note/" + note_id + "/", {
 			headers: {
 				"Content-Type": "application/json",
-				Authorization: userToken,
 			},
+			withCredentials: true,
 		})
 		.then(function (response) {
 			// Close the sidebar on mobile if open
