@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 from decouple import config
+from django.core.mail import get_connection
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -132,23 +133,29 @@ DATABASES = {
 }
 
 
-# Password validation
-# https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
+# Email
+# https://docs.djangoproject.com/en/5.0/topics/email/
 
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+
+def getEmailConnection():
+    if config('SMTP_USE_TLS') == 'True':
+        return get_connection(
+            host=config('SMTP_HOST'),
+            port=config('SMTP_PORT'),
+            username=config('SMTP_USER'),
+            password=config('SMTP_PASSWORD'),
+            use_tls=True,
+        )
+    else:
+        return get_connection(
+            host=config('SMTP_HOST'),
+            port=config('SMTP_PORT'),
+            username=config('SMTP_USER'),
+            password=config('SMTP_PASSWORD'),
+            use_ssl=True,
+        )
 
 
 # Internationalization

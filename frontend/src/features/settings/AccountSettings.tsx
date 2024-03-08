@@ -48,10 +48,9 @@ export default function AccountSettings() {
 				: Promise.reject("User authentication error. Logout and login again to retry.");
 		},
 		onSuccess: (res) => {
-			const response = res.data;
 			if (userContext.user) {
 				userContext.setUser({
-					user: response,
+					user: res.user,
 					session: userContext.user.session,
 				});
 				setShowEmailChange(false);
@@ -197,10 +196,26 @@ export default function AccountSettings() {
 					</form>
 				) : (
 					<>
-						<p className="mt-3 mx-4 text-gray-900 tracking-wide">{userContext?.user?.user.email}</p>
+						<p className="mt-3 mx-4 text-gray-900 tracking-wide">
+							{userContext?.user?.user.email}
+							{"  "}
+							{userContext.user?.user.verified ? (
+								<span className="ml-2 font-medium text-green-700 tracking-tight text-bb">
+									Verified
+								</span>
+							) : (
+								<span className="ml-2 font-medium text-red-600 inline-block tracking-tight text-bb">
+									Not Verified
+								</span>
+							)}
+						</p>
 						{changeEmailMutation.isSuccess && (
 							<p className="mx-4 mt-2 text-green-700 text-sm">
-								Email changed successfully. You will need to use your new email addresss to login.
+								Email changed successfully.{" "}
+								<span className="font-medium">
+									Please verify your new email address by clicking the link sent to your new email
+									address.
+								</span>
 							</p>
 						)}
 						<div className="mx-4 mt-1">

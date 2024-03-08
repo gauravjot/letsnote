@@ -1,6 +1,6 @@
 import pytz
-import json
 import uuid
+import re
 from datetime import datetime
 # Security
 import bcrypt
@@ -14,7 +14,12 @@ from .models import User, Verify, Session
 from .serializers import UserSerializer, VerifySerializer, SessionSerializer
 # Session
 from .session import issueToken, dropSession, getUserID, getSesson
-from backend.utils import tokenResponse, errorResponse, successResponse, hashThis
+# Utils
+from django.shortcuts import render
+from django.core.mail import send_mail
+from smtplib import SMTPDataError
+from backend.settings import getEmailConnection
+from backend.utils import errorResponse, successResponse, hashThis
 from decouple import config
 
 
@@ -51,12 +56,18 @@ def register(request):
         if verifySerializer.is_valid():
             verifySerializer.save()
             emailSent = sendEmailVerification(
-                userSerializer.data['id'], userSerializer.data['email'], verifyToken)
+                userSerializer.data['email'], verifyToken)
         # send token to user
         token, session_id, expire = issueToken(
             userSerializer.data['id'], request)
-        response = Response(data=successResponse(
-            {"verifyEmailSent": emailSent, "user": userSerializer.data, **dict(session=session_id)}), status=status.HTTP_201_CREATED)
+        response = Response(
+            data=successResponse(
+                {"verifyEmailSent": True if emailSent == 1 else False,
+                 "user": userSerializer.data,
+                 **dict(session=session_id)}
+            ),
+            status=status.HTTP_201_CREATED
+        )
         # expire is in minutes so we multiply by 60
         response.set_cookie(
             key='auth',
@@ -129,22 +140,25 @@ def logout(request):
 
 # Verify Email, requires email verification token
 # -----------------------------------------------
-@api_view(['PUT'])
 def verifyEmail(request, emailtoken):
+    template = 'email_verification.html'
     try:
         verify = Verify.objects.get(token=hashThis(emailtoken))
         if not verify.consumed:
-            user = User.objects.get(uuid=verify.user)
+            user = User.objects.get(id=verify.user.id)
             user.verified = True
             user.save()
 
             verify.consumed = True
             verify.save()
-
-            return Response(data=successResponse(), status=status.HTTP_200_OK)
-        return Response(data=errorResponse("Email verification failed. Resend verification email.", "A0007"), status=status.HTTP_400_BAD_REQUEST)
+            return render(request, template, {"verified": True, "url": config('FRONTEND_URL')})
+        else:
+            user = User.objects.get(id=verify.user.id)
+            if user.verified:
+                return render(request, template, {"verified": True, "url": config('FRONTEND_URL')})
+        return render(request, template, {"verified": False, "url": config('FRONTEND_URL')})
     except (User.DoesNotExist, Verify.DoesNotExist) as err:
-        return Response(data=errorResponse("Email verification failed. Resend verification email.", "A0008"), status=status.HTTP_400_BAD_REQUEST)
+        return render(request, template, {"verified": False, "url": config('FRONTEND_URL')})
 
 
 # Get User Profile, requires token
@@ -197,12 +211,41 @@ def changeEmail(request):
     user = getUserID(request)
     if type(user) is Response:
         return user
+    # Check if email is not empty
     if not request.data['email']:
         return Response(data=errorResponse("Email is required.", "A0013"), status=status.HTTP_400_BAD_REQUEST)
-    user.email = request.data['email']
+    # Check if it valid email
+    if not re.match(r"^\S+@\S+\.\S+$", request.data['email'].strip()):
+        return Response(data=errorResponse("Email is invalid.", "A0017"), status=status.HTTP_400_BAD_REQUEST)
+    # Check if email is not the same
+    if user.email == request.data['email'].strip():
+        return Response(data=errorResponse("New email is the same.", "A0018"), status=status.HTTP_400_BAD_REQUEST)
+    # Check if email is not in use
+    if User.objects.filter(email=request.data['email'].strip()).exists():
+        return Response(data=errorResponse("Email is already in use.", "A0016"), status=status.HTTP_400_BAD_REQUEST)
+
+    # Update email
+    user.email = request.data['email'].strip()
+    user.verified = False
     user.updated = datetime.now(pytz.utc)
     user.save()
-    return Response(data=successResponse(UserSerializer(user).data), status=status.HTTP_200_OK)
+
+    # Generate and send email verification token
+    emailSent = 0
+    verifyToken = token_hex(24)
+
+    verifySerializer = VerifySerializer(data=dict(
+        user=user.id,
+        token=hashThis(verifyToken),
+        created=datetime.now(pytz.utc)
+    ))
+    if verifySerializer.is_valid():
+        verifySerializer.save()
+        emailSent = sendEmailVerification(
+            request.data['email'], verifyToken)
+
+    return Response(data=successResponse({"verifyEmailSent": True if emailSent == 1 else False,
+                                          "user": UserSerializer(user).data}), status=status.HTTP_200_OK)
 
 
 # Get User Sessions, requires token
@@ -254,9 +297,17 @@ def closeSession(request):
 
 # Services
 # -----------------------------------------------
-def sendEmailVerification(uuid, email, token):
+def sendEmailVerification(email, token):
     # Send this token
-    return False
+    try:
+        with getEmailConnection() as connection:
+            subject = "Verify your email"
+            message = f"Click the link to verify your email: {config('BASE_URL')}/api/user/verifyemail/{token}/"
+            from_email = config('SMTP_DEFAULT_SEND_FROM')
+            to_email = email
+            return send_mail(subject, message, from_email, [to_email], connection=connection)
+    except SMTPDataError:
+        return 0
 
 
 # Helper Functions
