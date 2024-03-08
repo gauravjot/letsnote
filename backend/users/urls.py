@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import register, login, logout, verifyEmail, changeEmail, changeName, changePassword, getUserSessions, getUserProfile, closeSession, deleteUser
+from .views import *
 
 urlpatterns = [
     path('api/user/register/', register),
@@ -12,5 +12,6 @@ urlpatterns = [
     path('api/user/sessions/', getUserSessions),
     path('api/user/session/close/', closeSession),
     path('api/user/delete/', deleteUser),
+    path('api/user/verifyemail/resend/', resendVerifyEmail),
     path('api/user/verifyemail/<emailtoken>/', verifyEmail),
 ]

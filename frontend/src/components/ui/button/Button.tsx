@@ -61,7 +61,7 @@ export default function Button(props: Props) {
 		white_border:
 			"border border-gray-300 text-gray-700 hover:outline-gray-200 hover:border-gray-400 focus:outline-gray-200 focus:bg-gray-50",
 		primary_text_opaque:
-			"text-primary-700 font-medium bg-white border-none shadow-none hover:outline-none hover:bg-primary-50 focus:bg-primary-50",
+			"text-primary-700 font-medium bg-white border-none shadow-none hover:outline-none hover:bg-primary-50 focus:bg-primary-50 focus:outline-none focus:border-none focus:shadow-none",
 	};
 	const buttonSizing =
 		props.elementSize === "base"

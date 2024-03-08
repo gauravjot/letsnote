@@ -3,10 +3,11 @@ import Button from "@/components/ui/button/Button";
 import InputField from "@/components/ui/input/Input";
 import {ChangeEmailType, changeEmail} from "@/services/user/change_email";
 import {ChangeUserNameType, changeName} from "@/services/user/change_user_name";
+import {resendVerificationEmail} from "@/services/user/resend_verification_email";
 import {datePretty, dateTimePretty, timeSince} from "@/utils/DateTimeUtils";
 import {handleAxiosError} from "@/utils/HandleAxiosError";
 import {AxiosError} from "axios";
-import {useState, useContext} from "react";
+import {useState, useContext, useEffect} from "react";
 import {useForm} from "react-hook-form";
 import {useMutation} from "react-query";
 
@@ -61,6 +62,32 @@ export default function AccountSettings() {
 			handleAxiosError(error, setChangeEmailError);
 		},
 	});
+
+	const [verifyEmailResendError, setVerifyEmailResendError] = useState<string | null>(null);
+	const verifyEmailResendMutation = useMutation({
+		mutationFn: () => {
+			return userContext && userContext.user && !userContext.user.user.verified
+				? resendVerificationEmail()
+				: Promise.reject("User is already verified.");
+		},
+		onSuccess: () => {
+			setVerifyEmailResendError(null);
+		},
+		onError: (error: AxiosError) => {
+			handleAxiosError(error, setVerifyEmailResendError);
+		},
+	});
+
+	useEffect(() => {
+		if (verifyEmailResendError && verifyEmailResendError.toLowerCase().includes("verified")) {
+			const u = userContext.user;
+			if (u?.user) {
+				u.user.verified = true;
+				userContext?.setUser(u);
+				setVerifyEmailResendError(null);
+			}
+		}
+	}, [verifyEmailResendError, userContext]);
 
 	return (
 		<>
@@ -200,13 +227,38 @@ export default function AccountSettings() {
 							{userContext?.user?.user.email}
 							{"  "}
 							{userContext.user?.user.verified ? (
-								<span className="ml-2 font-medium text-green-700 tracking-tight text-bb">
+								<span className="ml-2 font-medium text-green-700 bg-green-100 rounded px-1.5 py-px tracking-tight text-bb">
 									Verified
 								</span>
 							) : (
-								<span className="ml-2 font-medium text-red-600 inline-block tracking-tight text-bb">
-									Not Verified
-								</span>
+								<>
+									<span className="ml-2 font-medium text-red-600 bg-red-100 rounded px-1.5 py-px inline-block tracking-tight text-bb">
+										Not Verified
+									</span>
+									<br />
+									{!verifyEmailResendMutation.isSuccess ? (
+										<>
+											{verifyEmailResendError && (
+												<p className="mt-2 text-red-600 text-sm">{verifyEmailResendError}</p>
+											)}
+											<Button
+												elementChildren="Resend Verification Email"
+												elementState={verifyEmailResendMutation.isLoading ? "loading" : "default"}
+												elementStyle="primary_text_opaque"
+												elementType="button"
+												elementSize="small"
+												onClick={() => {
+													verifyEmailResendMutation.mutate();
+												}}
+											/>
+										</>
+									) : (
+										<p className="mt-2 font-medium text-green-700 text-sm">
+											Verification email sent successfully. If you don't see the email, check your
+											spam or junk folder.
+										</p>
+									)}
+								</>
 							)}
 						</p>
 						{changeEmailMutation.isSuccess && (

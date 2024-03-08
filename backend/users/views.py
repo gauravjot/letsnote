@@ -1,7 +1,7 @@
 import pytz
 import uuid
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 # Security
 import bcrypt
 from secrets import token_hex
@@ -16,9 +16,7 @@ from .serializers import UserSerializer, VerifySerializer, SessionSerializer
 from .session import issueToken, dropSession, getUserID, getSesson
 # Utils
 from django.shortcuts import render
-from django.core.mail import send_mail
-from smtplib import SMTPDataError
-from backend.settings import getEmailConnection
+from .emails import sendEmailVerification, sendWelcomeEmailVerification, sendPasswordChangeEmail
 from backend.utils import errorResponse, successResponse, hashThis
 from decouple import config
 
@@ -55,8 +53,9 @@ def register(request):
         ))
         if verifySerializer.is_valid():
             verifySerializer.save()
-            emailSent = sendEmailVerification(
-                userSerializer.data['email'], verifyToken)
+            emailSent = sendWelcomeEmailVerification(userSerializer.data['name'],
+                                                     userSerializer.data['email'],
+                                                     verifyToken)
         # send token to user
         token, session_id, expire = issueToken(
             userSerializer.data['id'], request)
@@ -182,9 +181,11 @@ def changePassword(request):
     if not request.data['old_password'] or not request.data['new_password']:
         return Response(data=errorResponse("Old password and new password are required.", "A0010"), status=status.HTTP_400_BAD_REQUEST)
     if bcrypt.checkpw(request.data['old_password'].encode('utf-8'), user.password.encode('utf-8')):
+        when = datetime.now(pytz.utc)
         user.password = hashPwd(request.data['new_password'])
-        user.password_updated = datetime.now(pytz.utc)
+        user.password_updated = when
         user.save()
+        sendPasswordChangeEmail(request, user.name, user.email, when.ctime())
         return Response(data=successResponse(UserSerializer(user).data), status=status.HTTP_200_OK)
     return Response(data=errorResponse("Credentials are incorrect.", "A0011"), status=status.HTTP_400_BAD_REQUEST)
 
@@ -240,12 +241,50 @@ def changeEmail(request):
         created=datetime.now(pytz.utc)
     ))
     if verifySerializer.is_valid():
+        # Delete previous verification tokens
+        Verify.objects.filter(user=user, consumed=False).delete()
+        # Save new
         verifySerializer.save()
         emailSent = sendEmailVerification(
-            request.data['email'], verifyToken)
+            request.data['email'], user.name, verifyToken)
 
     return Response(data=successResponse({"verifyEmailSent": True if emailSent == 1 else False,
                                           "user": UserSerializer(user).data}), status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def resendVerifyEmail(request):
+    user = getUserID(request)
+    if type(user) is Response:
+        return user
+    if user.verified:
+        return Response(data=errorResponse("Email is already verified.", "A0019"), status=status.HTTP_400_BAD_REQUEST)
+
+    # Check if last email was sent atleast 10 mins ago
+    lastEmail = Verify.objects.filter(
+        user=user, consumed=False).order_by('-created').first()
+    if lastEmail and lastEmail.created + timedelta(minutes=10) > datetime.now(pytz.utc):
+        return Response(data=errorResponse("Email was sent less than 10 minutes ago. Please try again later.", "A0021"), status=status.HTTP_400_BAD_REQUEST)
+
+    # Generate and send email verification token
+    emailSent = 0
+    verifyToken = token_hex(24)
+
+    verifySerializer = VerifySerializer(data=dict(
+        user=user.id,
+        token=hashThis(verifyToken),
+        created=datetime.now(pytz.utc)
+    ))
+    if verifySerializer.is_valid():
+        # Delete previous verification tokens
+        Verify.objects.filter(user=user, consumed=False).delete()
+        # Save new
+        verifySerializer.save()
+        # Send email
+        emailSent = sendEmailVerification(
+            user.email, user.name, verifyToken)
+    return Response(data=successResponse() if emailSent == 1 else errorResponse("Failed to send the verification email. Please try again or contact support.", "A0020"),
+                    status=status.HTTP_200_OK)
 
 
 # Get User Sessions, requires token
@@ -268,6 +307,8 @@ def deleteUser(request):
     if type(user) is Response:
         return user
     if request.data['password'] and bcrypt.checkpw(request.data['password'].encode('utf-8'), user.password.encode('utf-8')):
+        sendPasswordChangeEmail(
+            request, user.name, user.email, datetime.now(pytz.utc).ctime())
         user.delete()
         return Response(data=successResponse(), status=status.HTTP_200_OK)
     return Response(data=errorResponse("Credentials are incorrect.", "A0015"), status=status.HTTP_400_BAD_REQUEST)
@@ -297,17 +338,6 @@ def closeSession(request):
 
 # Services
 # -----------------------------------------------
-def sendEmailVerification(email, token):
-    # Send this token
-    try:
-        with getEmailConnection() as connection:
-            subject = "Verify your email"
-            message = f"Click the link to verify your email: {config('BASE_URL')}/api/user/verifyemail/{token}/"
-            from_email = config('SMTP_DEFAULT_SEND_FROM')
-            to_email = email
-            return send_mail(subject, message, from_email, [to_email], connection=connection)
-    except SMTPDataError:
-        return 0
 
 
 # Helper Functions
