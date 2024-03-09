@@ -10,13 +10,13 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 # Models & Serializers
-from .models import User, Verify, Session
-from .serializers import UserSerializer, VerifySerializer, SessionSerializer
+from .models import User, Verify, Session, PasswordReset
+from .serializers import UserSerializer, VerifySerializer, SessionSerializer, PasswordResetSerializer
 # Session
 from .session import issueToken, dropSession, getUserID, getSesson
 # Utils
 from django.shortcuts import render
-from .emails import sendEmailVerification, sendWelcomeEmailVerification, sendPasswordChangeEmail
+from .emails import sendEmailVerification, sendWelcomeEmailVerification, sendPasswordChangeEmail, sendPasswordResetEmail, sendAccountDeletedEmail
 from backend.utils import errorResponse, successResponse, hashThis
 from decouple import config
 
@@ -25,6 +25,8 @@ from decouple import config
 # -----------------------------------------------
 @api_view(['POST'])
 def register(request):
+    if 'name' not in request.data or 'email' not in request.data or 'password' not in request.data:
+        return Response(data=errorResponse("Name, email and password are required.", "A0031"), status=status.HTTP_400_BAD_REQUEST)
     # -- user data & hash password
     dateStamp = datetime.now(pytz.utc)
 
@@ -178,13 +180,18 @@ def changePassword(request):
     user = getUserID(request)
     if type(user) is Response:
         return user
-    if not request.data['old_password'] or not request.data['new_password']:
+    if 'old_password' not in request.data or 'new_password' not in request.data:
         return Response(data=errorResponse("Old password and new password are required.", "A0010"), status=status.HTTP_400_BAD_REQUEST)
     if bcrypt.checkpw(request.data['old_password'].encode('utf-8'), user.password.encode('utf-8')):
         when = datetime.now(pytz.utc)
         user.password = hashPwd(request.data['new_password'])
         user.password_updated = when
         user.save()
+        # Disabe all sessions except current
+        session_id = getSesson(request)
+        if session_id and type(session_id) is not Response:
+            Session.objects.filter(user=user, valid=True).exclude(
+                id=session_id).update(valid=False)
         sendPasswordChangeEmail(request, user.name, user.email, when.ctime())
         return Response(data=successResponse(UserSerializer(user).data), status=status.HTTP_200_OK)
     return Response(data=errorResponse("Credentials are incorrect.", "A0011"), status=status.HTTP_400_BAD_REQUEST)
@@ -197,7 +204,7 @@ def changeName(request):
     user = getUserID(request)
     if type(user) is Response:
         return user
-    if not request.data['name']:
+    if 'name' not in request.data:
         return Response(data=errorResponse("Name is required.", "A0012"), status=status.HTTP_400_BAD_REQUEST)
     user.name = request.data['name']
     user.updated = datetime.now(pytz.utc)
@@ -205,7 +212,7 @@ def changeName(request):
     return Response(data=successResponse(UserSerializer(user).data), status=status.HTTP_200_OK)
 
 
-# Change Email, requires new email
+# Change Email, requires new email, password
 # -----------------------------------------------
 @api_view(['PUT'])
 def changeEmail(request):
@@ -213,11 +220,16 @@ def changeEmail(request):
     if type(user) is Response:
         return user
     # Check if email is not empty
-    if not request.data['email']:
+    if 'email' not in request.data:
         return Response(data=errorResponse("Email is required.", "A0013"), status=status.HTTP_400_BAD_REQUEST)
+    if 'password' not in request.data:
+        return Response(data=errorResponse("Password is required.", "A0013"), status=status.HTTP_400_BAD_REQUEST)
     # Check if it valid email
     if not re.match(r"^\S+@\S+\.\S+$", request.data['email'].strip()):
         return Response(data=errorResponse("Email is invalid.", "A0017"), status=status.HTTP_400_BAD_REQUEST)
+    # Check if password is correct
+    if not bcrypt.checkpw(request.data['password'].encode('utf-8'), user.password.encode('utf-8')):
+        return Response(data=errorResponse("Password is incorrect.", "A0030"), status=status.HTTP_400_BAD_REQUEST)
     # Check if email is not the same
     if user.email == request.data['email'].strip():
         return Response(data=errorResponse("New email is the same.", "A0018"), status=status.HTTP_400_BAD_REQUEST)
@@ -252,6 +264,8 @@ def changeEmail(request):
                                           "user": UserSerializer(user).data}), status=status.HTTP_200_OK)
 
 
+# Resend Verification Email if user is unverified
+# -----------------------------------------------
 @api_view(['POST'])
 def resendVerifyEmail(request):
     user = getUserID(request)
@@ -276,8 +290,8 @@ def resendVerifyEmail(request):
         created=datetime.now(pytz.utc)
     ))
     if verifySerializer.is_valid():
-        # Delete previous verification tokens
-        Verify.objects.filter(user=user, consumed=False).delete()
+        # Disable previous verification tokens
+        Verify.objects.filter(user=user, consumed=False).update(consumed=True)
         # Save new
         verifySerializer.save()
         # Send email
@@ -285,6 +299,91 @@ def resendVerifyEmail(request):
             user.email, user.name, verifyToken)
     return Response(data=successResponse() if emailSent == 1 else errorResponse("Failed to send the verification email. Please try again or contact support.", "A0020"),
                     status=status.HTTP_200_OK)
+
+
+# Request Reset Password, requires email
+# -----------------------------------------------
+@api_view(['POST'])
+def forgotPassword(request):
+    if 'email' not in request.data:
+        return Response(data=errorResponse("Email is required.", "A0025"), status=status.HTTP_400_BAD_REQUEST)
+    try:
+        user = User.objects.get(email=request.data['email'])
+        # Generate and send email verification token
+        emailSent = 0
+        resetToken = token_hex(24)
+
+        resetSerializer = PasswordResetSerializer(data=dict(
+            user=user.id,
+            token=hashThis(resetToken),
+            created=datetime.now(pytz.utc)
+        ))
+        if resetSerializer.is_valid():
+            # Disable previous tokens
+            PasswordReset.objects.filter(
+                user=user, consumed=False).update(consumed=True)
+            # Save new
+            resetSerializer.save()
+            # Send email
+            emailSent = sendPasswordResetEmail(
+                user.name, user.email, resetToken)
+        return Response(data=successResponse() if emailSent == 1 else errorResponse("Failed to send the reset email. Please try again or contact support.", "A0024"),
+                        status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response(data=errorResponse("Email is not found.", "A0023"), status=status.HTTP_400_BAD_REQUEST)
+
+
+# Reset Password from Token, result of Forgot Password
+# requires password and token
+# ----------------------------------------------------
+@api_view(['POST'])
+def resetPasswordFromToken(request):
+    if 'password' not in request.data:
+        return Response(data=errorResponse("Password is required.", "A0026"), status=status.HTTP_400_BAD_REQUEST)
+    if 'token' not in request.data:
+        return Response(data=errorResponse("URL is expired or token is invalid.", "A0032"), status=status.HTTP_400_BAD_REQUEST)
+    try:
+        reset = PasswordReset.objects.get(
+            token=hashThis(request.data['token']))
+        # Check if created is 24hrs old
+        if reset.created + timedelta(hours=24) < datetime.now(pytz.utc):
+            return Response(data=errorResponse("Token is expired. Please try reseting password again.", "A0027"), status=status.HTTP_400_BAD_REQUEST)
+        # Check if token is not consumed
+        if not reset.consumed:
+            user = User.objects.get(id=reset.user.id)
+            user.password = hashPwd(request.data['password'])
+            user.password_updated = datetime.now(pytz.utc)
+            user.save()
+
+            reset.consumed = True
+            reset.save()
+
+            # Disabe all sessions
+            Session.objects.filter(user=user, valid=True).update(valid=False)
+
+            return Response(data=successResponse(), status=status.HTTP_200_OK)
+        return Response(data=errorResponse("Token is already consumed.", "A0028"), status=status.HTTP_400_BAD_REQUEST)
+    except (User.DoesNotExist, PasswordReset.DoesNotExist):
+        return Response(data=errorResponse("Token is invalid.", "A0029"), status=status.HTTP_400_BAD_REQUEST)
+
+
+# Check if Password Reset Token is valid
+# -----------------------------------------------
+@api_view(['GET'])
+def passwordResetTokenHealthCheck(request, token):
+    try:
+        reset = PasswordReset.objects.get(token=hashThis(token))
+        if reset.created + timedelta(hours=24) < datetime.now(pytz.utc):
+            if not reset.consumed:
+                reset.consumed = True
+                reset.token = "expired_before_use"
+                reset.save()
+            return Response(data=errorResponse("Token is invalid. Please try reseting password again.", "A0033"), status=status.HTTP_400_BAD_REQUEST)
+        if not reset.consumed:
+            return Response(data=successResponse(), status=status.HTTP_200_OK)
+        return Response(data=errorResponse("Token is already consumed.", "A0033"), status=status.HTTP_400_BAD_REQUEST)
+    except PasswordReset.DoesNotExist:
+        return Response(data=errorResponse("Token is invalid. Please try reseting password again.", "A0034"), status=status.HTTP_400_BAD_REQUEST)
 
 
 # Get User Sessions, requires token
@@ -306,8 +405,8 @@ def deleteUser(request):
     user = getUserID(request)
     if type(user) is Response:
         return user
-    if request.data['password'] and bcrypt.checkpw(request.data['password'].encode('utf-8'), user.password.encode('utf-8')):
-        sendPasswordChangeEmail(
+    if 'password' in request.data and bcrypt.checkpw(request.data['password'].encode('utf-8'), user.password.encode('utf-8')):
+        sendAccountDeletedEmail(
             request, user.name, user.email, datetime.now(pytz.utc).ctime())
         user.delete()
         return Response(data=successResponse(), status=status.HTTP_200_OK)

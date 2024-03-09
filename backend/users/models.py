@@ -37,3 +37,13 @@ class Session(models.Model):
 
     def __str__(self):
         return f"User: {self.user}, Session made: {self.created} by {self.ip}, Valid: {self.valid}"
+
+
+class PasswordReset(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=128)
+    created = models.DateTimeField()
+    consumed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"id:{self.pk}, {self.user}, {self.created} (consumed: {self.consumed})"

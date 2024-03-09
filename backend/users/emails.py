@@ -1,5 +1,5 @@
 from django.core.mail import send_mail
-from .email_templates import welcomeEmailTemplate, emailChangedTemplate, passwordChangedTemplate, deleteAccountTemplate
+from .email_templates import welcomeEmailTemplate, emailChangedTemplate, passwordChangedTemplate, deleteAccountTemplate, passwordResetTemplate
 from smtplib import SMTPDataError
 from backend.settings import getEmailConnection
 from decouple import config
@@ -56,6 +56,25 @@ def sendPasswordChangeEmail(request, name, email, when):
                 who=getClientIP(request)
             )
             message = f"Hello {name},\n\nYour password was changed on {when}.\n\n IP Address: {getClientIP(request)}\nDevice: {getUserAgent(request)}.\n\nIf this was not you, please send us an email to \"contact@letsnote.io\".\n\nThank you,\nLetsnote Team"
+            from_email = config('SMTP_DEFAULT_SEND_FROM')
+            return send_mail(subject=subject,
+                             message=message,
+                             html_message=html_message,
+                             from_email=from_email,
+                             recipient_list=[email,],
+                             connection=connection)
+    except SMTPDataError:
+        return 0
+
+
+def sendPasswordResetEmail(email, name, token):
+    # Send this token
+    try:
+        with getEmailConnection() as connection:
+            subject = "Reset your password"
+            url = f"{config('FRONTEND_URL')}/passwordreset/{token}/"
+            html_message = passwordResetTemplate(name, url)
+            message = f"Hello {name},\n\nPlease reset your password by clicking the link below.\n\n{url}\n\nThank you,\nLetsnote Team"
             from_email = config('SMTP_DEFAULT_SEND_FROM')
             return send_mail(subject=subject,
                              message=message,

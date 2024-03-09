@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from users.models import User, Verify, Session
+from users.models import User, Verify, Session, PasswordReset
 
 
 class PublicUserSerializer(serializers.ModelSerializer):
@@ -51,4 +51,14 @@ class SessionSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'token': {'required': True, 'write_only': True},
             'user': {'required': True},
+        }
+
+
+class PasswordResetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PasswordReset
+        fields = ['id', 'user', 'token', 'created', 'consumed']
+        extra_kwargs = {
+            'user': {'required': True},
+            'token': {'required': True},
         }
