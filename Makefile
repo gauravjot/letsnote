@@ -1,11 +1,17 @@
-.PHONY : clean build run
+.PHONY : clean build run reset br
 
 build: clean
-	docker image rm letsnote || true
-	docker build --progress=plain -t letsnote .
+	docker build -t letsnote .
 
 run:
-	docker run --name letsnote -d -p 4173:4173 -p 8000:8000 letsnote
+	docker run --name letsnote -d -p 8080:80 letsnote
+
+br:	build run
+
+reset:
+	docker stop letsnote
+	docker rm letsnote
+	docker run --name letsnote -d -p 8080:80 letsnote
 
 clean:
 	docker stop letsnote || true
