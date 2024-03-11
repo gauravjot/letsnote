@@ -1,7 +1,8 @@
 from pathlib import Path
 from decouple import config
+from django.core.mail import get_connection
 
-#-----------------------------------------------------
+# -----------------------------------------------------
 # No need to change anything in this file
 
 DOMAIN = config('FRONTEND_URL', 'http://localhost')
@@ -90,7 +91,31 @@ DATABASES = {
     }
 }
 
+# Email
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+
+def getEmailConnection():
+    if config('SMTP_USE_TLS') == 'True':
+        return get_connection(
+            host=config('SMTP_HOST'),
+            port=config('SMTP_PORT'),
+            username=config('SMTP_USER'),
+            password=config('SMTP_PASSWORD'),
+            use_tls=True,
+        )
+    else:
+        return get_connection(
+            host=config('SMTP_HOST'),
+            port=config('SMTP_PORT'),
+            username=config('SMTP_USER'),
+            password=config('SMTP_PASSWORD'),
+            use_ssl=True,
+        )
+
 # Internationalization
+
 
 LANGUAGE_CODE = 'en-us'
 
