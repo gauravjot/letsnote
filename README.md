@@ -13,6 +13,7 @@ Password: `@lphaT3sting`_
 -   [Gallery](#gallery)
 -   [Technologies](#technologies)
 -   [Installation](#installation)
+-   [Building with Docker on Linux](#building-with-docker-on-linux)
 -   [Contributing](#contributing)
 -   [License](#license)
 
@@ -101,7 +102,8 @@ Current Letsnote Version in Production: `v0.3.0`
     If you encounter any issues, please refer to the [Django Documentation](https://docs.djangoproject.com/en/3.2/topics/migrations/).
 
 6. **For Production**: Set up a Django production environment. Follow this guide - [Deploy Django REST APIs on Ubuntu Server with uWSGI](https://gauravjot.com/blog/deploy_django_api_with_uwsgi_on_ubuntu).
-   **For Development**: Run the Django server
+
+    **For Development**: Run the Django server
 
     ```bash
     python manage.py runserver 0.0.0.0:8000
@@ -125,6 +127,26 @@ Current Letsnote Version in Production: `v0.3.0`
     ```bash
     npm run dev
     ```
+
+## Building with Docker on Linux
+
+1. Clone the repository.
+2. Go to the `deploy` directory. Read the `README.md` file for more information and make the required changes.
+3. In the root directory of this project, run the makefile.
+
+    ```bash
+    make build
+    ```
+
+    This will build the docker image for the project and the application will be available through port 80 of the image.
+
+4. Run the docker container.
+
+    ```bash
+    make run
+    ```
+
+    This will run the container and the application will be available on port 8080 of the host machine.
 
 ## Contributing
 

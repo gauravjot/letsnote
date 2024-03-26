@@ -95,8 +95,8 @@ def issueToken(uid, request):
         token=hashThis(newToken),
         user=uid,
         created=datetime.now(pytz.utc),
-        ip=_getClientIP(request),
-        ua=_getUserAgent(request)
+        ip=getClientIP(request),
+        ua=getUserAgent(request)
     ))
     if sessionSerializer.is_valid():
         sessionSerializer.save()
@@ -134,7 +134,7 @@ def dropSession(request):
 # Get Client IP Address
 
 
-def _getClientIP(request):
+def getClientIP(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
         ip = x_forwarded_for.split(',')[0]
@@ -145,5 +145,5 @@ def _getClientIP(request):
 # Get User Agent
 
 
-def _getUserAgent(request):
+def getUserAgent(request):
     return request.META.get('HTTP_USER_AGENT')

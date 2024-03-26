@@ -3,10 +3,11 @@ import Button from "@/components/ui/button/Button";
 import InputField from "@/components/ui/input/Input";
 import {ChangeEmailType, changeEmail} from "@/services/user/change_email";
 import {ChangeUserNameType, changeName} from "@/services/user/change_user_name";
+import {resendVerificationEmail} from "@/services/user/resend_verification_email";
 import {datePretty, dateTimePretty, timeSince} from "@/utils/DateTimeUtils";
 import {handleAxiosError} from "@/utils/HandleAxiosError";
 import {AxiosError} from "axios";
-import {useState, useContext} from "react";
+import {useState, useContext, useEffect} from "react";
 import {useForm} from "react-hook-form";
 import {useMutation} from "react-query";
 
@@ -48,10 +49,9 @@ export default function AccountSettings() {
 				: Promise.reject("User authentication error. Logout and login again to retry.");
 		},
 		onSuccess: (res) => {
-			const response = res.data;
 			if (userContext.user) {
 				userContext.setUser({
-					user: response,
+					user: res.user,
 					session: userContext.user.session,
 				});
 				setShowEmailChange(false);
@@ -62,6 +62,32 @@ export default function AccountSettings() {
 			handleAxiosError(error, setChangeEmailError);
 		},
 	});
+
+	const [verifyEmailResendError, setVerifyEmailResendError] = useState<string | null>(null);
+	const verifyEmailResendMutation = useMutation({
+		mutationFn: () => {
+			return userContext && userContext.user && !userContext.user.user.verified
+				? resendVerificationEmail()
+				: Promise.reject("User is already verified.");
+		},
+		onSuccess: () => {
+			setVerifyEmailResendError(null);
+		},
+		onError: (error: AxiosError) => {
+			handleAxiosError(error, setVerifyEmailResendError);
+		},
+	});
+
+	useEffect(() => {
+		if (verifyEmailResendError && verifyEmailResendError.toLowerCase().includes("verified")) {
+			const u = userContext.user;
+			if (u?.user) {
+				u.user.verified = true;
+				userContext?.setUser(u);
+				setVerifyEmailResendError(null);
+			}
+		}
+	}, [verifyEmailResendError, userContext]);
 
 	return (
 		<>
@@ -197,10 +223,51 @@ export default function AccountSettings() {
 					</form>
 				) : (
 					<>
-						<p className="mt-3 mx-4 text-gray-900 tracking-wide">{userContext?.user?.user.email}</p>
+						<p className="mt-3 mx-4 text-gray-900 tracking-wide">
+							{userContext?.user?.user.email}
+							{"  "}
+							{userContext.user?.user.verified ? (
+								<span className="ml-2 font-medium text-green-700 bg-green-100 rounded px-1.5 py-px tracking-tight text-bb">
+									Verified
+								</span>
+							) : (
+								<>
+									<span className="ml-2 font-medium text-red-600 bg-red-100 rounded px-1.5 py-px inline-block tracking-tight text-bb">
+										Not Verified
+									</span>
+									<br />
+									{!verifyEmailResendMutation.isSuccess ? (
+										<>
+											{verifyEmailResendError && (
+												<p className="mt-2 text-red-600 text-sm">{verifyEmailResendError}</p>
+											)}
+											<Button
+												elementChildren="Resend Verification Email"
+												elementState={verifyEmailResendMutation.isLoading ? "loading" : "default"}
+												elementStyle="primary_text_opaque"
+												elementType="button"
+												elementSize="small"
+												onClick={() => {
+													verifyEmailResendMutation.mutate();
+												}}
+											/>
+										</>
+									) : (
+										<p className="mt-2 font-medium text-green-700 text-sm">
+											Verification email sent successfully. If you don't see the email, check your
+											spam or junk folder.
+										</p>
+									)}
+								</>
+							)}
+						</p>
 						{changeEmailMutation.isSuccess && (
 							<p className="mx-4 mt-2 text-green-700 text-sm">
-								Email changed successfully. You will need to use your new email addresss to login.
+								Email changed successfully.{" "}
+								<span className="font-medium">
+									Please verify your new email address by clicking the link sent to your new email
+									address.
+								</span>
 							</p>
 						)}
 						<div className="mx-4 mt-1">

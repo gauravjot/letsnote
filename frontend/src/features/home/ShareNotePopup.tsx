@@ -1,6 +1,5 @@
 import {useCallback, useContext, useEffect, useState} from "react";
 import {AxiosError} from "axios";
-import {DEPLOY_DOMAIN} from "@/config";
 import {timeSince} from "@/utils/DateTimeUtils";
 import {ShareNote} from "@/types/api";
 import {NoteListItemType} from "@/types/note";
@@ -108,7 +107,7 @@ export default function ShareNotePopup({closePopup, note, open}: Props) {
 											<input
 												type="text"
 												className="w-full border border-gray-400 rounded-md py-1.5 px-2 bg-gray-100 text-bb focus-visible:outline-none"
-												value={DEPLOY_DOMAIN + "/shared/" + shareNoteMutation.data.urlkey}
+												value={window.location.origin + "/shared/" + shareNoteMutation.data.urlkey}
 												readOnly
 											/>
 											<button
@@ -116,7 +115,7 @@ export default function ShareNotePopup({closePopup, note, open}: Props) {
 												className="text-primary-600 text-sm font-bold uppercase border border-primary-500 px-2 py-0.5 rounded-md shadow-sm hover:bg-primary-50 hover:outline hover:outline-primary-200"
 												onClick={(self) => {
 													navigator.clipboard.writeText(
-														DEPLOY_DOMAIN + "/shared/" + shareNoteMutation.data.urlkey
+														window.location.origin + "/shared/" + shareNoteMutation.data.urlkey
 													);
 													self.currentTarget.innerHTML = "Copied!";
 												}}

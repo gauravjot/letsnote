@@ -1,4 +1,5 @@
 import {BACKEND_SERVER_DOMAIN} from "@/config";
+import {UserType} from "@/types/user";
 import axios from "axios";
 
 export interface ChangeEmailType {
@@ -19,6 +20,6 @@ export async function changeEmail(payload: ChangeEmailType) {
 			withCredentials: true,
 		})
 		.then(function (response) {
-			return response.data;
+			return response.data.data as {verifyEmailSent: boolean; user: UserType["user"]};
 		});
 }

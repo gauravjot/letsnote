@@ -13,7 +13,7 @@ import {UserContext} from "@/App";
 import {useForm} from "react-hook-form";
 import InputField from "../../components/ui/input/Input";
 import Button from "../../components/ui/button/Button";
-import {useMutation} from "react-query";
+import {useQuery} from "react-query";
 import {getSharedNote} from "@/services/note/get_shared_note";
 import {handleAxiosError} from "@/utils/HandleAxiosError";
 
@@ -38,35 +38,32 @@ export default function SharedPage() {
 	const [editor] = useState(() => withReact(createEditor()));
 	const {renderLeaf, renderElement} = useEditorConfig(editor);
 	const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+	const [password, setPassword] = useState("");
 
-	const noteMutation = useMutation({
-		mutationFn: (payload: {password: string}) => {
-			return shareid && user
-				? getSharedNote(shareid, payload.password)
-				: Promise.reject("Share ID is null");
-		},
-		onSuccess: (res) => {
-			setDocument(JSON.parse(res.noteContent));
-			setResponse(res);
-			setError(null);
-		},
-		onError: (error: AxiosError) => {
-			handleAxiosError(error, setError);
-		},
-	});
+	const noteQuery = useQuery(
+		["sharedNote", shareid, password],
+		() => (shareid ? getSharedNote(shareid, password) : Promise.reject("No note exist.")),
+		{
+			onSuccess: (res) => {
+				setDocument(JSON.parse(res.noteContent));
+				setResponse(res);
+				setError(null);
+			},
+			onError: (error: AxiosError) => {
+				handleAxiosError(error, setError);
+			},
+			refetchOnWindowFocus: false,
+			enabled: shareid ? true : false,
+			retry: false,
+		}
+	);
 
 	useEffect(() => {
-		noteMutation.mutate({password: ""});
 		// if mobile toggle sidebar off
 		if (window.innerWidth < 1024) {
 			setIsSidebarOpen(false);
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
-
-	const setPassword = (password: string) => {
-		noteMutation.mutate({password: password});
-	};
 
 	return (
 		<>
@@ -189,7 +186,7 @@ export default function SharedPage() {
 							</button>
 						</div>
 						<div className="z-40">
-							{noteMutation.isSuccess && document ? (
+							{noteQuery.isSuccess && document ? (
 								<Slate editor={editor} initialValue={document}>
 									<div className="editor-container">
 										<div className="editor">
@@ -199,7 +196,7 @@ export default function SharedPage() {
 										</div>
 									</div>
 								</Slate>
-							) : noteMutation.isError ? (
+							) : noteQuery.isError ? (
 								<>
 									<ErrorPage error={error} title="Err, something went wrong" />
 								</>
@@ -210,7 +207,7 @@ export default function SharedPage() {
 					</div>
 				</div>
 				{/** Password needed */}
-				{(noteMutation.isError && error?.includes("N1401")) || error?.includes("N1402") ? (
+				{(noteQuery.isError && error?.includes("N1401")) || error?.includes("N1402") ? (
 					<PasswordPrompt setPassword={setPassword} error={error} />
 				) : (
 					<></>

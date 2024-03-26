@@ -273,6 +273,17 @@ function UserCard({user}: {user: UserType}) {
 							<div className="infomsg mt-3 bottom-9 right-0 whitespace-nowrap">Logout</div>
 						</button>
 					</div>
+					{!userContext.user?.user.verified && (
+						<div className="bg-gray-50 py-2 px-3 mt-4 text-gray-800 rounded border-gray-300 border">
+							<div className="flex place-items-center gap-1 font-medium text-bb">
+								<span className="ic-close ic-gray-75 ic"></span>
+								<span>Account not verified</span>
+							</div>
+							<p className="mt-1 text-bb leading-5">
+								Please check your email and click on the verification link.
+							</p>
+						</div>
+					)}
 				</div>
 			</div>
 		</>

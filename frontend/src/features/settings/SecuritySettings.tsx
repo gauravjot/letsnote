@@ -166,7 +166,7 @@ export default function SecuritySettings() {
 							Showing Oldest → Newest
 						</p>
 						{sessionsQuery.data.map((session) => (
-							<UserSession session={session} />
+							<UserSession session={session} key={session.id} />
 						))}
 					</>
 				) : sessionsQuery.isLoading ? (
@@ -187,16 +187,18 @@ export default function SecuritySettings() {
 						<p className="text-sm text-gray-500">Delete your account and all its associated data</p>
 					</div>
 					<div className="flex justify-center place-content-center">
-						<Button
-							elementChildren="DELETE ACCOUNT"
-							elementState="default"
-							elementStyle="danger"
-							elementSize="small"
-							elementType="button"
-							onClick={() => {
-								setShowDeleteAccount(true);
-							}}
-						/>
+						<div>
+							<Button
+								elementChildren="DELETE ACCOUNT"
+								elementState="default"
+								elementStyle="danger"
+								elementSize="small"
+								elementType="button"
+								onClick={() => {
+									setShowDeleteAccount(true);
+								}}
+							/>
+						</div>
 					</div>
 				</div>
 			</div>
