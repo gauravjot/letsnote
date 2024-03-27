@@ -60,7 +60,7 @@ function Toolbar({note}: {note: NoteType | null}) {
 			)}
 			<div className="top-0 z-30 sticky" id="toolbar">
 				<div className="bg-gray-50 px-1 mt-1 shadow-md rounded ab-toolbar">
-					<div className="px-3 pt-2 ml-1 flex gap-2 place-items-center">
+					<div className="px-3 pt-1 ml-1 flex gap-2 place-items-center">
 						<span className="text-lg font-serif font-medium truncate">
 							{note ? note.title : "Untitled"}
 						</span>
