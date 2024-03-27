@@ -56,6 +56,7 @@ export default function AccountSettings() {
 				});
 				setShowEmailChange(false);
 				setChangeEmailError(null);
+				setVerifyEmailResendError(null);
 			}
 		},
 		onError: (error: AxiosError) => {
@@ -192,6 +193,14 @@ export default function AccountSettings() {
 								defaultValue={userContext?.user?.user.email}
 								elementInputMinLength={5}
 								elementInputMaxLength={256}
+								elementIsRequired={true}
+								elementHookFormRegister={changeEmailForm.register}
+								elementHookFormErrors={changeEmailForm.formState.errors}
+							/>
+							<InputField
+								elementId="as-password"
+								elementInputType="password"
+								elementLabel="Enter your password"
 								elementIsRequired={true}
 								elementHookFormRegister={changeEmailForm.register}
 								elementHookFormErrors={changeEmailForm.formState.errors}
