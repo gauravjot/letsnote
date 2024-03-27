@@ -78,7 +78,7 @@ export function ForgotPassword({
 								}
 								elementStyle="primary"
 								elementSize="base"
-								elementChildren="Register"
+								elementChildren="Send Reset Link"
 								elementType="submit"
 							/>
 						</fieldset>
