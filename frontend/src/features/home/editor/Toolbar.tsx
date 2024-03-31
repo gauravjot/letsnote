@@ -49,7 +49,7 @@ function Toolbar({note}: {note: NoteType | null}) {
 	const closeEditNameDialog = () => setIsRenameDialogOpen(false);
 
 	return (
-		<>
+		<div className="print:hidden">
 			{isRenameDialogOpen && note && userToken && (
 				<div className="fixed inset-0 z-[100]">
 					<div className="fixed inset-0 bg-black/30 z-0" onClick={closeEditNameDialog}></div>
@@ -60,30 +60,57 @@ function Toolbar({note}: {note: NoteType | null}) {
 			)}
 			<div className="top-0 z-30 sticky" id="toolbar">
 				<div className="bg-gray-50 px-1 mt-1 shadow-md rounded ab-toolbar">
-					<div className="px-3 pt-2 ml-1 flex gap-2 place-items-center">
-						<span className="text-lg font-serif font-medium truncate">
-							{note ? note.title : "Untitled"}
-						</span>
-						{note && (
-							<Button
-								elementChildren="Rename"
-								elementIcon="edit"
-								elementIconOnly={true}
-								elementType="button"
-								elementState="default"
-								elementStyle="white_no_border"
-								elementSize="xsmall"
-								onClick={() => {
-									setTimeout(() => {
-										document?.getElementById("editnotename")?.focus();
-									}, 100);
-									setIsRenameDialogOpen(true);
-								}}
-							/>
-						)}
-						<span className="text-xs text-gray-500 align-middle block">
-							{note ? `(modified ${timeSince(note.updated)})` : ""}
-						</span>
+					<div className="px-3 pt-1 ml-1 flex gap-2 place-items-center">
+						<div className="flex-1 flex gap-2 place-items-center">
+							<span className="text-lg font-serif font-medium truncate">
+								{note ? note.title : "Untitled"}
+							</span>
+							{note && (
+								<Button
+									elementChildren="Rename"
+									elementIcon="edit"
+									elementIconOnly={true}
+									elementType="button"
+									elementState="default"
+									elementStyle="white_no_border"
+									elementSize="xsmall"
+									onClick={() => {
+										setTimeout(() => {
+											document?.getElementById("editnotename")?.focus();
+										}, 100);
+										setIsRenameDialogOpen(true);
+									}}
+								/>
+							)}
+							<span className="text-xs text-gray-500 align-middle block">
+								{note ? `(modified ${timeSince(note.updated)})` : ""}
+							</span>
+						</div>
+						<div className="flex place-items-center gap-2">
+							<span className="font-medium text-sm">Zoom</span>
+							<div className="zoomslidecontainer flex place-items-center">
+								<input
+									type="range"
+									min="2"
+									max="5"
+									step="0.25"
+									defaultValue="3"
+									className="zoomslider"
+									id="myRange"
+									onInput={(e) => {
+										let zoomValue: string | number = (e.target as HTMLInputElement).value;
+										if (zoomValue !== "") {
+											zoomValue = parseFloat(zoomValue);
+										}
+										zoomValue = ((zoomValue as number) / 3) * 16;
+										console.log(zoomValue);
+										document
+											.getElementById("editor")
+											?.style.setProperty("font-size", `${zoomValue}px`);
+									}}
+								/>
+							</div>
+						</div>
 					</div>
 					<div className="pb-2 line-height-150 space-y-1">
 						{/* Dropdown for paragraph styles */}
@@ -151,7 +178,7 @@ function Toolbar({note}: {note: NoteType | null}) {
 					</div>
 				</div>
 			</div>
-		</>
+		</div>
 	);
 }
 

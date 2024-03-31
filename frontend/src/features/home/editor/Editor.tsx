@@ -65,7 +65,7 @@ export default function Editor({
 			<div className={"editor-container"}>
 				<div>
 					<div>
-						<div className="editor" ref={editorRef}>
+						<div className="editor" ref={editorRef} id="editor">
 							{selectionForLink != null ? (
 								<LinkEditor
 									editorOffsets={

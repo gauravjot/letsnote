@@ -10,10 +10,12 @@ import {UserRegisterInfo, UserRegisterResponse, userRegister} from "@/services/u
 import {useMutation} from "react-query";
 import {Settings} from "@/features/settings/Settings";
 import {UserType} from "@/types/user";
+import {ForgotPassword} from "./ForgotPassword";
 
 export default function LoginRegister() {
 	const userContext = useContext(UserContext);
 	const [showRegister, setShowRegister] = React.useState(false);
+	const [showForgotPassword, setShowForgotPassword] = React.useState(false);
 
 	return (
 		<>
@@ -21,8 +23,10 @@ export default function LoginRegister() {
 				<UserCard user={userContext.user} />
 			) : showRegister ? (
 				<RegisterComponent showRegister={setShowRegister} />
+			) : showForgotPassword ? (
+				<ForgotPassword switchToForgotPassword={setShowForgotPassword} />
 			) : (
-				<Login switchToRegister={setShowRegister} />
+				<Login switchToRegister={setShowRegister} switchToForgotPassword={setShowForgotPassword} />
 			)}
 		</>
 	);
@@ -30,8 +34,10 @@ export default function LoginRegister() {
 
 function Login({
 	switchToRegister,
+	switchToForgotPassword,
 }: {
 	switchToRegister?: React.Dispatch<React.SetStateAction<boolean>>;
+	switchToForgotPassword?: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
 	const userContext = React.useContext(UserContext);
 
@@ -101,11 +107,21 @@ function Login({
 					/>
 				</fieldset>
 			</form>
+			{switchToForgotPassword && (
+				<p className="text-bb text-gray-600 mt-3">
+					<button
+						className="text-primary-700 hover:underline font-medium"
+						onClick={() => switchToForgotPassword(true)}
+					>
+						Forgot Password?
+					</button>
+				</p>
+			)}
 			{switchToRegister && (
-				<p className="text-bb text-gray-500">
+				<p className="text-bb text-gray-600 mt-1.5">
 					Don't have an account?{" "}
 					<button
-						className="text-primary-700 hover:underline"
+						className="text-primary-700 hover:underline font-medium"
 						onClick={() => switchToRegister(true)}
 					>
 						Register now
@@ -215,9 +231,12 @@ function RegisterComponent({
 				</fieldset>
 			</form>
 			{showRegister && (
-				<p className="text-bb text-gray-500">
+				<p className="text-bb text-gray-600 mt-3">
 					Already have an account?{" "}
-					<button className="text-primary-700 hover:underline" onClick={() => showRegister(false)}>
+					<button
+						className="text-primary-700 hover:underline font-medium"
+						onClick={() => showRegister(false)}
+					>
 						Login here
 					</button>
 				</p>

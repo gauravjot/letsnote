@@ -213,7 +213,7 @@ export default function Home() {
 						{user && (
 							<>
 								{/* arrow toggle on desktop */}
-								<div className="hidden lg:block sticky top-2 right-auto z-50 -ml-4 left-0 h-0">
+								<div className="print:hidden hidden lg:block sticky top-2 right-auto z-50 -ml-4 left-0 h-0">
 									<button
 										className="sidebar-expand-btn"
 										aria-expanded={isSidebarOpen ? "true" : "false"}
@@ -229,7 +229,7 @@ export default function Home() {
 									</button>
 								</div>
 								{/* hambuger menu for mobile */}
-								<div className="fixed top-0 right-0 lg:hidden z-[50]">
+								<div className="print:hidden fixed top-0 right-0 lg:hidden z-[50]">
 									{isSidebarOpen && <div className="z-[40] fixed bg-black/20 inset-0"></div>}
 									<button
 										className="mobile-sidebar-toggle relative z-[50]"
@@ -258,7 +258,7 @@ export default function Home() {
 						<div className={(isNoteLoading ? "blur-sm " : "") + "min-h-screen h-full"}>
 							<Suspense
 								fallback={
-									<div className="flex place-items-center flex-row gap-4 justify-center min-h-screen h-full">
+									<div className="flex print:hidden place-items-center flex-row gap-4 justify-center min-h-screen h-full">
 										<Spinner color="black" size="md" />
 										<p className="inline-block bg-black/5 border border-gray-300 px-2 py-0.5 rounded-md text-bb">
 											Loading editor...
@@ -276,7 +276,7 @@ export default function Home() {
 							<NoteStatus status={status} isLoggedIn={user ? true : false} />
 						</div>
 						{isNoteLoading && (
-							<div className="absolute z-30 inset-0 flex justify-center place-items-center">
+							<div className="absolute print:hidden z-30 inset-0 flex justify-center place-items-center">
 								<Spinner color="black" size="xl" />
 							</div>
 						)}

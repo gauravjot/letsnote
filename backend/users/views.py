@@ -326,11 +326,12 @@ def forgotPassword(request):
             resetSerializer.save()
             # Send email
             emailSent = sendPasswordResetEmail(
-                user.name, user.email, resetToken)
+                user.email, user.name, resetToken)
         return Response(data=successResponse() if emailSent == 1 else errorResponse("Failed to send the reset email. Please try again or contact support.", "A0024"),
                         status=status.HTTP_200_OK)
     except User.DoesNotExist:
-        return Response(data=errorResponse("Email is not found.", "A0023"), status=status.HTTP_400_BAD_REQUEST)
+        # Send success response even if email is not found to prevent email enumeration
+        return Response(data=successResponse(), status=status.HTTP_400_BAD_REQUEST)
 
 
 # Reset Password from Token, result of Forgot Password
@@ -347,6 +348,10 @@ def resetPasswordFromToken(request):
             token=hashThis(request.data['token']))
         # Check if created is 24hrs old
         if reset.created + timedelta(hours=24) < datetime.now(pytz.utc):
+            if not reset.consumed:
+                reset.consumed = True
+                reset.token = "expired_before_use"
+                reset.save()
             return Response(data=errorResponse("Token is expired. Please try reseting password again.", "A0027"), status=status.HTTP_400_BAD_REQUEST)
         # Check if token is not consumed
         if not reset.consumed:

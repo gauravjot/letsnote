@@ -9,6 +9,7 @@ import {BACKEND_SERVER_DOMAIN} from "./config";
 // lazy imports
 const Home = React.lazy(() => import("@/pages/Home"));
 const SharedPage = React.lazy(() => import("@/pages/Shared/SharedPage"));
+const PasswordResetPage = React.lazy(() => import("@/pages/PasswordReset"));
 
 export const UserContext = createContext({
 	user: null,
@@ -53,7 +54,40 @@ export default function App() {
 			<Router>
 				<Suspense>
 					<Routes>
-						<Route path="/" element={<Home />} />
+						<Route
+							path="/"
+							element={
+								<Suspense
+									fallback={
+										<div className="fixed inset-0 size-full flex gap-4 place-items-center justify-center">
+											<Spinner size="md" color="gray" />
+											<p className="inline-block bg-black/5 border border-gray-300 px-2 py-0.5 rounded-md text-bb">
+												Loading page...
+											</p>
+										</div>
+									}
+								>
+									<Home />
+								</Suspense>
+							}
+						/>
+						<Route
+							path="/passwordreset/:token"
+							element={
+								<Suspense
+									fallback={
+										<div className="fixed inset-0 size-full flex gap-4 place-items-center justify-center">
+											<Spinner size="md" color="gray" />
+											<p className="inline-block bg-black/5 border border-gray-300 px-2 py-0.5 rounded-md text-bb">
+												Loading page...
+											</p>
+										</div>
+									}
+								>
+									<PasswordResetPage />
+								</Suspense>
+							}
+						/>
 						<Route
 							path="/shared/:shareid"
 							element={
