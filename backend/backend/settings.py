@@ -110,18 +110,33 @@ CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
 SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=True, cast=bool)
 SECURE_FRAME_DENY = False
 
-# Database
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USERNAME'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT'),
-    }
-}
+# Database
+def get_database():
+    if config('DB_HOST', default=None) is None:
+        directory = Path(BASE_DIR.parent +
+                         "/db").mkdir(parents=True, exist_ok=True)
+        return {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': directory / 'db.sqlite3',
+            }
+        }
+    else:
+        return {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': config('DB_NAME'),
+                'USER': config('DB_USERNAME'),
+                'PASSWORD': config('DB_PASSWORD'),
+                'HOST': config('DB_HOST'),
+                'PORT': config('DB_PORT'),
+            }
+        }
+
+
+# If no database is provided, use sqlite3
+DATABASES = get_database()
 
 
 # Email

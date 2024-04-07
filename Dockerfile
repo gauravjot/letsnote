@@ -33,6 +33,7 @@ RUN python manage.py migrate
 
 # generate encryption key
 RUN python /home/app/webapp/backend/notes/generate_key.py
+RUN cp /home/app/webapp/backend/notes/key.bin /home/app/webapp/db/key.bin
 
 # Frontend and Nodejs
 WORKDIR /home/app/webapp/frontend
