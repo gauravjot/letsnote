@@ -4,7 +4,7 @@ import re
 from datetime import datetime, timedelta
 # Security
 import bcrypt
-from secrets import token_hex
+from secrets import token_urlsafe
 # RestFramework
 from rest_framework import status
 from rest_framework.response import Response
@@ -13,7 +13,7 @@ from rest_framework.decorators import api_view
 from .models import User, Verify, Session, PasswordReset
 from .serializers import UserSerializer, VerifySerializer, SessionSerializer, PasswordResetSerializer
 # Session
-from .session import issueToken, dropSession, getUserID, getSesson
+from .session import issueToken, dropSession, getUser, getSesson
 # Utils
 from django.shortcuts import render
 from .emails import sendEmailVerification, sendWelcomeEmailVerification, sendPasswordChangeEmail, sendPasswordResetEmail, sendAccountDeletedEmail
@@ -46,7 +46,7 @@ def register(request):
 
         # Generate and send email verification token
         emailSent = False
-        verifyToken = token_hex(24)
+        verifyToken = token_urlsafe(42)
 
         verifySerializer = VerifySerializer(data=dict(
             user=userSerializer.data['id'],
@@ -71,7 +71,7 @@ def register(request):
         )
         # expire is in minutes so we multiply by 60
         response.set_cookie(
-            key='auth',
+            key='auth_ln',
             value=token,
             expires=expire*60,
             httponly=True,
@@ -114,7 +114,7 @@ def login(request):
         user).data, **dict(session=session_id)}), status=status.HTTP_202_ACCEPTED)
     # expire is in minutes so we multiply by 60
     response.set_cookie(
-        key='auth',
+        key='auth_ln',
         value=token,
         expires=expire*60,
         httponly=True,
@@ -133,7 +133,7 @@ def logout(request):
     dropSession(request)
     response = Response(data=successResponse(), status=status.HTTP_200_OK)
     response.delete_cookie(
-        key='auth',
+        key='auth_ln',
         domain=config('AUTH_COOKIE_DOMAIN', default='localhost')
     )
     return response
@@ -166,20 +166,17 @@ def verifyEmail(request, emailtoken):
 # -----------------------------------------------
 @api_view(['GET'])
 def getUserProfile(request):
-    user = getUserID(request)
-    if type(user) is Response:
-        return user
+    session = getSesson(request)
     return Response(data=successResponse({"user": UserSerializer(
-        user).data, **dict(session=getSesson(request))}), status=status.HTTP_202_ACCEPTED)
+        session.user).data, **dict(session=session.id)}), status=status.HTTP_202_ACCEPTED)
 
 
 # Change Password, requires old password and new password
 # -----------------------------------------------
 @api_view(['PUT'])
 def changePassword(request):
-    user = getUserID(request)
-    if type(user) is Response:
-        return user
+    session = getSesson(request)
+    user = session.user
     if 'old_password' not in request.data or 'new_password' not in request.data:
         return Response(data=errorResponse("Old password and new password are required.", "A0010"), status=status.HTTP_400_BAD_REQUEST)
     if bcrypt.checkpw(request.data['old_password'].encode('utf-8'), user.password.encode('utf-8')):
@@ -188,10 +185,8 @@ def changePassword(request):
         user.password_updated = when
         user.save()
         # Disabe all sessions except current
-        session_id = getSesson(request)
-        if session_id and type(session_id) is not Response:
-            Session.objects.filter(user=user, valid=True).exclude(
-                id=session_id).update(valid=False)
+        Session.objects.filter(user=user, valid=True).exclude(
+            id=session.id).update(valid=False)
         sendPasswordChangeEmail(request, user.name, user.email, when.ctime())
         return Response(data=successResponse(UserSerializer(user).data), status=status.HTTP_200_OK)
     return Response(data=errorResponse("Credentials are incorrect.", "A0011"), status=status.HTTP_400_BAD_REQUEST)
@@ -201,9 +196,7 @@ def changePassword(request):
 # -----------------------------------------------
 @api_view(['PUT'])
 def changeName(request):
-    user = getUserID(request)
-    if type(user) is Response:
-        return user
+    user = getUser(request)
     if 'name' not in request.data:
         return Response(data=errorResponse("Name is required.", "A0012"), status=status.HTTP_400_BAD_REQUEST)
     user.name = request.data['name']
@@ -216,9 +209,7 @@ def changeName(request):
 # -----------------------------------------------
 @api_view(['PUT'])
 def changeEmail(request):
-    user = getUserID(request)
-    if type(user) is Response:
-        return user
+    user = getUser(request)
     # Check if email is not empty
     if 'email' not in request.data:
         return Response(data=errorResponse("Email is required.", "A0013"), status=status.HTTP_400_BAD_REQUEST)
@@ -245,7 +236,7 @@ def changeEmail(request):
 
     # Generate and send email verification token
     emailSent = 0
-    verifyToken = token_hex(24)
+    verifyToken = token_urlsafe(42)
 
     verifySerializer = VerifySerializer(data=dict(
         user=user.id,
@@ -268,9 +259,7 @@ def changeEmail(request):
 # -----------------------------------------------
 @api_view(['POST'])
 def resendVerifyEmail(request):
-    user = getUserID(request)
-    if type(user) is Response:
-        return user
+    user = getUser(request)
     if user.verified:
         return Response(data=errorResponse("Email is already verified.", "A0019"), status=status.HTTP_400_BAD_REQUEST)
 
@@ -282,7 +271,7 @@ def resendVerifyEmail(request):
 
     # Generate and send email verification token
     emailSent = 0
-    verifyToken = token_hex(24)
+    verifyToken = token_urlsafe(42)
 
     verifySerializer = VerifySerializer(data=dict(
         user=user.id,
@@ -311,7 +300,7 @@ def forgotPassword(request):
         user = User.objects.get(email=request.data['email'])
         # Generate and send email verification token
         emailSent = 0
-        resetToken = token_hex(24)
+        resetToken = token_urlsafe(42)
 
         resetSerializer = PasswordResetSerializer(data=dict(
             user=user.id,
@@ -328,10 +317,10 @@ def forgotPassword(request):
             emailSent = sendPasswordResetEmail(
                 user.email, user.name, resetToken)
         return Response(data=successResponse() if emailSent == 1 else errorResponse("Failed to send the reset email. Please try again or contact support.", "A0024"),
-                        status=status.HTTP_200_OK)
+                        status=status.HTTP_200_OK if emailSent == 1 else status.HTTP_500_INTERNAL_SERVER_ERROR)
     except User.DoesNotExist:
         # Send success response even if email is not found to prevent email enumeration
-        return Response(data=successResponse(), status=status.HTTP_400_BAD_REQUEST)
+        return Response(data=successResponse(), status=status.HTTP_200_OK)
 
 
 # Reset Password from Token, result of Forgot Password
@@ -395,9 +384,7 @@ def passwordResetTokenHealthCheck(request, token):
 # -----------------------------------------------
 @api_view(['GET'])
 def getUserSessions(request):
-    user = getUserID(request)
-    if type(user) is Response:
-        return user
+    user = getUser(request)
     sessionSerializer = SessionSerializer(
         Session.objects.filter(user=user, valid=True), many=True)
     return Response(data=successResponse(sessionSerializer.data), status=status.HTTP_200_OK)
@@ -407,9 +394,7 @@ def getUserSessions(request):
 # -----------------------------------------------
 @api_view(['PUT'])
 def deleteUser(request):
-    user = getUserID(request)
-    if type(user) is Response:
-        return user
+    user = getUser(request)
     if 'password' in request.data and bcrypt.checkpw(request.data['password'].encode('utf-8'), user.password.encode('utf-8')):
         sendAccountDeletedEmail(
             request, user.name, user.email, datetime.now(pytz.utc).ctime())
@@ -422,9 +407,7 @@ def deleteUser(request):
 # -----------------------------------------------
 @api_view(['PUT'])
 def closeSession(request):
-    user = getUserID(request)
-    if type(user) is Response:
-        return user
+    user = getUser(request)
     try:
         session = Session.objects.get(
             user=user,

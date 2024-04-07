@@ -12,7 +12,7 @@ from rest_framework.decorators import api_view
 from .models import Note, ShareExternal
 from .serializers import NoteListSerializer, ShareExternalSerializer
 # Session
-from users.session import getUserID
+from users.session import getUser
 from backend.utils import errorResponse, successResponse, hashThis
 from notes.utils import encrypt_note, decrypt_note, InvalidKeyException
 
@@ -21,10 +21,6 @@ from notes.utils import encrypt_note, decrypt_note, InvalidKeyException
 # -----------------------------------------------
 @api_view(['POST'])
 def createNote(request):
-    user = getUserID(request)
-    if type(user) is Response:
-        return user
-
     try:
         # -- user data & hash password
         dateStamp = datetime.now(pytz.utc)
@@ -32,7 +28,7 @@ def createNote(request):
             id=uuid.uuid4(),
             title=request.data['title'],
             content=encrypt_note(request.data['content']),
-            user=user,
+            user=getUser(request),
             created=dateStamp,
             updated=dateStamp
         )
@@ -47,13 +43,9 @@ def createNote(request):
 # -----------------------------------------------
 @api_view(['GET'])
 def getUserNotes(request):
-    user = getUserID(request)
-    if type(user) is Response:
-        return user
-
     try:
         notes = NoteListSerializer(Note.objects.filter(
-            user=user).order_by('updated'), many=True)
+            user=getUser(request)).order_by('updated'), many=True)
         return Response(data=successResponse(notes.data), status=status.HTTP_200_OK)
     except Note.DoesNotExist:
         return Response(data=errorResponse("Could not find any notes.", "N0411"), status=status.HTTP_404_NOT_FOUND)
@@ -74,12 +66,8 @@ def noteOps(request, noteid):
 
 # Read
 def readNote(request, noteid):
-    user = getUserID(request)
-    if type(user) is Response:
-        return user
-
     try:
-        note = Note.objects.get(id=noteid, user=user)
+        note = Note.objects.get(id=noteid, user=getUser(request))
         # Decrypt the note
         if note.content:
             content = decrypt_note(note.content)
@@ -96,12 +84,8 @@ def readNote(request, noteid):
 
 # Delete
 def deleteNote(request, noteid):
-    user = getUserID(request)
-    if type(user) is Response:
-        return user
-
     try:
-        Note.objects.get(id=noteid, user=user).delete()
+        Note.objects.get(id=noteid, user=getUser(request)).delete()
         return Response(data=successResponse(), status=status.HTTP_200_OK)
     except Note.DoesNotExist:
         return Response(data=errorResponse("This note does not exist.", "N0407"), status=status.HTTP_404_NOT_FOUND)
@@ -109,11 +93,8 @@ def deleteNote(request, noteid):
 
 # Update
 def updateNoteContent(request, noteid):
-    user = getUserID(request)
-    if type(user) is Response:
-        return user
     try:
-        note = Note.objects.get(id=noteid, user=user)
+        note = Note.objects.get(id=noteid, user=getUser(request))
         note.content = encrypt_note(request.data['content'])
         note.updated = datetime.now(pytz.utc)
         note.save()
@@ -130,11 +111,8 @@ def updateNoteContent(request, noteid):
 # Update
 @api_view(['PUT'])
 def updateNoteTitle(request, noteid):
-    user = getUserID(request)
-    if type(user) is Response:
-        return user
     try:
-        note = Note.objects.get(id=noteid, user=user)
+        note = Note.objects.get(id=noteid, user=getUser(request))
         note.title = request.data['title']
         note.save()
 
@@ -148,15 +126,11 @@ def updateNoteTitle(request, noteid):
 # Create a URL
 @api_view(['POST'])
 def createNoteShareLink(request, noteid):
-    user = getUserID(request)
-    if type(user) is Response:
-        return user
-
-    # Check if the user requesting is the owner
     try:
         note = Note.objects.select_related('user').get(id=noteid)
         note_owner = note.user
-        if user == note_owner:
+        # Check if the user requesting is the owner
+        if getUser(request) == note_owner:
             rid = ''.join(random.choice(string.ascii_letters+"0123456789$")
                           for m in range(6))
             active = request.data['active'] if type(
@@ -234,10 +208,7 @@ def readNoteViaShareLink(request, permkey):
 # Read all share links for the note
 @api_view(['GET'])
 def getNoteShareLinks(request, noteid):
-    user = getUserID(request)
-    if type(user) is Response:
-        return user
-    links = ShareExternal.objects.filter(note=noteid, user=user).values(
+    links = ShareExternal.objects.filter(note=noteid, user=getUser(request)).values(
         'id', 'anonymous', 'created', 'title', 'active', 'password').order_by('-created')
 
     result = []
@@ -252,12 +223,9 @@ def getNoteShareLinks(request, noteid):
 # Disable a share link
 @api_view(['PUT'])
 def disableNoteShareLink(request):
-    user = getUserID(request)
-    if type(user) is Response:
-        return user
-
     try:
-        query = ShareExternal.objects.get(id=request.data['id'], user=user)
+        query = ShareExternal.objects.get(
+            id=request.data['id'], user=getUser(request))
         query.active = False
         query.save()
         return Response(data=successResponse(), status=status.HTTP_200_OK)

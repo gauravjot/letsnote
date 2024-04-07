@@ -18,7 +18,7 @@ class User(models.Model):
 
 class Verify(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    token = models.CharField(max_length=128)
+    token = models.CharField(max_length=64)
     created = models.DateTimeField()
     consumed = models.BooleanField(default=False)
 
@@ -27,7 +27,7 @@ class Verify(models.Model):
 
 
 class Session(models.Model):
-    token = models.CharField(max_length=128)
+    token = models.CharField(max_length=64)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     expire = models.IntegerField(default=MAX_SIGNIN_PERIOD)
     valid = models.BooleanField(default=True)
@@ -41,7 +41,7 @@ class Session(models.Model):
 
 class PasswordReset(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    token = models.CharField(max_length=128)
+    token = models.CharField(max_length=64)
     created = models.DateTimeField()
     consumed = models.BooleanField(default=False)
 

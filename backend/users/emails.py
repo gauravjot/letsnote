@@ -21,7 +21,7 @@ def sendEmailVerification(email, name, token):
                              from_email=from_email,
                              recipient_list=[email,],
                              connection=connection)
-    except SMTPDataError:
+    except Exception as e:
         return 0
 
 
@@ -40,7 +40,7 @@ def sendWelcomeEmailVerification(name, email, token):
                              from_email=from_email,
                              recipient_list=[email,],
                              connection=connection)
-    except SMTPDataError:
+    except Exception as e:
         return 0
 
 
@@ -63,7 +63,7 @@ def sendPasswordChangeEmail(request, name, email, when):
                              from_email=from_email,
                              recipient_list=[email,],
                              connection=connection)
-    except SMTPDataError:
+    except Exception as e:
         return 0
 
 
@@ -82,7 +82,7 @@ def sendPasswordResetEmail(email, name, token):
                              from_email=from_email,
                              recipient_list=[email,],
                              connection=connection)
-    except SMTPDataError:
+    except Exception as e:
         return 0
 
 
@@ -105,5 +105,5 @@ def sendAccountDeletedEmail(request, name, email, when):
                              from_email=from_email,
                              recipient_list=[email,],
                              connection=connection)
-    except SMTPDataError:
+    except Exception as e:
         return 0
