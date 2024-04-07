@@ -2,6 +2,29 @@ from pathlib import Path
 from decouple import config
 from django.core.mail import get_connection
 
+
+"""
+#################################################################
+#                                                               #
+#                       DJANGO SETTINGS                         #
+#             Possibly no need to change anything               #
+#                      Edit .env instead                        #
+#                                                               #
+#################################################################
+"""
+
+# Any URL in this list will not require authentication
+# All other will require user to be authentication
+NON_AUTH_URLS = [
+    '/api/user/register/',
+    '/api/user/login/',
+    '/api/user/password/forgot/',
+    '/api/user/password/reset/health/',
+    '/api/user/password/reset/',
+    '/api/user/verifyemail/resend/',
+    '/api/user/verifyemail/',
+]
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -56,13 +79,7 @@ REST_FRAMEWORK = {
 ALLOWED_HOSTS = ['*']
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "https://letsnote.io",
-    "https://www.letsnote.io",
-    "https://api.letsnote.io"
+    config('FRONTEND_URL', default='http://localhost:5173'),
 ]
 
 CORS_ALLOW_METHODS = (
@@ -92,16 +109,6 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
 SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=True, cast=bool)
 SECURE_FRAME_DENY = False
-
-NON_AUTH_URLS = [
-    '/api/user/register/',
-    '/api/user/login/',
-    '/api/user/password/forgot/',
-    '/api/user/password/reset/health/',
-    '/api/user/password/reset/',
-    '/api/user/verifyemail/resend/',
-    '/api/user/verifyemail/',
-]
 
 # Database
 
