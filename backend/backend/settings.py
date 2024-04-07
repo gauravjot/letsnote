@@ -114,12 +114,12 @@ SECURE_FRAME_DENY = False
 # Database
 def get_database():
     if config('DB_HOST', default=None) is None:
-        directory = Path(BASE_DIR.parent +
+        Path(str(BASE_DIR.parent) +
                          "/db").mkdir(parents=True, exist_ok=True)
         return {
             'default': {
                 'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': directory / 'db.sqlite3',
+                'NAME': BASE_DIR.parent / 'db' / 'db.sqlite3',
             }
         }
     else:
@@ -145,7 +145,7 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 
 def getEmailConnection():
-    if config('SMTP_USE_TLS') == 'True':
+    if config('SMTP_USE_TLS', default=True, cast=bool) == True:
         return get_connection(
             host=config('SMTP_HOST'),
             port=config('SMTP_PORT'),

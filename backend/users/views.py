@@ -75,7 +75,7 @@ def register(request):
             value=token,
             expires=expire*60,
             httponly=True,
-            secure=config('AUTH_COOKIE_SECURE', default=True),
+            secure=config('AUTH_COOKIE_SECURE', default=True, cast=bool),
             samesite=config('AUTH_COOKIE_SAMESITE', default='Strict'),
             domain=config('AUTH_COOKIE_DOMAIN', default='localhost')
         )
@@ -118,7 +118,7 @@ def login(request):
         value=token,
         expires=expire*60,
         httponly=True,
-        secure=config('AUTH_COOKIE_SECURE', default=True),
+        secure=config('AUTH_COOKIE_SECURE', default=True, cast=bool),
         samesite=config('AUTH_COOKIE_SAMESITE', default='Strict'),
         domain=config('AUTH_COOKIE_DOMAIN', default='localhost')
     )

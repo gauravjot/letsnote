@@ -25,9 +25,8 @@ RUN pip install -r /home/app/webapp/backend/requirements.txt
 
 # setup django server
 RUN cp /home/app/webapp/deploy/backend.env /home/app/webapp/backend/.env
-RUN cp /home/app/webapp/deploy/backend_settings.py /home/app/webapp/backend/backend/settings.py
-RUN echo "SECRET_KEY=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 64; echo)" >> .env
-RUN python manage.py migrate
+RUN echo "\nSECRET_KEY=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 64; echo)" >> .env
+RUN cat .env
 RUN python manage.py makemigrations notes users
 RUN python manage.py migrate
 
@@ -46,6 +45,7 @@ RUN apt-get update && apt-get install nodejs -y
 RUN npm install
 RUN npm run build
 RUN apt-get purge nodejs gnupg ca-certificates -y
+RUN apt autoremove
 
 # Supervisor and uWSGI setup
 WORKDIR /var/log/supervisor
