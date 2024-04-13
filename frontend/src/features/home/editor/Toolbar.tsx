@@ -49,16 +49,16 @@ function Toolbar({note}: {note: NoteType | null}) {
 	const closeEditNameDialog = () => setIsRenameDialogOpen(false);
 
 	return (
-		<div className="print:hidden">
+		<>
 			{isRenameDialogOpen && note && userToken && (
-				<div className="fixed inset-0 z-[100]">
+				<div className="fixed inset-0 z-[100] print:hidden">
 					<div className="fixed inset-0 bg-black/30 z-0" onClick={closeEditNameDialog}></div>
 					<div className="fixed inset-0 flex place-items-center justify-center z-[60]">
 						<TitleUpdateDialog note={note} closeFn={closeEditNameDialog} />
 					</div>
 				</div>
 			)}
-			<div className="top-0 z-30 sticky" id="toolbar">
+			<div className="top-0 z-30 sticky print:hidden" id="toolbar">
 				<div className="bg-gray-50 px-1 mt-1 shadow-md rounded ab-toolbar">
 					<div className="px-3 pt-1 ml-1 flex gap-2 place-items-center">
 						<div className="flex-1 flex gap-2 place-items-center">
@@ -178,7 +178,7 @@ function Toolbar({note}: {note: NoteType | null}) {
 					</div>
 				</div>
 			</div>
-		</div>
+		</>
 	);
 }
 

@@ -7,7 +7,8 @@ from datetime import datetime
 # RestFramework
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from users.permissions import HasSessionActive
 # Models & Serializers
 from .models import Note, ShareExternal
 from .serializers import NoteListSerializer, ShareExternalSerializer
@@ -20,6 +21,7 @@ from notes.utils import encrypt_note, decrypt_note, InvalidKeyException
 # Create a note
 # -----------------------------------------------
 @api_view(['POST'])
+@permission_classes([HasSessionActive])
 def createNote(request):
     try:
         # -- user data & hash password
@@ -42,6 +44,7 @@ def createNote(request):
 # Get all notes
 # -----------------------------------------------
 @api_view(['GET'])
+@permission_classes([HasSessionActive])
 def getUserNotes(request):
     try:
         notes = NoteListSerializer(Note.objects.filter(
@@ -54,6 +57,7 @@ def getUserNotes(request):
 # Read, update, delete a note
 # -----------------------------------------------
 @api_view(['GET', 'DELETE', 'PUT', 'POST'])
+@permission_classes([HasSessionActive])
 def noteOps(request, noteid):
     if request.method == 'GET':
         return readNote(request, noteid)
@@ -110,6 +114,7 @@ def updateNoteContent(request, noteid):
 
 # Update
 @api_view(['PUT'])
+@permission_classes([HasSessionActive])
 def updateNoteTitle(request, noteid):
     try:
         note = Note.objects.get(id=noteid, user=getUser(request))
@@ -125,6 +130,7 @@ def updateNoteTitle(request, noteid):
 # -----------------------------------------------
 # Create a URL
 @api_view(['POST'])
+@permission_classes([HasSessionActive])
 def createNoteShareLink(request, noteid):
     try:
         note = Note.objects.select_related('user').get(id=noteid)
@@ -207,6 +213,7 @@ def readNoteViaShareLink(request, permkey):
 
 # Read all share links for the note
 @api_view(['GET'])
+@permission_classes([HasSessionActive])
 def getNoteShareLinks(request, noteid):
     links = ShareExternal.objects.filter(note=noteid, user=getUser(request)).values(
         'id', 'anonymous', 'created', 'title', 'active', 'password').order_by('-created')
@@ -222,6 +229,7 @@ def getNoteShareLinks(request, noteid):
 
 # Disable a share link
 @api_view(['PUT'])
+@permission_classes([HasSessionActive])
 def disableNoteShareLink(request):
     try:
         query = ShareExternal.objects.get(

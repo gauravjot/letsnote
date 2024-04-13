@@ -13,18 +13,6 @@ from django.core.mail import get_connection
 #################################################################
 """
 
-# Any URL in this list will not require authentication
-# All other will require user to be authentication
-NON_AUTH_URLS = [
-    '/api/user/register/',
-    '/api/user/login/',
-    '/api/user/password/forgot/',
-    '/api/user/password/reset/health/',
-    '/api/user/password/reset/',
-    '/api/user/verifyemail/resend/',
-    '/api/user/verifyemail/',
-]
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -115,7 +103,7 @@ SECURE_FRAME_DENY = False
 def get_database():
     if config('DB_HOST', default=None) is None:
         Path(str(BASE_DIR.parent) +
-                         "/db").mkdir(parents=True, exist_ok=True)
+             "/db").mkdir(parents=True, exist_ok=True)
         return {
             'default': {
                 'ENGINE': 'django.db.backends.sqlite3',

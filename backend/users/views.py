@@ -8,7 +8,8 @@ from secrets import token_urlsafe
 # RestFramework
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from .permissions import HasSessionActive
 # Models & Serializers
 from .models import User, Verify, Session, PasswordReset
 from .serializers import UserSerializer, VerifySerializer, SessionSerializer, PasswordResetSerializer
@@ -128,6 +129,7 @@ def login(request):
 # Log Out function, requires token
 # -----------------------------------------------
 @api_view(['DELETE'])
+@permission_classes([HasSessionActive])
 def logout(request):
     # Invalidate the token
     dropSession(request)
@@ -165,6 +167,7 @@ def verifyEmail(request, emailtoken):
 # Get User Profile, requires token
 # -----------------------------------------------
 @api_view(['GET'])
+@permission_classes([HasSessionActive])
 def getUserProfile(request):
     session = getSesson(request)
     return Response(data=successResponse({"user": UserSerializer(
@@ -174,6 +177,7 @@ def getUserProfile(request):
 # Change Password, requires old password and new password
 # -----------------------------------------------
 @api_view(['PUT'])
+@permission_classes([HasSessionActive])
 def changePassword(request):
     session = getSesson(request)
     user = session.user
@@ -195,6 +199,7 @@ def changePassword(request):
 # Change Name, requires new name
 # -----------------------------------------------
 @api_view(['PUT'])
+@permission_classes([HasSessionActive])
 def changeName(request):
     user = getUser(request)
     if 'name' not in request.data:
@@ -208,6 +213,7 @@ def changeName(request):
 # Change Email, requires new email, password
 # -----------------------------------------------
 @api_view(['PUT'])
+@permission_classes([HasSessionActive])
 def changeEmail(request):
     user = getUser(request)
     # Check if email is not empty
@@ -258,6 +264,7 @@ def changeEmail(request):
 # Resend Verification Email if user is unverified
 # -----------------------------------------------
 @api_view(['POST'])
+@permission_classes([HasSessionActive])
 def resendVerifyEmail(request):
     user = getUser(request)
     if user.verified:
@@ -383,6 +390,7 @@ def passwordResetTokenHealthCheck(request, token):
 # Get User Sessions, requires token
 # -----------------------------------------------
 @api_view(['GET'])
+@permission_classes([HasSessionActive])
 def getUserSessions(request):
     user = getUser(request)
     sessionSerializer = SessionSerializer(
@@ -393,6 +401,7 @@ def getUserSessions(request):
 # Delete User, requires password
 # -----------------------------------------------
 @api_view(['PUT'])
+@permission_classes([HasSessionActive])
 def deleteUser(request):
     user = getUser(request)
     if 'password' in request.data and bcrypt.checkpw(request.data['password'].encode('utf-8'), user.password.encode('utf-8')):
@@ -406,6 +415,7 @@ def deleteUser(request):
 # Close Session, requires session_id
 # -----------------------------------------------
 @api_view(['PUT'])
+@permission_classes([HasSessionActive])
 def closeSession(request):
     user = getUser(request)
     try:
