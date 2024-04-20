@@ -1,9 +1,8 @@
 from django.core.mail import send_mail
 from .email_templates import welcomeEmailTemplate, emailChangedTemplate, passwordChangedTemplate, deleteAccountTemplate, passwordResetTemplate
-from smtplib import SMTPDataError
 from backend.settings import getEmailConnection
 from decouple import config
-from .session import getClientIP, getUserAgent
+from ..session import getClientIP, getUserAgent
 
 
 def sendEmailVerification(email, name, token):

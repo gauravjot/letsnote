@@ -60,7 +60,7 @@ export default function TitleUpdateDialog(props: IEditNoteNameDialogProps) {
 
 	return (
 		<>
-			<div className="max-w-[350px] py-4 px-5 w-4/5 bg-white rounded-2xl shadow-md relative z-10">
+			<div className="max-w-[380px] py-4 px-5 w-4/5 bg-white rounded-2xl shadow-md relative z-10">
 				<div className="flex justify-between place-items-center mb-3">
 					<h3 className="text-black select-none">Edit Note Title</h3>
 					<Button
@@ -75,9 +75,11 @@ export default function TitleUpdateDialog(props: IEditNoteNameDialogProps) {
 						onClick={closeDialog}
 					/>
 				</div>
-				<p className="text-sm font-medium text-gray-800 mb-px select-none">Selected Note</p>
-				<p className="text-sm text-gray-500">{props.note.title}</p>
-				<p className="text-sm text-gray-500">Updated on {dateTimePretty(props.note.updated)}</p>
+				<div className="mt-6 mb-4">
+					<p className="text-sm font-medium text-gray-800 mb-px select-none">Selected Note</p>
+					<p className="text-sm text-gray-500">{props.note.title}</p>
+					<p className="text-sm text-gray-500">Updated on {dateTimePretty(props.note.updated)}</p>
+				</div>
 				{error && <p className="text-sm text-red-600 bg-red-100 px-2 mt-3 py-1 rounded">{error}</p>}
 				{mutation.isSuccess && (
 					<p className="text-sm text-green-700 bg-green-100 px-2 py-1 mt-3 rounded flex place-items-center gap-2">
@@ -103,7 +105,6 @@ export default function TitleUpdateDialog(props: IEditNoteNameDialogProps) {
 								elementHookFormErrors={errors}
 								defaultValue={props.note.title}
 							/>
-
 							<Button
 								elementChildren="Save"
 								elementState={

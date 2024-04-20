@@ -17,7 +17,7 @@ from .serializers import UserSerializer, VerifySerializer, SessionSerializer, Pa
 from .session import issueToken, dropSession, getUser, getSesson
 # Utils
 from django.shortcuts import render
-from .emails import sendEmailVerification, sendWelcomeEmailVerification, sendPasswordChangeEmail, sendPasswordResetEmail, sendAccountDeletedEmail
+from .users_emails.emails import sendEmailVerification, sendWelcomeEmailVerification, sendPasswordChangeEmail, sendPasswordResetEmail, sendAccountDeletedEmail
 from backend.utils import errorResponse, successResponse, hashThis
 from decouple import config
 

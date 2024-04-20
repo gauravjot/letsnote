@@ -1,13 +1,21 @@
 import * as React from "react";
 import {Link} from "react-router-dom";
-import LoginRegister from "./LoginRegister";
 import SidebarUserSkeleton from "@/components/skeleton/SidebarUserSkeleton";
+import {UserContext} from "@/App";
+import Register from "./Register";
+import {ForgotPassword} from "./ForgotPassword";
+import Login from "./Login";
+import UserCard from "./UserCard";
 
 export interface ISidebarProps {
 	component: React.ReactNode;
 }
 
 export default function Sidebar(props: ISidebarProps) {
+	const userContext = React.useContext(UserContext);
+	const [showRegister, setShowRegister] = React.useState(false);
+	const [showForgotPassword, setShowForgotPassword] = React.useState(false);
+
 	return (
 		<div className="h-screen print:hidden max-h-screen overflow-y-auto min-w-0 w-full bg-white block border-r border-gray-300 border-solid sticky top-0">
 			<div className="py-5 px-4 border-b bg-white border-gray-300 shadow-smb sticky top-0 z-30">
@@ -38,7 +46,18 @@ export default function Sidebar(props: ISidebarProps) {
 				</div>
 			</div>
 			<React.Suspense fallback={<SidebarUserSkeleton />}>
-				<LoginRegister />
+				{userContext.user ? (
+					<UserCard user={userContext.user} />
+				) : showRegister ? (
+					<Register showRegister={setShowRegister} />
+				) : showForgotPassword ? (
+					<ForgotPassword switchToForgotPassword={setShowForgotPassword} />
+				) : (
+					<Login
+						switchToRegister={setShowRegister}
+						switchToForgotPassword={setShowForgotPassword}
+					/>
+				)}
 			</React.Suspense>
 			{props.component}
 		</div>

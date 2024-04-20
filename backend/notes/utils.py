@@ -1,6 +1,9 @@
 from Crypto.Cipher import AES
 import os
 import json
+from backend.settings import BASE_DIR
+
+KEY_PATH = os.path.join(BASE_DIR, 'keys', 'notes_key.bin')
 
 
 # define Python user-defined exceptions
@@ -11,7 +14,7 @@ class InvalidKeyException(Exception):
 
 def encrypt_note(note):
     # Get the key
-    with open(os.path.join(os.path.dirname(__file__), 'key.bin'), 'rb') as f:
+    with open(KEY_PATH, 'rb') as f:
         key = f.read()
 
     cipher = AES.new(key, AES.MODE_EAX)
@@ -24,7 +27,7 @@ def encrypt_note(note):
 
 def decrypt_note(encrypted_msg):
     # Get the key
-    with open(os.path.join(os.path.dirname(__file__), 'key.bin'), 'rb') as f:
+    with open(KEY_PATH, 'rb') as f:
         key = f.read()
     nonce, tag, ciphertext = encrypted_msg[:
                                            16], encrypted_msg[16:32], encrypted_msg[32:]

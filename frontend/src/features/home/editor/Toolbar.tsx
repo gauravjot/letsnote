@@ -6,7 +6,7 @@ import {
 	toggleBlockType,
 	toggleLinkAtSelection,
 	toggleStyle,
-} from "@/utils/EditorUtils";
+} from "./EditorUtils";
 
 import React, {useCallback, useContext} from "react";
 import {useSlateStatic} from "slate-react";

@@ -7,7 +7,7 @@ import "@/assets/css/editor.css";
 import useEditorConfig, {LinkEditor} from "@/hooks/useEditorConfig";
 
 import ExampleDocument, {SlateDocumentType, SlateNodeType} from "@/utils/ExampleDocument";
-import {identifyLinksInTextIfAny, isLinkNodeAtSelection} from "@/utils/EditorUtils";
+import {identifyLinksInTextIfAny, isLinkNodeAtSelection} from "./EditorUtils";
 import useSelection from "@/hooks/useSelection";
 import {NoteType} from "@/types/api";
 import {EditorToolbar} from "./Toolbar";

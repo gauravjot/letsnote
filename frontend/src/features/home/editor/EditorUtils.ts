@@ -276,7 +276,7 @@ function createLinkForRange(
 					children: [{text: linkText}],
 				} as CustomBaseElement,
 				range != null ? {at: range} : undefined
-			)
+		  )
 		: Transforms.wrapNodes(
 				editor,
 				{
@@ -285,5 +285,5 @@ function createLinkForRange(
 					children: [{text: linkText}],
 				} as CustomBaseElement,
 				{split: true, at: range || undefined}
-			);
+		  );
 }

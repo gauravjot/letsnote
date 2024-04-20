@@ -76,7 +76,7 @@ code {
 }
 
 .infomsg {
-	@apply opacity-0 hidden absolute max-w-6xl bg-slate-500 text-white;
+	@apply opacity-0 hidden absolute z-[100] max-w-6xl bg-slate-500 text-white;
 	@apply rounded px-1.5 py-0.5 text-xs font-medium;
 }
 

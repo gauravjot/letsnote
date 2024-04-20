@@ -1,6 +1,6 @@
 import {DefaultElement, ReactEditor} from "slate-react";
 import isHotkey from "is-hotkey";
-import {toggleStyle, insertContent, toggleBlockType} from "@/utils/EditorUtils";
+import {toggleStyle, insertContent, toggleBlockType} from "@/features/home/editor/EditorUtils";
 import {BaseEditor, Node} from "slate";
 import {Editor, Transforms} from "slate";
 import {useCallback, useState, useEffect, useRef} from "react";
