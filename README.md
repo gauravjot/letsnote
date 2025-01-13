@@ -1,6 +1,6 @@
-[![Letsnote.io](press/logo/logo_simple.png)](https://letsnote.io)
+[![Letsnote.io](press/logo/logo_simple.png)](https://letsnote.nzran.com)
 
-🖱 <https://letsnote.io>
+🖱 <https://letsnote.nzran.com>
 
 A rich text note-writing application. Letsnote's engine automatically saves notes and lets users share them with others.
 
